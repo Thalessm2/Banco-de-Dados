@@ -1,0 +1,285 @@
+CREATE DATABASE SkyLodge;
+USE SkyLodge;
+
+
+CREATE TABLE Hotel (
+    HotelID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(100) NOT NULL,
+    CNPJ CHAR(18) NOT NULL UNIQUE,
+    Endereco VARCHAR(150) NOT NULL,
+    Cidade VARCHAR(50),
+    Estado CHAR(2),
+    CEP CHAR(9),
+    Telefone VARCHAR(20),
+    Email VARCHAR(100),
+    Site VARCHAR(100)
+);
+
+
+CREATE TABLE Funcionarios (
+    FuncionariosID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(100) NOT NULL,
+    CPF CHAR(14) UNIQUE,
+    Email VARCHAR(100),
+    Telefone VARCHAR(20),
+    Endereco VARCHAR(150),
+    Cargo VARCHAR(50),
+    Salario DECIMAL(10,2)
+);
+
+
+CREATE TABLE Clientes (
+    ClientesID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(100) NOT NULL,
+    CPF CHAR(14) UNIQUE,
+    Email VARCHAR(100),
+    Telefone VARCHAR(20),
+    Endereco VARCHAR(150)
+);
+
+
+CREATE TABLE Categoria (
+    CategoriaID INT PRIMARY KEY AUTO_INCREMENT,
+    NomeCategoria VARCHAR(50) NOT NULL,
+    ValorDiaria DECIMAL(10,2) NOT NULL
+);
+
+
+CREATE TABLE Quartos (
+    QuartosID INT PRIMARY KEY AUTO_INCREMENT,
+    Numero INT UNIQUE NOT NULL,
+    Ocupado BOOLEAN DEFAULT FALSE,
+    CategoriaID INT NOT NULL,
+    FOREIGN KEY (CategoriaID)
+        REFERENCES Categoria(CategoriaID)
+);
+
+
+CREATE TABLE Cadastro (
+    CadastroID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(100) NOT NULL,
+    CPF CHAR(14) UNIQUE,
+    Email VARCHAR(100),
+    Telefone VARCHAR(20),
+    Endereco VARCHAR(150),
+    DataCadastro DATE
+);
+
+
+CREATE TABLE Consumos (
+    ConsumosID INT PRIMARY KEY AUTO_INCREMENT,
+    Descricao VARCHAR(100),
+    Valor DECIMAL(10,2),
+    DataConsumo DATE
+);
+
+
+CREATE TABLE Recepcao (
+    RecepcaoID INT PRIMARY KEY AUTO_INCREMENT,
+    FuncionariosID INT NOT NULL,
+    CadastroID INT NOT NULL,
+    ConsumosID INT NOT NULL,
+    FOREIGN KEY (FuncionariosID)
+        REFERENCES Funcionarios(FuncionariosID),
+    FOREIGN KEY (CadastroID)
+        REFERENCES Cadastro(CadastroID),
+    FOREIGN KEY (ConsumosID)
+        REFERENCES Consumos(ConsumosID)
+);
+
+
+CREATE TABLE Check_in (
+    Check_inID INT PRIMARY KEY AUTO_INCREMENT,
+    Agendamento DATE NOT NULL,
+    ClientesID INT NOT NULL,
+    FOREIGN KEY (ClientesID)
+        REFERENCES Clientes(ClientesID)
+);
+
+
+CREATE TABLE Check_out (
+    Check_outID INT PRIMARY KEY AUTO_INCREMENT,
+    DataDeFinalizacao DATE NOT NULL,
+    ClientesID INT NOT NULL,
+    FOREIGN KEY (ClientesID)
+        REFERENCES Clientes(ClientesID)
+);
+
+ALTER TABLE Hotel
+ADD DataCriacao DATE;
+
+ALTER TABLE Funcionarios
+ADD Status VARCHAR(20) DEFAULT 'Ativo';
+
+ALTER TABLE Clientes
+MODIFY Telefone VARCHAR(25);
+
+ALTER TABLE Categoria
+ADD Capacidade INT;
+
+ALTER TABLE Quartos
+ADD HotelID INT,
+ADD FOREIGN KEY (HotelID) REFERENCES Hotel(HotelID);
+
+ALTER TABLE Check_out
+ADD FormaPagamento VARCHAR(50);
+
+ALTER TABLE Check_in
+CHANGE Agendamento DataCheckIn DATE NOT NULL;
+
+INSERT INTO Hotel (Nome, CNPJ, Endereco, Cidade, Estado, CEP, Telefone, Email, Site, DataCriacao)
+VALUES 
+('SkyLodge Premium', '12.345.678/0001-90', 'Av. Central, 1000', 'Belo Horizonte', 'MG', '30000-000', '(31)99999-0000', 'contato@skylodge.com', 'www.skylodge.com', '2024-01-01');
+
+INSERT INTO Funcionarios (Nome, CPF, Email, Telefone, Endereco, Cargo, Salario, Status)
+VALUES
+('Carlos Silva', '123.456.789-00', 'carlos@skylodge.com', '(31)98888-1111', 'Rua A, 123', 'Recepcionista', 2500.00, 'Ativo'),
+('Ana Souza', '987.654.321-00', 'ana@skylodge.com', '(31)97777-2222', 'Rua B, 456', 'Gerente', 5000.00, 'Ativo');
+
+INSERT INTO Clientes (Nome, CPF, Email, Telefone, Endereco)
+VALUES
+('João Pedro', '111.222.333-44', 'joao@email.com', '(31)96666-3333', 'Rua C, 789'),
+('Maria Clara', '555.666.777-88', 'maria@email.com', '(31)95555-4444', 'Rua D, 101');
+
+INSERT INTO Categoria (NomeCategoria, ValorDiaria, Capacidade)
+VALUES
+('Luxo', 350.00, 4),
+('Standard', 150.00, 2);
+
+INSERT INTO Quartos (Numero, Ocupado, CategoriaID, HotelID)
+VALUES
+(101, FALSE, 1, 1),
+(102, TRUE, 2, 1);
+
+INSERT INTO Cadastro (Nome, CPF, Email, Telefone, Endereco, DataCadastro)
+VALUES
+('Lucas Mendes', '222.333.444-55', 'lucas@email.com', '(31)94444-5555', 'Rua E, 202', '2025-07-01');
+
+INSERT INTO Consumos (Descricao, Valor, DataConsumo)
+VALUES
+('Refrigerante', 8.50, '2025-07-02'),
+('Jantar', 45.00, '2025-07-02');
+
+INSERT INTO Recepcao (FuncionariosID, CadastroID, ConsumosID)
+VALUES
+(1, 1, 1),
+(2, 1, 2);
+
+INSERT INTO Check_in (DataCheckIn, ClientesID)
+VALUES
+('2025-07-01', 1),
+('2025-07-03', 2);
+
+INSERT INTO Check_out (DataDeFinalizacao, ClientesID, FormaPagamento)
+VALUES
+('2025-07-05', 1, 'Cartão de Crédito'),
+('2025-07-06', 2, 'Dinheiro');
+
+-- 1. Check-in com dados do cliente
+-- Regra: visualizar entradas no hotel com identificação do cliente
+
+DELIMITER $$
+
+CREATE PROCEDURE CheckInClientes()
+BEGIN
+    SELECT ci.Check_inID, ci.DataCheckIn, c.Nome, c.CPF
+    FROM Check_in ci
+    INNER JOIN Clientes c ON ci.ClientesID = c.ClientesID;
+END $$
+
+DELIMITER ;
+
+-- 2. Check-out com cliente
+-- Regra: controlar saídas e forma de pagamento
+
+DELIMITER $$
+
+CREATE PROCEDURE CheckOutClientes()
+BEGIN
+    SELECT co.Check_outID, co.DataDeFinalizacao, c.Nome, co.FormaPagamento
+    FROM Check_out co
+    INNER JOIN Clientes c ON co.ClientesID = c.ClientesID;
+END $$
+
+DELIMITER ;
+
+-- 3. Quartos com categoria
+-- Regra: mostrar tipo de quarto e valor
+
+DELIMITER $$
+
+CREATE PROCEDURE QuartosCategoria()
+BEGIN
+    SELECT q.Numero, q.Ocupado, cat.NomeCategoria, cat.ValorDiaria
+    FROM Quartos q
+    INNER JOIN Categoria cat ON q.CategoriaID = cat.CategoriaID;
+END $$
+
+DELIMITER ;
+
+-- 4. Quartos com hotel
+-- Regra: visualizar estrutura do hotel
+
+DELIMITER $$
+
+CREATE PROCEDURE QuartosHotel()
+BEGIN
+    SELECT q.Numero, h.Nome AS Hotel, h.Cidade
+    FROM Quartos q
+    INNER JOIN Hotel h ON q.HotelID = h.HotelID;
+END $$
+
+DELIMITER ;
+
+-- 5. Recepção completa
+-- Regra: integrar funcionário + cadastro + consumo
+
+DELIMITER $$
+
+CREATE PROCEDURE RecepcaoCompleta()
+BEGIN
+    SELECT f.Nome AS Funcionario,
+           c.Nome AS Cliente,
+           cons.Descricao,
+           cons.Valor
+    FROM Recepcao r
+    INNER JOIN Funcionarios f ON r.FuncionariosID = f.FuncionariosID
+    INNER JOIN Cadastro c ON r.CadastroID = c.CadastroID
+    INNER JOIN Consumos cons ON r.ConsumosID = cons.ConsumosID;
+END $$
+
+DELIMITER ;
+
+-- 6. Consumo total por cliente
+-- Regra: calcular gastos durante estadia
+
+DELIMITER $$
+
+CREATE PROCEDURE ConsumoPorCliente()
+BEGIN
+    SELECT c.Nome, SUM(cons.Valor) AS TotalGasto
+    FROM Recepcao r
+    INNER JOIN Cadastro c ON r.CadastroID = c.CadastroID
+    INNER JOIN Consumos cons ON r.ConsumosID = cons.ConsumosID
+    GROUP BY c.CadastroID;
+END $$
+
+DELIMITER ;
+
+-- 7. Clientes com check-in e check-out
+-- Regra: histórico completo da estadia
+
+DELIMITER $$
+
+CREATE PROCEDURE HistoricoClientes()
+BEGIN
+    SELECT c.Nome,
+           ci.DataCheckIn,
+           co.DataDeFinalizacao
+    FROM Clientes c
+    INNER JOIN Check_in ci ON c.ClientesID = ci.ClientesID
+    INNER JOIN Check_out co ON c.ClientesID = co.ClientesID;
+END $$
+
+DELIMITER ;
+
