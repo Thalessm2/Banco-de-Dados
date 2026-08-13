@@ -1,0 +1,274 @@
+CREATE DATABASE IronFit;
+USE IronFit;
+
+CREATE TABLE Membros (
+MembroID INT PRIMARY KEY AUTO_INCREMENT,
+Nome VARCHAR(100) NOT NULL,
+DataNascimento DATE,
+Sexo CHAR(1),
+Telefone VARCHAR(20),
+Email VARCHAR(100) UNIQUE,
+Endereco VARCHAR(150),
+DataCadastro DATE NOT NULL
+);
+
+CREATE TABLE Planos (
+PlanoID INT PRIMARY KEY AUTO_INCREMENT,
+NomePlano VARCHAR(50) NOT NULL,
+DuracaoMeses INT NOT NULL,
+Valor DECIMAL(10,2) NOT NULL,
+Beneficios VARCHAR(255)
+);
+
+CREATE TABLE Subscricoes (
+SubscricaoID INT PRIMARY KEY AUTO_INCREMENT,
+MembroID INT NOT NULL,
+PlanoID INT NOT NULL,
+DataInicio DATE NOT NULL,
+DataFim DATE NOT NULL,
+Status VARCHAR(20),
+FOREIGN KEY (MembroID) REFERENCES Membros(MembroID),
+FOREIGN KEY (PlanoID) REFERENCES Planos(PlanoID)
+);
+
+CREATE TABLE PersonalTrainers (
+TrainerID INT PRIMARY KEY AUTO_INCREMENT,
+Nome VARCHAR(100) NOT NULL,
+Especialidade VARCHAR(100),
+Telefone VARCHAR(20),
+Email VARCHAR(100),
+Salario DECIMAL(10,2)
+);
+
+CREATE TABLE AvaliacoesFisicas (
+AvaliacaoID INT PRIMARY KEY AUTO_INCREMENT,
+MembroID INT NOT NULL,
+TrainerID INT NOT NULL,
+DataAvaliacao DATE NOT NULL,
+Peso DECIMAL(5,2),
+Altura DECIMAL(4,2),
+PercentualGordura DECIMAL(5,2),
+Observacoes VARCHAR(255),
+FOREIGN KEY (MembroID) REFERENCES Membros(MembroID),
+FOREIGN KEY (TrainerID) REFERENCES PersonalTrainers(TrainerID)
+);
+
+CREATE TABLE AulasGrupo (
+AulaID INT PRIMARY KEY AUTO_INCREMENT,
+NomeAula VARCHAR(100) NOT NULL,
+TrainerID INT NOT NULL,
+DataAula DATE,
+Hora TIME,
+DuracaoMinutos INT,
+Capacidade INT,
+FOREIGN KEY (TrainerID) REFERENCES PersonalTrainers(TrainerID)
+);
+
+CREATE TABLE MarcacoesAulas (
+MarcacaoID INT PRIMARY KEY AUTO_INCREMENT,
+MembroID INT NOT NULL,
+AulaID INT NOT NULL,
+DataMarcacao DATE,
+Presenca BOOLEAN DEFAULT FALSE,
+FOREIGN KEY (MembroID) REFERENCES Membros(MembroID),
+FOREIGN KEY (AulaID) REFERENCES AulasGrupo(AulaID)
+);
+
+CREATE TABLE SessoesPersonal (
+SessaoID INT PRIMARY KEY AUTO_INCREMENT,
+MembroID INT NOT NULL,
+TrainerID INT NOT NULL,
+DataSessao DATE,
+Hora TIME,
+DuracaoMinutos INT,
+Status VARCHAR(20),
+FOREIGN KEY (MembroID) REFERENCES Membros(MembroID),
+FOREIGN KEY (TrainerID) REFERENCES PersonalTrainers(TrainerID)
+);
+
+ALTER TABLE Membros
+ADD CPF VARCHAR(11);
+
+ALTER TABLE Planos
+ADD TipoPlano VARCHAR(30);
+
+ALTER TABLE Subscricoes
+ADD FormaPagamento VARCHAR(30);
+
+ALTER TABLE PersonalTrainers
+ADD CREF VARCHAR(20);
+
+ALTER TABLE AvaliacoesFisicas
+ADD IMC DECIMAL(5,2);
+
+ALTER TABLE AulasGrupo
+ADD Sala VARCHAR(30);
+
+ALTER TABLE SessoesPersonal
+ADD ObjetivoTreino VARCHAR(100);
+USE IronFit;
+
+INSERT INTO Membros
+(Nome, DataNascimento, Sexo, Telefone, Email, Endereco, DataCadastro, CPF)
+VALUES
+('João Silva','1998-05-12','M','31999990001','joao@email.com','Rua A, 100','2026-01-10','11111111111'),
+('Maria Oliveira','1995-08-20','F','31999990002','maria@email.com','Rua B, 200','2026-01-15','22222222222'),
+('Pedro Santos','2000-03-18','M','31999990003','pedro@email.com','Rua C, 300','2026-02-01','33333333333'),
+('Ana Costa','1997-10-25','F','31999990004','ana@email.com','Rua D, 400','2026-02-05','44444444444'),
+('Lucas Pereira','1999-12-30','M','31999990005','lucas@email.com','Rua E, 500','2026-02-10','55555555555');
+
+INSERT INTO Planos
+(NomePlano, DuracaoMeses, Valor, Beneficios, TipoPlano)
+VALUES
+('Mensal',1,99.90,'Acesso à academia','Básico'),
+('Trimestral',3,269.90,'Academia + Avaliação Física','Intermediário'),
+('Semestral',6,499.90,'Academia + Aulas','Premium'),
+('Anual',12,899.90,'Todos os benefícios','Premium'),
+('VIP',12,1299.90,'Academia + Personal','VIP');
+
+INSERT INTO PersonalTrainers
+(Nome, Especialidade, Telefone, Email, Salario, CREF)
+VALUES
+('Carlos Mendes','Musculação','31988880001','carlos@ironfit.com',4500.00,'CREF001'),
+('Fernanda Lima','CrossFit','31988880002','fernanda@ironfit.com',4700.00,'CREF002'),
+('Ricardo Alves','Emagrecimento','31988880003','ricardo@ironfit.com',4300.00,'CREF003'),
+('Juliana Souza','Pilates','31988880004','juliana@ironfit.com',4200.00,'CREF004'),
+('Bruno Rocha','Funcional','31988880005','bruno@ironfit.com',4600.00,'CREF005');
+
+INSERT INTO Subscricoes
+(MembroID, PlanoID, DataInicio, DataFim, Status, FormaPagamento)
+VALUES
+(1,1,'2026-01-10','2026-02-10','Ativa','Cartão'),
+(2,2,'2026-01-15','2026-04-15','Ativa','PIX'),
+(3,3,'2026-02-01','2026-08-01','Ativa','Boleto'),
+(4,4,'2026-02-05','2027-02-05','Ativa','Cartão'),
+(5,5,'2026-02-10','2027-02-10','Ativa','PIX');
+
+INSERT INTO AvaliacoesFisicas
+(MembroID, TrainerID, DataAvaliacao, Peso, Altura, PercentualGordura, Observacoes, IMC)
+VALUES
+(1,1,'2026-01-12',78.5,1.78,18.5,'Bom condicionamento',24.8),
+(2,2,'2026-01-18',62.0,1.65,22.0,'Objetivo: ganho de massa',22.8),
+(3,3,'2026-02-03',85.2,1.82,24.5,'Treino de emagrecimento',25.7),
+(4,4,'2026-02-06',58.7,1.60,20.1,'Boa flexibilidade',22.9),
+(5,5,'2026-02-12',90.0,1.85,27.0,'Melhorar resistência',26.3);
+
+INSERT INTO AulasGrupo
+(NomeAula, TrainerID, DataAula, Hora, DuracaoMinutos, Capacidade, Sala)
+VALUES
+('CrossFit',2,'2026-07-15','08:00:00',60,20,'Sala A'),
+('Pilates',4,'2026-07-15','10:00:00',50,15,'Sala B'),
+('Funcional',5,'2026-07-16','18:00:00',60,25,'Sala C'),
+('Musculação Avançada',1,'2026-07-17','19:00:00',90,30,'Sala D'),
+('HIIT',3,'2026-07-18','17:00:00',45,20,'Sala E');
+
+INSERT INTO MarcacoesAulas
+(MembroID, AulaID, DataMarcacao, Presenca)
+VALUES
+(1,1,'2026-07-10',TRUE),
+(2,2,'2026-07-10',FALSE),
+(3,3,'2026-07-11',TRUE),
+(4,4,'2026-07-11',TRUE),
+(5,5,'2026-07-12',FALSE);
+
+INSERT INTO SessoesPersonal
+(MembroID, TrainerID, DataSessao, Hora, DuracaoMinutos, Status, ObjetivoTreino)
+VALUES
+(1,1,'2026-07-20','09:00:00',60,'Agendada','Hipertrofia'),
+(2,2,'2026-07-20','10:00:00',60,'Concluída','Condicionamento'),
+(3,3,'2026-07-21','14:00:00',45,'Agendada','Emagrecimento'),
+(4,4,'2026-07-21','16:00:00',60,'Cancelada','Flexibilidade'),
+(5,5,'2026-07-22','18:00:00',60,'Agendada','Resistência');
+
+-- 1. Listar todos os membros ativos (com subscrição válida)
+DELIMITER $$
+
+CREATE PROCEDURE ListarMembrosAtivos()
+BEGIN
+    SELECT m.Nome, s.Status, s.DataFim
+    FROM Membros m
+    INNER JOIN Subscricoes s ON m.MembroID = s.MembroID
+    WHERE s.Status = 'Ativa';
+END $$
+
+DELIMITER ;
+
+-- 2. Buscar histórico de avaliações físicas de um membro
+DELIMITER $$
+
+CREATE PROCEDURE HistoricoAvaliacoes(IN idMembro INT)
+BEGIN
+    SELECT DataAvaliacao, Peso, Altura, IMC
+    FROM AvaliacoesFisicas
+    WHERE MembroID = idMembro
+    ORDER BY DataAvaliacao DESC;
+END $$
+
+DELIMITER ;
+
+-- 3. Listar aulas disponíveis com informações do treinador
+DELIMITER $$
+
+CREATE PROCEDURE ListarAulas()
+BEGIN
+    SELECT a.NomeAula, a.DataAula, a.Hora, a.Capacidade, t.Nome AS Trainer
+    FROM AulasGrupo a
+    INNER JOIN PersonalTrainers t ON a.TrainerID = t.TrainerID;
+END $$
+
+DELIMITER ;
+
+-- 4. Verificar sessões de personal de um membro
+DELIMITER $$
+
+CREATE PROCEDURE SessoesPorMembro(IN idMembro INT)
+BEGIN
+    SELECT s.DataSessao, s.Hora, s.Status, t.Nome AS Trainer
+    FROM SessoesPersonal s
+    INNER JOIN PersonalTrainers t ON s.TrainerID = t.TrainerID
+    WHERE s.MembroID = idMembro;
+END $$
+
+DELIMITER ;
+
+-- 5. Calcular faturamento total dos planos
+DELIMITER $$
+
+CREATE PROCEDURE FaturamentoTotal()
+BEGIN
+    SELECT SUM(p.Valor) AS TotalFaturado
+    FROM Subscricoes s
+    INNER JOIN Planos p ON s.PlanoID = p.PlanoID
+    WHERE s.Status = 'Ativa';
+END $$
+
+DELIMITER ;
+
+-- 6. Listar membros por plano
+DELIMITER $$
+
+CREATE PROCEDURE MembrosPorPlano(IN idPlano INT)
+BEGIN
+    SELECT m.Nome, p.NomePlano
+    FROM Membros m
+    INNER JOIN Subscricoes s ON m.MembroID = s.MembroID
+    INNER JOIN Planos p ON s.PlanoID = p.PlanoID
+    WHERE p.PlanoID = idPlano;
+END $$
+
+DELIMITER ;
+
+-- 7. Verificar lotação de aulas (quantos inscritos vs capacidade)
+DELIMITER $$
+
+CREATE PROCEDURE LotacaoAulas()
+BEGIN
+    SELECT 
+        a.NomeAula,
+        a.Capacidade,
+        COUNT(ma.MarcacaoID) AS Inscritos
+    FROM AulasGrupo a
+    LEFT JOIN MarcacoesAulas ma ON a.AulaID = ma.AulaID
+    GROUP BY a.AulaID;
+END $$
+DELIMITER ;
