@@ -1,0 +1,1886 @@
+CREATE DATABASE TuneStream;
+USE TuneStream;
+
+CREATE TABLE Plan (
+PlanID INT AUTO_INCREMENT PRIMARY KEY,
+PlanName ENUM ('free','premium') NOT NULL,
+Price DECIMAL(10,2)
+);
+
+CREATE TABLE _User (
+UserID INT AUTO_INCREMENT PRIMARY KEY,
+UserName VARCHAR(100) NOT NULL,
+Email VARCHAR(100) NOT NULL,
+CONSTRAINT uc_email UNIQUE (Email),
+UsersPassword VARCHAR(255) NOT NULL,
+DateOfBirth DATE,
+Phone VARCHAR(20),
+CONSTRAINT uc_phone UNIQUE (Phone)
+);
+
+CREATE TABLE Artist (
+ArtistID INT AUTO_INCREMENT PRIMARY KEY,
+StageName VARCHAR(100) NOT NULL,
+RealName VARCHAR(100),
+Country VARCHAR(50),
+MusicGenre ENUM('Pop','Rock','Hip Hop','Rap','R&B','Soul','Funk','Disco','Jazz','Blues','Country','Folk','Reggae','Ska','Dub','Dancehall','Latin','Salsa','Merengue','Bachata','Tango','Samba','Pagode','Forró','Sertanejo','MPB','Bossa Nova','Axé','Frevo','Maracatu','Gospel','Christian','Classical','Opera','Instrumental','Electronic','House','Deep House','Tech House','Techno','Trance','Progressive House','Drum and Bass','Dubstep','Hardstyle','EDM','Ambient','Lo-fi','Synthwave','New Age','K-Pop','J-Pop','C-Pop','Metal','Heavy Metal','Thrash Metal','Death Metal','Black Metal','Power Metal','Progressive Metal','Metalcore','Hard Rock','Punk','Pop Punk','Alternative Rock','Indie Rock','Grunge','Emo','Alternative','Indie','Psychedelic Rock','Glam Rock','Rockabilly','Bluegrass','Afrobeat','Afropop','Trap','Drill','Grime','Phonk','Reggaeton','Moombahton','World Music','Children','Holiday','Soundtrack','Anime','Game Soundtrack','Comedy','Spoken Word','Podcast','Other'),
+Email VARCHAR(100) NOT NULL,
+CONSTRAINT uc_email UNIQUE (Email),
+Phone VARCHAR(20),
+CONSTRAINT uc_phone UNIQUE (Phone)
+);
+
+CREATE TABLE Album (
+AlbumID INT AUTO_INCREMENT PRIMARY KEY,
+Title VARCHAR(100) NOT NULL,
+ReleaseDate DATE,
+Genre ENUM('Pop','Rock','Hip Hop','Rap','R&B','Soul','Funk','Disco','Jazz','Blues','Country','Folk','Reggae','Ska','Dub','Dancehall','Latin','Salsa','Merengue','Bachata','Tango','Samba','Pagode','Forró','Sertanejo','MPB','Bossa Nova','Axé','Frevo','Maracatu','Gospel','Christian','Classical','Opera','Instrumental','Electronic','House','Deep House','Tech House','Techno','Trance','Progressive House','Drum and Bass','Dubstep','Hardstyle','EDM','Ambient','Lo-fi','Synthwave','New Age','K-Pop','J-Pop','C-Pop','Metal','Heavy Metal','Thrash Metal','Death Metal','Black Metal','Power Metal','Progressive Metal','Metalcore','Hard Rock','Punk','Pop Punk','Alternative Rock','Indie Rock','Grunge','Emo','Alternative','Indie','Psychedelic Rock','Glam Rock','Rockabilly','Bluegrass','Afrobeat','Afropop','Trap','Drill','Grime','Phonk','Reggaeton','Moombahton','World Music','Children','Holiday','Soundtrack','Anime','Game Soundtrack','Comedy','Spoken Word','Podcast','Other')
+);
+
+CREATE TABLE Song (
+SongID INT AUTO_INCREMENT PRIMARY KEY,
+Title VARCHAR(100) NOT NULL,
+Duration TIME,
+Genre ENUM('Pop','Rock','Hip Hop','Rap','R&B','Soul','Funk','Disco','Jazz','Blues','Country','Folk','Reggae','Ska','Dub','Dancehall','Latin','Salsa','Merengue','Bachata','Tango','Samba','Pagode','Forró','Sertanejo','MPB','Bossa Nova','Axé','Frevo','Maracatu','Gospel','Christian','Classical','Opera','Instrumental','Electronic','House','Deep House','Tech House','Techno','Trance','Progressive House','Drum and Bass','Dubstep','Hardstyle','EDM','Ambient','Lo-fi','Synthwave','New Age','K-Pop','J-Pop','C-Pop','Metal','Heavy Metal','Thrash Metal','Death Metal','Black Metal','Power Metal','Progressive Metal','Metalcore','Hard Rock','Punk','Pop Punk','Alternative Rock','Indie Rock','Grunge','Emo','Alternative','Indie','Psychedelic Rock','Glam Rock','Rockabilly','Bluegrass','Afrobeat','Afropop','Trap','Drill','Grime','Phonk','Reggaeton','Moombahton','World Music','Children','Holiday','Soundtrack','Anime','Game Soundtrack','Comedy','Spoken Word','Podcast','Other')
+);
+
+CREATE TABLE Podcast (
+PodcastID INT AUTO_INCREMENT PRIMARY KEY,
+Title VARCHAR(100),
+DescriptionPodcasts TEXT,
+Category VARCHAR(50),
+Creator VARCHAR(100)
+);
+
+CREATE TABLE Episode(
+EpisodeID INT AUTO_INCREMENT PRIMARY KEY,
+Title VARCHAR(100),
+DescriptionEpisodes TEXT,
+Duration TIME,
+PublicationDate DATE,
+PodcastID INT,
+    FOREIGN KEY (PodcastID)
+     REFERENCES Podcast(PodcastID)
+);
+
+CREATE TABLE Playlist (
+PlaylistID INT AUTO_INCREMENT PRIMARY KEY,
+PlaylistName VARCHAR(100),
+CreationDate DATE,
+Public BOOLEAN,
+UserID INT,
+    FOREIGN KEY (UserID)
+    REFERENCES _User(UserID)
+);
+
+CREATE TABLE PlaylistSongs (
+PlaylistSongsID INT AUTO_INCREMENT PRIMARY KEY,
+DateAdded DATE,
+PlaylistID INT,
+SongID INT,
+    FOREIGN KEY (PlaylistID)
+     REFERENCES Playlist(PlaylistID),
+    FOREIGN KEY (SongID)
+     REFERENCES Song(SongID)
+);
+
+CREATE TABLE PodcastHistory (
+HistoryID INT AUTO_INCREMENT PRIMARY KEY,
+PlaybackDate DATETIME,
+ListeningTime TIME,
+UserID INT,
+EpisodeID INT,
+    FOREIGN KEY (UserID)
+     REFERENCES _User(UserID),
+    FOREIGN KEY (EpisodeID)
+     REFERENCES Episode(EpisodeID)
+);
+
+CREATE TABLE Subscription (
+SubscriptionID INT AUTO_INCREMENT PRIMARY KEY,
+StartDate DATE,
+EndDate DATE,
+StatusSubscriptions VARCHAR(30),
+UserID INT,
+PlanID INT,
+    FOREIGN KEY (UserID)
+     REFERENCES _User(UserID),
+    FOREIGN KEY (PlanID)
+     REFERENCES Plan(PlanID)
+);
+
+CREATE TABLE Payment (
+PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+Amount DECIMAL(10,2),
+PaymentMethod VARCHAR(30),
+PaymentDate DATE,
+StatusPayments VARCHAR(30),
+SubscriptionID INT,
+    FOREIGN KEY (SubscriptionID)
+    REFERENCES Subscription(SubscriptionID)
+);
+
+CREATE TABLE Royaltie (
+RoyaltyID INT AUTO_INCREMENT PRIMARY KEY,
+ReferenceMonth DATE,
+TotalStreams INT,
+AmountPaid DECIMAL(10,2),
+PaymentDate DATE,
+ArtistID INT,
+    FOREIGN KEY (ArtistID)
+    REFERENCES Artist(ArtistID)
+);
+
+ALTER TABLE Plan
+ADD COLUMN PlanDescription VARCHAR(255) NULL;
+
+ALTER TABLE _User
+ADD COLUMN Country VARCHAR(50) NULL;
+
+ALTER TABLE Artist
+ADD COLUMN Biography TEXT NULL;
+
+ALTER TABLE Album
+ADD COLUMN AlbumDescription TEXT NULL;
+
+ALTER TABLE Song
+ADD COLUMN IsExplicit BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE Podcast
+ADD COLUMN Language VARCHAR(30) NULL;
+
+ALTER TABLE Episode
+ADD COLUMN EpisodeNumber INT NULL;
+
+ALTER TABLE Playlist
+ADD COLUMN UpdatedAt DATETIME NULL;
+
+ALTER TABLE PlaylistSongs
+ADD COLUMN AddedByUserID INT NULL;
+
+ALTER TABLE PodcastHistory
+ADD COLUMN DeviceType VARCHAR(50) NULL;
+
+ALTER TABLE Subscription
+ADD COLUMN AutoRenew BOOLEAN NOT NULL DEFAULT TRUE;
+
+ALTER TABLE Payment
+ADD COLUMN TransactionReference VARCHAR(100) NULL;
+
+ALTER TABLE Royaltie
+ADD COLUMN Notes VARCHAR(255) NULL;
+
+USE TuneStream;
+ 
+-- =========================
+-- Plan
+-- =========================
+INSERT INTO Plan (PlanName, Price, PlanDescription) VALUES
+('free', 0.00, 'Variação de plano free #1 com condições promocionais específicas'),
+('premium', 22.69, 'Variação de plano premium #2 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #3 com condições promocionais específicas'),
+('premium', 10.40, 'Variação de plano premium #4 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #5 com condições promocionais específicas'),
+('premium', 15.40, 'Variação de plano premium #6 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #7 com condições promocionais específicas'),
+('premium', 14.36, 'Variação de plano premium #8 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #9 com condições promocionais específicas'),
+('premium', 24.63, 'Variação de plano premium #10 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #11 com condições promocionais específicas'),
+('premium', 23.43, 'Variação de plano premium #12 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #13 com condições promocionais específicas'),
+('premium', 27.74, 'Variação de plano premium #14 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #15 com condições promocionais específicas'),
+('premium', 11.64, 'Variação de plano premium #16 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #17 com condições promocionais específicas'),
+('premium', 18.34, 'Variação de plano premium #18 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #19 com condições promocionais específicas'),
+('premium', 10.50, 'Variação de plano premium #20 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #21 com condições promocionais específicas'),
+('premium', 14.27, 'Variação de plano premium #22 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #23 com condições promocionais específicas'),
+('premium', 20.01, 'Variação de plano premium #24 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #25 com condições promocionais específicas'),
+('premium', 10.43, 'Variação de plano premium #26 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #27 com condições promocionais específicas'),
+('premium', 13.88, 'Variação de plano premium #28 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #29 com condições promocionais específicas'),
+('premium', 22.90, 'Variação de plano premium #30 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #31 com condições promocionais específicas'),
+('premium', 20.80, 'Variação de plano premium #32 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #33 com condições promocionais específicas'),
+('premium', 14.31, 'Variação de plano premium #34 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #35 com condições promocionais específicas'),
+('premium', 21.69, 'Variação de plano premium #36 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #37 com condições promocionais específicas'),
+('premium', 26.09, 'Variação de plano premium #38 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #39 com condições promocionais específicas'),
+('premium', 10.03, 'Variação de plano premium #40 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #41 com condições promocionais específicas'),
+('premium', 26.02, 'Variação de plano premium #42 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #43 com condições promocionais específicas'),
+('premium', 23.86, 'Variação de plano premium #44 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #45 com condições promocionais específicas'),
+('premium', 16.71, 'Variação de plano premium #46 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #47 com condições promocionais específicas'),
+('premium', 13.01, 'Variação de plano premium #48 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #49 com condições promocionais específicas'),
+('premium', 29.04, 'Variação de plano premium #50 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #51 com condições promocionais específicas'),
+('premium', 16.63, 'Variação de plano premium #52 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #53 com condições promocionais específicas'),
+('premium', 11.75, 'Variação de plano premium #54 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #55 com condições promocionais específicas'),
+('premium', 11.83, 'Variação de plano premium #56 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #57 com condições promocionais específicas'),
+('premium', 26.85, 'Variação de plano premium #58 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #59 com condições promocionais específicas'),
+('premium', 21.97, 'Variação de plano premium #60 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #61 com condições promocionais específicas'),
+('premium', 26.04, 'Variação de plano premium #62 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #63 com condições promocionais específicas'),
+('premium', 24.49, 'Variação de plano premium #64 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #65 com condições promocionais específicas'),
+('premium', 20.62, 'Variação de plano premium #66 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #67 com condições promocionais específicas'),
+('premium', 29.36, 'Variação de plano premium #68 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #69 com condições promocionais específicas'),
+('premium', 17.47, 'Variação de plano premium #70 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #71 com condições promocionais específicas'),
+('premium', 20.94, 'Variação de plano premium #72 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #73 com condições promocionais específicas'),
+('premium', 26.49, 'Variação de plano premium #74 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #75 com condições promocionais específicas'),
+('premium', 22.27, 'Variação de plano premium #76 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #77 com condições promocionais específicas'),
+('premium', 27.13, 'Variação de plano premium #78 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #79 com condições promocionais específicas'),
+('premium', 21.45, 'Variação de plano premium #80 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #81 com condições promocionais específicas'),
+('premium', 23.99, 'Variação de plano premium #82 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #83 com condições promocionais específicas'),
+('premium', 10.82, 'Variação de plano premium #84 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #85 com condições promocionais específicas'),
+('premium', 14.46, 'Variação de plano premium #86 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #87 com condições promocionais específicas'),
+('premium', 15.69, 'Variação de plano premium #88 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #89 com condições promocionais específicas'),
+('premium', 11.50, 'Variação de plano premium #90 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #91 com condições promocionais específicas'),
+('premium', 14.56, 'Variação de plano premium #92 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #93 com condições promocionais específicas'),
+('premium', 11.92, 'Variação de plano premium #94 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #95 com condições promocionais específicas'),
+('premium', 15.46, 'Variação de plano premium #96 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #97 com condições promocionais específicas'),
+('premium', 22.61, 'Variação de plano premium #98 com condições promocionais específicas'),
+('free', 0.00, 'Variação de plano free #99 com condições promocionais específicas'),
+('premium', 17.20, 'Variação de plano premium #100 com condições promocionais específicas');
+ 
+-- =========================
+-- _User
+-- =========================
+INSERT INTO _User (UserName, Email, UsersPassword, DateOfBirth, Phone, Country) VALUES
+('André Araújo', 'andré.araújo1@email.com', '$2y$10$hash0001RandomSalt3803', '1974-05-26', '+5596945833156', 'Portugal'),
+('Tatiane Pinto', 'tatiane.pinto2@email.com', '$2y$10$hash0002RandomSalt5422', '1975-12-25', '+5531972043515', 'Argentina'),
+('Luciana Correia', 'luciana.correia3@email.com', '$2y$10$hash0003RandomSalt4752', '1989-12-26', '+5539953524491', 'Brasil'),
+('Sofia Vieira', 'sofia.vieira4@email.com', '$2y$10$hash0004RandomSalt4456', '1979-02-25', '+5562945935572', 'Portugal'),
+('Cristina Melo', 'cristina.melo5@email.com', '$2y$10$hash0005RandomSalt7482', '1997-03-16', '+5551938538251', 'México'),
+('Ricardo Dias', 'ricardo.dias6@email.com', '$2y$10$hash0006RandomSalt9830', '1971-05-30', '+5544928740864', 'Moçambique'),
+('Amanda Pinto', 'amanda.pinto7@email.com', '$2y$10$hash0007RandomSalt6930', '1991-03-23', '+5565988320463', 'Argentina'),
+('Fernanda Souza', 'fernanda.souza8@email.com', '$2y$10$hash0008RandomSalt2796', '1987-11-10', '+5574922201654', 'Brasil'),
+('Rafael Lopes', 'rafael.lopes9@email.com', '$2y$10$hash0009RandomSalt2040', '1972-03-06', '+5598966661351', 'Reino Unido'),
+('Renata Barbosa', 'renata.barbosa10@email.com', '$2y$10$hash0010RandomSalt1188', '1991-09-25', '+5570981016525', 'Estados Unidos'),
+('Fernando Pinto', 'fernando.pinto11@email.com', '$2y$10$hash0011RandomSalt6573', '1970-02-20', '+5598982070937', 'Estados Unidos'),
+('Gabriel Gomes', 'gabriel.gomes12@email.com', '$2y$10$hash0012RandomSalt5315', '1984-07-03', '+5531970897765', 'Brasil'),
+('Débora Cavalcanti', 'débora.cavalcanti13@email.com', '$2y$10$hash0013RandomSalt9317', '1973-01-06', '+5575924282218', 'Estados Unidos'),
+('Simone Santos', 'simone.santos14@email.com', '$2y$10$hash0014RandomSalt9689', '1971-11-10', '+5558931682744', 'França'),
+('Mariana Teixeira', 'mariana.teixeira15@email.com', '$2y$10$hash0015RandomSalt6947', '1979-07-17', '+5573912614124', 'Portugal'),
+('Thiago Ribeiro', 'thiago.ribeiro16@email.com', '$2y$10$hash0016RandomSalt2403', '1967-08-08', '+5541986149359', 'Portugal'),
+('Vivian Nascimento', 'vivian.nascimento17@email.com', '$2y$10$hash0017RandomSalt3103', '2001-08-09', '+5519981498611', 'Angola'),
+('Elaine Nascimento', 'elaine.nascimento18@email.com', '$2y$10$hash0018RandomSalt7932', '1989-08-30', '+5532945575298', 'França'),
+('Felipe Freitas', 'felipe.freitas19@email.com', '$2y$10$hash0019RandomSalt7537', '1989-03-11', '+5599936998038', 'Estados Unidos'),
+('Elaine Lopes', 'elaine.lopes20@email.com', '$2y$10$hash0020RandomSalt2982', '1981-10-02', '+5567979467853', 'México'),
+('Rodrigo Ribeiro', 'rodrigo.ribeiro21@email.com', '$2y$10$hash0021RandomSalt4770', '1967-11-16', '+5554912823170', 'Reino Unido'),
+('Alexandre Ribeiro', 'alexandre.ribeiro22@email.com', '$2y$10$hash0022RandomSalt4750', '1965-04-28', '+5520994705205', 'Brasil'),
+('Ana Melo', 'ana.melo23@email.com', '$2y$10$hash0023RandomSalt4899', '1966-05-30', '+5553919510312', 'França'),
+('Diego Machado', 'diego.machado24@email.com', '$2y$10$hash0024RandomSalt8744', '1986-10-11', '+5538982374753', 'Angola'),
+('Rodrigo Vieira', 'rodrigo.vieira25@email.com', '$2y$10$hash0025RandomSalt2588', '1986-03-21', '+5563935556386', 'Portugal'),
+('Elaine Rocha', 'elaine.rocha26@email.com', '$2y$10$hash0026RandomSalt1887', '1980-11-22', '+5565965177213', 'México'),
+('Fernando Lopes', 'fernando.lopes27@email.com', '$2y$10$hash0027RandomSalt6559', '1993-12-27', '+5523918135295', 'Argentina'),
+('Beatriz Ribeiro', 'beatriz.ribeiro28@email.com', '$2y$10$hash0028RandomSalt3296', '1973-08-06', '+5535981979055', 'México'),
+('Leonardo Oliveira', 'leonardo.oliveira29@email.com', '$2y$10$hash0029RandomSalt8260', '1977-06-30', '+5570943528453', 'Portugal'),
+('Fábio Fernandes', 'fábio.fernandes30@email.com', '$2y$10$hash0030RandomSalt2528', '1967-04-09', '+5594982556484', 'Brasil'),
+('Sabrina Duarte', 'sabrina.duarte31@email.com', '$2y$10$hash0031RandomSalt8886', '1975-08-09', '+5532964547971', 'México'),
+('Felipe Duarte', 'felipe.duarte32@email.com', '$2y$10$hash0032RandomSalt1035', '1982-12-28', '+5518932097220', 'Argentina'),
+('Renata Carvalho', 'renata.carvalho33@email.com', '$2y$10$hash0033RandomSalt8973', '2006-07-25', '+5569948285503', 'Argentina'),
+('Rafael Santos', 'rafael.santos34@email.com', '$2y$10$hash0034RandomSalt9883', '1978-04-24', '+5538917849494', 'Reino Unido'),
+('Lucas Pinto', 'lucas.pinto35@email.com', '$2y$10$hash0035RandomSalt8811', '1979-01-26', '+5518916729990', 'Reino Unido'),
+('Débora Freitas', 'débora.freitas36@email.com', '$2y$10$hash0036RandomSalt9320', '2003-04-02', '+5578931130263', 'Brasil'),
+('Pedro Duarte', 'pedro.duarte37@email.com', '$2y$10$hash0037RandomSalt4853', '1973-05-03', '+5519989864260', 'Portugal'),
+('Gustavo Fernandes', 'gustavo.fernandes38@email.com', '$2y$10$hash0038RandomSalt1651', '2004-12-08', '+5583943046464', 'Reino Unido'),
+('Daniel Almeida', 'daniel.almeida39@email.com', '$2y$10$hash0039RandomSalt9565', '1983-10-22', '+5595988339168', 'Reino Unido'),
+('Carolina Freitas', 'carolina.freitas40@email.com', '$2y$10$hash0040RandomSalt4910', '1976-09-12', '+5537999889098', 'Espanha'),
+('Amanda Barbosa', 'amanda.barbosa41@email.com', '$2y$10$hash0041RandomSalt8491', '1970-11-15', '+5596996637649', 'Estados Unidos'),
+('Carolina Freitas', 'carolina.freitas42@email.com', '$2y$10$hash0042RandomSalt2638', '1998-09-23', '+5520911250299', 'México'),
+('Ana Moreira', 'ana.moreira43@email.com', '$2y$10$hash0043RandomSalt6718', '1974-07-25', '+5575945594597', 'Angola'),
+('Ana Melo', 'ana.melo44@email.com', '$2y$10$hash0044RandomSalt8179', '1975-12-17', '+5558948250360', 'Angola'),
+('Tatiane Correia', 'tatiane.correia45@email.com', '$2y$10$hash0045RandomSalt1128', '1978-07-28', '+5589997775215', 'França'),
+('Elaine Monteiro', 'elaine.monteiro46@email.com', '$2y$10$hash0046RandomSalt3200', '1989-11-17', '+5549999038526', 'Portugal'),
+('Amanda Fernandes', 'amanda.fernandes47@email.com', '$2y$10$hash0047RandomSalt5462', '2004-11-29', '+5524984252420', 'Angola'),
+('Patrícia Teixeira', 'patrícia.teixeira48@email.com', '$2y$10$hash0048RandomSalt9280', '1974-06-13', '+5554937326368', 'Estados Unidos'),
+('Eduardo Carvalho', 'eduardo.carvalho49@email.com', '$2y$10$hash0049RandomSalt5533', '2005-08-12', '+5517922388090', 'Argentina'),
+('Sofia Costa', 'sofia.costa50@email.com', '$2y$10$hash0050RandomSalt3647', '1979-12-18', '+5527995511909', 'Estados Unidos'),
+('Cláudio Dias', 'cláudio.dias51@email.com', '$2y$10$hash0051RandomSalt2832', '1989-09-30', '+5565985283645', 'Brasil'),
+('Ana Melo', 'ana.melo52@email.com', '$2y$10$hash0052RandomSalt7049', '1995-12-31', '+5530983227889', 'Brasil'),
+('Alexandre Moreira', 'alexandre.moreira53@email.com', '$2y$10$hash0053RandomSalt6050', '1971-08-24', '+5566927105448', 'Brasil'),
+('André Melo', 'andré.melo54@email.com', '$2y$10$hash0054RandomSalt5088', '2006-11-09', '+5516958024342', 'Moçambique'),
+('Elaine Fernandes', 'elaine.fernandes55@email.com', '$2y$10$hash0055RandomSalt3532', '1980-11-12', '+5582964543049', 'Reino Unido'),
+('Rodrigo Duarte', 'rodrigo.duarte56@email.com', '$2y$10$hash0056RandomSalt3938', '1972-04-16', '+5533965337219', 'Brasil'),
+('Cláudio Freitas', 'cláudio.freitas57@email.com', '$2y$10$hash0057RandomSalt5371', '1979-11-26', '+5563999913412', 'Moçambique'),
+('Camila Vieira', 'camila.vieira58@email.com', '$2y$10$hash0058RandomSalt8711', '1996-06-16', '+5524961343880', 'Brasil'),
+('Fernanda Santos', 'fernanda.santos59@email.com', '$2y$10$hash0059RandomSalt4728', '2001-08-18', '+5569956930359', 'Estados Unidos'),
+('Fernanda Costa', 'fernanda.costa60@email.com', '$2y$10$hash0060RandomSalt5564', '1994-08-10', '+5535963481198', 'Espanha'),
+('Ana Cavalcanti', 'ana.cavalcanti61@email.com', '$2y$10$hash0061RandomSalt7548', '1977-07-10', '+5555996098221', 'França'),
+('Fernando Monteiro', 'fernando.monteiro62@email.com', '$2y$10$hash0062RandomSalt5279', '1989-01-20', '+5553913704481', 'Portugal'),
+('Bruno Cardoso', 'bruno.cardoso63@email.com', '$2y$10$hash0063RandomSalt8119', '1976-11-28', '+5515924549543', 'Reino Unido'),
+('Vanessa Pinto', 'vanessa.pinto64@email.com', '$2y$10$hash0064RandomSalt9379', '2000-04-11', '+5551968571795', 'Reino Unido'),
+('Gabriel Barbosa', 'gabriel.barbosa65@email.com', '$2y$10$hash0065RandomSalt1727', '2005-05-08', '+5584935511941', 'Estados Unidos'),
+('Paulo Rocha', 'paulo.rocha66@email.com', '$2y$10$hash0066RandomSalt6967', '1965-01-28', '+5577982269803', 'Moçambique'),
+('Leonardo Almeida', 'leonardo.almeida67@email.com', '$2y$10$hash0067RandomSalt3041', '1994-10-18', '+5553993638503', 'Espanha'),
+('Vivian Melo', 'vivian.melo68@email.com', '$2y$10$hash0068RandomSalt6344', '1978-06-22', '+5575951511484', 'Argentina'),
+('Gustavo Correia', 'gustavo.correia69@email.com', '$2y$10$hash0069RandomSalt7888', '1978-04-07', '+5581927084279', 'Moçambique'),
+('Elaine Barbosa', 'elaine.barbosa70@email.com', '$2y$10$hash0070RandomSalt5930', '1995-05-21', '+5533992613013', 'Reino Unido'),
+('Gustavo Moreira', 'gustavo.moreira71@email.com', '$2y$10$hash0071RandomSalt4443', '2002-05-26', '+5511950785405', 'Estados Unidos'),
+('Leonardo Vieira', 'leonardo.vieira72@email.com', '$2y$10$hash0072RandomSalt8618', '1991-01-07', '+5588997873101', 'Espanha'),
+('Aline Dias', 'aline.dias73@email.com', '$2y$10$hash0073RandomSalt3780', '1995-04-23', '+5538978608612', 'México'),
+('Elaine Almeida', 'elaine.almeida74@email.com', '$2y$10$hash0074RandomSalt6491', '1977-09-24', '+5576999100953', 'Reino Unido'),
+('Pedro Monteiro', 'pedro.monteiro75@email.com', '$2y$10$hash0075RandomSalt4262', '1998-09-11', '+5541951663795', 'Moçambique'),
+('Rafael Costa', 'rafael.costa76@email.com', '$2y$10$hash0076RandomSalt2193', '1967-01-28', '+5542973771720', 'Reino Unido'),
+('Vinícius Rocha', 'vinícius.rocha77@email.com', '$2y$10$hash0077RandomSalt7291', '2004-10-01', '+5591987265240', 'Moçambique'),
+('Eduardo Barbosa', 'eduardo.barbosa78@email.com', '$2y$10$hash0078RandomSalt2746', '1975-12-12', '+5529998054615', 'Brasil'),
+('Sérgio Rocha', 'sérgio.rocha79@email.com', '$2y$10$hash0079RandomSalt1822', '1974-10-26', '+5533979519112', 'México'),
+('Fábio Ribeiro', 'fábio.ribeiro80@email.com', '$2y$10$hash0080RandomSalt8612', '2006-02-26', '+5526971265269', 'Angola'),
+('Elaine Andrade', 'elaine.andrade81@email.com', '$2y$10$hash0081RandomSalt9270', '1990-01-27', '+5587952587010', 'México'),
+('Leonardo Monteiro', 'leonardo.monteiro82@email.com', '$2y$10$hash0082RandomSalt8777', '2005-09-05', '+5581969849511', 'Angola'),
+('Aline Carvalho', 'aline.carvalho83@email.com', '$2y$10$hash0083RandomSalt9540', '1998-09-22', '+5542995585469', 'Estados Unidos'),
+('Eduardo Lopes', 'eduardo.lopes84@email.com', '$2y$10$hash0084RandomSalt5681', '1975-09-25', '+5546969038700', 'Portugal'),
+('Rodrigo Carvalho', 'rodrigo.carvalho85@email.com', '$2y$10$hash0085RandomSalt3267', '1980-01-25', '+5551982498004', 'Portugal'),
+('Rafael Ribeiro', 'rafael.ribeiro86@email.com', '$2y$10$hash0086RandomSalt2052', '1982-03-08', '+5599930509175', 'Moçambique'),
+('Isabela Rocha', 'isabela.rocha87@email.com', '$2y$10$hash0087RandomSalt2020', '1979-11-05', '+5580972535301', 'Argentina'),
+('Felipe Monteiro', 'felipe.monteiro88@email.com', '$2y$10$hash0088RandomSalt7232', '1983-11-06', '+5560988393811', 'Brasil'),
+('Priscila Costa', 'priscila.costa89@email.com', '$2y$10$hash0089RandomSalt9818', '1980-10-12', '+5549962343121', 'Argentina'),
+('Cláudio Pinto', 'cláudio.pinto90@email.com', '$2y$10$hash0090RandomSalt4595', '1989-07-01', '+5588939600202', 'México'),
+('Diego Rocha', 'diego.rocha91@email.com', '$2y$10$hash0091RandomSalt7624', '1986-10-14', '+5514962191530', 'Espanha'),
+('Vivian Oliveira', 'vivian.oliveira92@email.com', '$2y$10$hash0092RandomSalt9751', '2002-09-14', '+5570927129912', 'Reino Unido'),
+('João Freitas', 'joão.freitas93@email.com', '$2y$10$hash0093RandomSalt2375', '1982-09-04', '+5586985751409', 'Brasil'),
+('Ricardo Rocha', 'ricardo.rocha94@email.com', '$2y$10$hash0094RandomSalt5262', '1971-02-02', '+5570934391257', 'Brasil'),
+('Renata Martins', 'renata.martins95@email.com', '$2y$10$hash0095RandomSalt7211', '1974-06-30', '+5569953868501', 'Espanha'),
+('Diego Cavalcanti', 'diego.cavalcanti96@email.com', '$2y$10$hash0096RandomSalt8705', '2002-04-27', '+5564943859311', 'Portugal'),
+('João Pinto', 'joão.pinto97@email.com', '$2y$10$hash0097RandomSalt2124', '1989-03-13', '+5517956970882', 'Moçambique'),
+('Sérgio Lopes', 'sérgio.lopes98@email.com', '$2y$10$hash0098RandomSalt1333', '1966-10-22', '+5514943189803', 'Moçambique'),
+('Daniel Souza', 'daniel.souza99@email.com', '$2y$10$hash0099RandomSalt4571', '1975-09-14', '+5527973560289', 'Portugal'),
+('Vinícius Correia', 'vinícius.correia100@email.com', '$2y$10$hash0100RandomSalt2876', '1976-06-30', '+5558932520277', 'Reino Unido');
+ 
+-- =========================
+-- Artist
+-- =========================
+INSERT INTO Artist (StageName, RealName, Country, MusicGenre, Email, Phone, Biography) VALUES
+('Coletivo Serra1', 'Thiago Fernandes', 'Reino Unido', 'Rap', 'contato1@serra1.com', '+5550987282128', 'Artista de Rap com carreira consolidada em Reino Unido, conhecido por manhã nas composições'),
+('Mestre Terra2', 'Paulo Santos', 'Portugal', 'Afropop', 'contato2@terra2.com', '+5599994187049', 'Artista de Afropop com carreira consolidada em Portugal, conhecido por estrada nas composições'),
+('MC Fênix3', 'Fernando Teixeira', 'Portugal', 'Rockabilly', 'contato3@fênix3.com', '+5516956600900', 'Artista de Rockabilly com carreira consolidada em Portugal, conhecido por beleza nas composições'),
+('Mestre Céu4', 'Ana Andrade', 'Espanha', 'Rock', 'contato4@céu4.com', '+5564975793759', 'Artista de Rock com carreira consolidada em Espanha, conhecido por verão nas composições'),
+('Mestre Céu5', 'Luciana Melo', 'México', 'Podcast', 'contato5@céu5.com', '+5530968450095', 'Artista de Podcast com carreira consolidada em México, conhecido por chuva nas composições'),
+('Banda Pulso6', 'Ricardo Carvalho', 'Reino Unido', 'Alternative', 'contato6@pulso6.com', '+5572972394301', 'Artista de Alternative com carreira consolidada em Reino Unido, conhecido por luz nas composições'),
+('Coletivo Zênite7', 'Diego Martins', 'Moçambique', 'Folk', 'contato7@zênite7.com', '+5546970505620', 'Artista de Folk com carreira consolidada em Moçambique, conhecido por estrada nas composições'),
+('Coletivo Sol8', 'Cristina Teixeira', 'Argentina', 'Dubstep', 'contato8@sol8.com', '+5514976344695', 'Artista de Dubstep com carreira consolidada em Argentina, conhecido por paixão nas composições'),
+('DJ Raiz9', 'Felipe Araújo', 'Estados Unidos', 'Dubstep', 'contato9@raiz9.com', '+5546990014570', 'Artista de Dubstep com carreira consolidada em Estados Unidos, conhecido por segredo nas composições'),
+('Dona Eco10', 'Mariana Andrade', 'Moçambique', 'Country', 'contato10@eco10.com', '+5541964549859', 'Artista de Country com carreira consolidada em Moçambique, conhecido por vida nas composições'),
+('Grupo Sul11', 'Michele Nascimento', 'México', 'Black Metal', 'contato11@sul11.com', '+5513922489409', 'Artista de Black Metal com carreira consolidada em México, conhecido por fé nas composições'),
+('DJ Terra12', 'Michele Ribeiro', 'Estados Unidos', 'Holiday', 'contato12@terra12.com', '+5585959529086', 'Artista de Holiday com carreira consolidada em Estados Unidos, conhecido por vida nas composições'),
+('Grupo Pulso13', 'Vanessa Rocha', 'França', 'Drum and Bass', 'contato13@pulso13.com', '+5556970900658', 'Artista de Drum and Bass com carreira consolidada em França, conhecido por sonho nas composições'),
+('Dona Aurora14', 'Fernanda Fernandes', 'Moçambique', 'Trance', 'contato14@aurora14.com', '+5526981922443', 'Artista de Trance com carreira consolidada em Moçambique, conhecido por memória nas composições'),
+('Banda Serra15', 'Juliana Santos', 'México', 'Electronic', 'contato15@serra15.com', '+5586980415568', 'Artista de Electronic com carreira consolidada em México, conhecido por raiz nas composições'),
+('Dona Vento16', 'Juliana Gomes', 'Moçambique', 'Ambient', 'contato16@vento16.com', '+5533950569669', 'Artista de Ambient com carreira consolidada em Moçambique, conhecido por amor nas composições'),
+('Banda Eco17', 'Larissa Carvalho', 'Brasil', 'Funk', 'contato17@eco17.com', '+5581949209916', 'Artista de Funk com carreira consolidada em Brasil, conhecido por segredo nas composições'),
+('DJ Raiz18', 'Beatriz Duarte', 'Brasil', 'Bluegrass', 'contato18@raiz18.com', '+5547973001391', 'Artista de Bluegrass com carreira consolidada em Brasil, conhecido por vida nas composições'),
+('Mestre Onda19', 'Bruno Pereira', 'Estados Unidos', 'Hard Rock', 'contato19@onda19.com', '+5525918770247', 'Artista de Hard Rock com carreira consolidada em Estados Unidos, conhecido por caminho nas composições'),
+('Mestre Fogo20', 'Cristina Lopes', 'Brasil', 'Bachata', 'contato20@fogo20.com', '+5530985543051', 'Artista de Bachata com carreira consolidada em Brasil, conhecido por fé nas composições'),
+('MC Sul21', 'Gabriel Moreira', 'Argentina', 'Drill', 'contato21@sul21.com', '+5587993002706', 'Artista de Drill com carreira consolidada em Argentina, conhecido por estrada nas composições'),
+('Coletivo Pulso22', 'Renata Dias', 'México', 'Tech House', 'contato22@pulso22.com', '+5586967556566', 'Artista de Tech House com carreira consolidada em México, conhecido por fé nas composições'),
+('Grupo Vibe23', 'Lucas Teixeira', 'Portugal', 'Bossa Nova', 'contato23@vibe23.com', '+5591938323322', 'Artista de Bossa Nova com carreira consolidada em Portugal, conhecido por sonho nas composições'),
+('Banda Fogo24', 'Camila Ribeiro', 'Angola', 'Psychedelic Rock', 'contato24@fogo24.com', '+5520931009452', 'Artista de Psychedelic Rock com carreira consolidada em Angola, conhecido por amor nas composições'),
+('Mestre Sol25', 'Michele Teixeira', 'México', 'Deep House', 'contato25@sol25.com', '+5515941068214', 'Artista de Deep House com carreira consolidada em México, conhecido por fé nas composições'),
+('Banda Fênix26', 'Michele Duarte', 'México', 'Blues', 'contato26@fênix26.com', '+5598941329612', 'Artista de Blues com carreira consolidada em México, conhecido por sonho nas composições'),
+('Coletivo Zênite27', 'Elaine Vieira', 'Moçambique', 'Heavy Metal', 'contato27@zênite27.com', '+5525983089925', 'Artista de Heavy Metal com carreira consolidada em Moçambique, conhecido por estrada nas composições'),
+('Banda Rio28', 'Diego Monteiro', 'Angola', 'Blues', 'contato28@rio28.com', '+5518932269779', 'Artista de Blues com carreira consolidada em Angola, conhecido por fé nas composições'),
+('Grupo Zênite29', 'Patrícia Dias', 'Portugal', 'Progressive Metal', 'contato29@zênite29.com', '+5599950814428', 'Artista de Progressive Metal com carreira consolidada em Portugal, conhecido por segredo nas composições'),
+('Mestre Aurora30', 'Débora Moreira', 'México', 'Death Metal', 'contato30@aurora30.com', '+5521990267122', 'Artista de Death Metal com carreira consolidada em México, conhecido por saudade nas composições'),
+('Mestre Onda31', 'Simone Carvalho', 'Brasil', 'Folk', 'contato31@onda31.com', '+5540987201917', 'Artista de Folk com carreira consolidada em Brasil, conhecido por esperança nas composições'),
+('MC Aurora32', 'Cristina Pereira', 'Angola', 'Metalcore', 'contato32@aurora32.com', '+5577997444123', 'Artista de Metalcore com carreira consolidada em Angola, conhecido por fogo nas composições'),
+('Dona Serra33', 'Alexandre Rocha', 'México', 'Folk', 'contato33@serra33.com', '+5571956702542', 'Artista de Folk com carreira consolidada em México, conhecido por luz nas composições'),
+('Dona Onda34', 'Elaine Fernandes', 'Angola', 'Drum and Bass', 'contato34@onda34.com', '+5563976500726', 'Artista de Drum and Bass com carreira consolidada em Angola, conhecido por fé nas composições'),
+('Banda Terra35', 'Sabrina Moreira', 'Brasil', 'Power Metal', 'contato35@terra35.com', '+5522952213778', 'Artista de Power Metal com carreira consolidada em Brasil, conhecido por sonho nas composições'),
+('Dona Vento36', 'Sérgio Barbosa', 'França', 'Pop', 'contato36@vento36.com', '+5595982825679', 'Artista de Pop com carreira consolidada em França, conhecido por fogo nas composições'),
+('Mestre Luz37', 'Juliana Andrade', 'Espanha', 'Phonk', 'contato37@luz37.com', '+5574993940940', 'Artista de Phonk com carreira consolidada em Espanha, conhecido por fogo nas composições'),
+('Coletivo Luz38', 'Felipe Carvalho', 'França', 'Latin', 'contato38@luz38.com', '+5547968802946', 'Artista de Latin com carreira consolidada em França, conhecido por segredo nas composições'),
+('Mestre Vento39', 'João Lopes', 'Reino Unido', 'Gospel', 'contato39@vento39.com', '+5531951708177', 'Artista de Gospel com carreira consolidada em Reino Unido, conhecido por beleza nas composições'),
+('MC Eco40', 'Isabela Almeida', 'Moçambique', 'Dub', 'contato40@eco40.com', '+5570925766039', 'Artista de Dub com carreira consolidada em Moçambique, conhecido por brisa nas composições'),
+('Coletivo Rio41', 'Eduardo Freitas', 'Estados Unidos', 'Indie Rock', 'contato41@rio41.com', '+5545965766169', 'Artista de Indie Rock com carreira consolidada em Estados Unidos, conhecido por vida nas composições'),
+('Mestre Sul42', 'Vinícius Moreira', 'Angola', 'New Age', 'contato42@sul42.com', '+5535990447099', 'Artista de New Age com carreira consolidada em Angola, conhecido por dança nas composições'),
+('Banda Rio43', 'Ana Carvalho', 'Argentina', 'Dubstep', 'contato43@rio43.com', '+5575945859307', 'Artista de Dubstep com carreira consolidada em Argentina, conhecido por amor nas composições'),
+('Dona Fênix44', 'Alexandre Cardoso', 'México', 'Bachata', 'contato44@fênix44.com', '+5568982287061', 'Artista de Bachata com carreira consolidada em México, conhecido por vida nas composições'),
+('Dona Onda45', 'Fábio Cavalcanti', 'França', 'Synthwave', 'contato45@onda45.com', '+5569953188224', 'Artista de Synthwave com carreira consolidada em França, conhecido por coração nas composições'),
+('Banda Sul46', 'Cristina Barbosa', 'Moçambique', 'C-Pop', 'contato46@sul46.com', '+5516952704903', 'Artista de C-Pop com carreira consolidada em Moçambique, conhecido por distância nas composições'),
+('Mestre Terra47', 'Renata Machado', 'Angola', 'Pop Punk', 'contato47@terra47.com', '+5515926944487', 'Artista de Pop Punk com carreira consolidada em Angola, conhecido por dança nas composições'),
+('Grupo Onda48', 'Beatriz Duarte', 'México', 'Reggae', 'contato48@onda48.com', '+5578971327848', 'Artista de Reggae com carreira consolidada em México, conhecido por amor nas composições'),
+('Banda Rio49', 'Isabela Duarte', 'Angola', 'Blues', 'contato49@rio49.com', '+5571945570755', 'Artista de Blues com carreira consolidada em Angola, conhecido por paixão nas composições'),
+('Grupo Terra50', 'Ricardo Almeida', 'Espanha', 'Anime', 'contato50@terra50.com', '+5579961003997', 'Artista de Anime com carreira consolidada em Espanha, conhecido por paixão nas composições'),
+('Banda Raiz51', 'Tatiane Pereira', 'Reino Unido', 'Jazz', 'contato51@raiz51.com', '+5541994712997', 'Artista de Jazz com carreira consolidada em Reino Unido, conhecido por manhã nas composições'),
+('Dona Sul52', 'Cláudio Almeida', 'Argentina', 'Reggae', 'contato52@sul52.com', '+5592923489853', 'Artista de Reggae com carreira consolidada em Argentina, conhecido por fogo nas composições'),
+('DJ Fênix53', 'João Pereira', 'Espanha', 'Disco', 'contato53@fênix53.com', '+5548958112135', 'Artista de Disco com carreira consolidada em Espanha, conhecido por alegria nas composições'),
+('Mestre Rio54', 'Rodrigo Andrade', 'Argentina', 'Rockabilly', 'contato54@rio54.com', '+5598934166826', 'Artista de Rockabilly com carreira consolidada em Argentina, conhecido por chuva nas composições'),
+('DJ Fogo55', 'Daniel Duarte', 'Argentina', 'Phonk', 'contato55@fogo55.com', '+5598942323627', 'Artista de Phonk com carreira consolidada em Argentina, conhecido por vida nas composições'),
+('Grupo Rio56', 'Fernanda Dias', 'Estados Unidos', 'Power Metal', 'contato56@rio56.com', '+5543999501846', 'Artista de Power Metal com carreira consolidada em Estados Unidos, conhecido por amor nas composições'),
+('Coletivo Sol57', 'Patrícia Machado', 'França', 'Tango', 'contato57@sol57.com', '+5520969287967', 'Artista de Tango com carreira consolidada em França, conhecido por alegria nas composições'),
+('Grupo Fênix58', 'Luciana Rocha', 'Estados Unidos', 'Power Metal', 'contato58@fênix58.com', '+5549936738452', 'Artista de Power Metal com carreira consolidada em Estados Unidos, conhecido por caminho nas composições'),
+('Coletivo Raiz59', 'Beatriz Ribeiro', 'Argentina', 'Bluegrass', 'contato59@raiz59.com', '+5556987149951', 'Artista de Bluegrass com carreira consolidada em Argentina, conhecido por fé nas composições'),
+('Banda Fênix60', 'João Monteiro', 'Argentina', 'Electronic', 'contato60@fênix60.com', '+5512985957706', 'Artista de Electronic com carreira consolidada em Argentina, conhecido por manhã nas composições'),
+('Coletivo Luz61', 'Simone Pinto', 'México', 'House', 'contato61@luz61.com', '+5540991478884', 'Artista de House com carreira consolidada em México, conhecido por alegria nas composições'),
+('DJ Norte62', 'Daniel Carvalho', 'Angola', 'Reggaeton', 'contato62@norte62.com', '+5523994216001', 'Artista de Reggaeton com carreira consolidada em Angola, conhecido por brisa nas composições'),
+('MC Fênix63', 'Aline Pereira', 'Reino Unido', 'Ambient', 'contato63@fênix63.com', '+5527922097496', 'Artista de Ambient com carreira consolidada em Reino Unido, conhecido por fé nas composições'),
+('Dona Lua64', 'Bruno Santos', 'Angola', 'Indie', 'contato64@lua64.com', '+5557981249799', 'Artista de Indie com carreira consolidada em Angola, conhecido por dança nas composições'),
+('Dona Serra65', 'Amanda Freitas', 'México', 'Deep House', 'contato65@serra65.com', '+5554925457816', 'Artista de Deep House com carreira consolidada em México, conhecido por fogo nas composições'),
+('MC Rio66', 'Sabrina Ribeiro', 'Argentina', 'Glam Rock', 'contato66@rio66.com', '+5557922120246', 'Artista de Glam Rock com carreira consolidada em Argentina, conhecido por caminho nas composições'),
+('MC Aurora67', 'Tatiane Fernandes', 'México', 'Lo-fi', 'contato67@aurora67.com', '+5597945186708', 'Artista de Lo-fi com carreira consolidada em México, conhecido por esperança nas composições'),
+('Mestre Céu68', 'Beatriz Machado', 'Moçambique', 'Metalcore', 'contato68@céu68.com', '+5514993154172', 'Artista de Metalcore com carreira consolidada em Moçambique, conhecido por beleza nas composições'),
+('Dona Vibe69', 'Fernanda Lopes', 'Portugal', 'Moombahton', 'contato69@vibe69.com', '+5570950559278', 'Artista de Moombahton com carreira consolidada em Portugal, conhecido por brisa nas composições'),
+('Mestre Vento70', 'Larissa Pereira', 'Brasil', 'Tech House', 'contato70@vento70.com', '+5574925585427', 'Artista de Tech House com carreira consolidada em Brasil, conhecido por verão nas composições'),
+('DJ Eco71', 'Larissa Barbosa', 'México', 'Lo-fi', 'contato71@eco71.com', '+5596982503409', 'Artista de Lo-fi com carreira consolidada em México, conhecido por luz nas composições'),
+('Grupo Rio72', 'Isabela Lopes', 'Portugal', 'Punk', 'contato72@rio72.com', '+5589964776386', 'Artista de Punk com carreira consolidada em Portugal, conhecido por sonho nas composições'),
+('MC Céu73', 'Felipe Dias', 'México', 'Gospel', 'contato73@céu73.com', '+5557923335151', 'Artista de Gospel com carreira consolidada em México, conhecido por manhã nas composições'),
+('Dona Eco74', 'Ricardo Araújo', 'Brasil', 'K-Pop', 'contato74@eco74.com', '+5546935475673', 'Artista de K-Pop com carreira consolidada em Brasil, conhecido por verão nas composições'),
+('Coletivo Sol75', 'Pedro Machado', 'Moçambique', 'World Music', 'contato75@sol75.com', '+5592990147573', 'Artista de World Music com carreira consolidada em Moçambique, conhecido por amor nas composições'),
+('MC Onda76', 'Rodrigo Souza', 'Reino Unido', 'Bossa Nova', 'contato76@onda76.com', '+5519984384510', 'Artista de Bossa Nova com carreira consolidada em Reino Unido, conhecido por coração nas composições'),
+('Grupo Norte77', 'Fernanda Martins', 'Angola', 'Trap', 'contato77@norte77.com', '+5511947215199', 'Artista de Trap com carreira consolidada em Angola, conhecido por noite nas composições'),
+('DJ Eco78', 'Amanda Vieira', 'Angola', 'Dub', 'contato78@eco78.com', '+5595913460153', 'Artista de Dub com carreira consolidada em Angola, conhecido por noite nas composições'),
+('MC Céu79', 'Rodrigo Cardoso', 'Espanha', 'Hip Hop', 'contato79@céu79.com', '+5533945617024', 'Artista de Hip Hop com carreira consolidada em Espanha, conhecido por saudade nas composições'),
+('DJ Lua80', 'Marcos Fernandes', 'Portugal', 'Metalcore', 'contato80@lua80.com', '+5568958592048', 'Artista de Metalcore com carreira consolidada em Portugal, conhecido por dança nas composições'),
+('Grupo Vento81', 'Aline Andrade', 'Moçambique', 'Grime', 'contato81@vento81.com', '+5516998436473', 'Artista de Grime com carreira consolidada em Moçambique, conhecido por dança nas composições'),
+('Dona Sol82', 'Ricardo Costa', 'Brasil', 'Hard Rock', 'contato82@sol82.com', '+5562967213476', 'Artista de Hard Rock com carreira consolidada em Brasil, conhecido por manhã nas composições'),
+('MC Raiz83', 'Paulo Freitas', 'México', 'Blues', 'contato83@raiz83.com', '+5521953233116', 'Artista de Blues com carreira consolidada em México, conhecido por raiz nas composições'),
+('DJ Fogo84', 'Larissa Carvalho', 'Reino Unido', 'Moombahton', 'contato84@fogo84.com', '+5585983599154', 'Artista de Moombahton com carreira consolidada em Reino Unido, conhecido por segredo nas composições'),
+('Dona Terra85', 'Simone Andrade', 'Estados Unidos', 'Power Metal', 'contato85@terra85.com', '+5575991259008', 'Artista de Power Metal com carreira consolidada em Estados Unidos, conhecido por luz nas composições'),
+('MC Vento86', 'Ricardo Lopes', 'França', 'Axé', 'contato86@vento86.com', '+5566970606674', 'Artista de Axé com carreira consolidada em França, conhecido por estrada nas composições'),
+('Mestre Onda87', 'Vinícius Barbosa', 'Argentina', 'Reggae', 'contato87@onda87.com', '+5551967279295', 'Artista de Reggae com carreira consolidada em Argentina, conhecido por paixão nas composições'),
+('Banda Aurora88', 'André Souza', 'México', 'Jazz', 'contato88@aurora88.com', '+5522921457410', 'Artista de Jazz com carreira consolidada em México, conhecido por liberdade nas composições'),
+('Mestre Vento89', 'Cláudio Pinto', 'Espanha', 'Latin', 'contato89@vento89.com', '+5582918050510', 'Artista de Latin com carreira consolidada em Espanha, conhecido por esperança nas composições'),
+('Grupo Eco90', 'Marcelo Machado', 'Portugal', 'C-Pop', 'contato90@eco90.com', '+5556999300492', 'Artista de C-Pop com carreira consolidada em Portugal, conhecido por memória nas composições'),
+('Mestre Luz91', 'Patrícia Teixeira', 'Estados Unidos', 'EDM', 'contato91@luz91.com', '+5524987566910', 'Artista de EDM com carreira consolidada em Estados Unidos, conhecido por dança nas composições'),
+('DJ Rio92', 'Elaine Nascimento', 'Moçambique', 'Ska', 'contato92@rio92.com', '+5555984660688', 'Artista de Ska com carreira consolidada em Moçambique, conhecido por alegria nas composições'),
+('MC Aurora93', 'Cristina Ribeiro', 'Argentina', 'Glam Rock', 'contato93@aurora93.com', '+5590992352411', 'Artista de Glam Rock com carreira consolidada em Argentina, conhecido por manhã nas composições'),
+('Banda Eco94', 'João Teixeira', 'Estados Unidos', 'Rap', 'contato94@eco94.com', '+5534946677730', 'Artista de Rap com carreira consolidada em Estados Unidos, conhecido por segredo nas composições'),
+('Coletivo Fênix95', 'Marcelo Araújo', 'Brasil', 'Forró', 'contato95@fênix95.com', '+5529986010330', 'Artista de Forró com carreira consolidada em Brasil, conhecido por manhã nas composições'),
+('Mestre Fogo96', 'Rafael Pinto', 'Brasil', 'Folk', 'contato96@fogo96.com', '+5578938874646', 'Artista de Folk com carreira consolidada em Brasil, conhecido por caminho nas composições'),
+('Mestre Sol97', 'Marcelo Oliveira', 'Espanha', 'Techno', 'contato97@sol97.com', '+5552986181117', 'Artista de Techno com carreira consolidada em Espanha, conhecido por raiz nas composições'),
+('MC Luz98', 'Rafael Oliveira', 'Reino Unido', 'Funk', 'contato98@luz98.com', '+5597920949687', 'Artista de Funk com carreira consolidada em Reino Unido, conhecido por sonho nas composições'),
+('Mestre Lua99', 'Eduardo Teixeira', 'México', 'Metal', 'contato99@lua99.com', '+5545938933176', 'Artista de Metal com carreira consolidada em México, conhecido por memória nas composições'),
+('Grupo Vento100', 'Vanessa Rocha', 'Portugal', 'House', 'contato100@vento100.com', '+5597989609131', 'Artista de House com carreira consolidada em Portugal, conhecido por vida nas composições');
+ 
+-- =========================
+-- Album
+-- =========================
+INSERT INTO Album (Title, ReleaseDate, Genre, AlbumDescription) VALUES
+('Dança Manhã', '2013-11-01', 'Soul', 'Álbum de Soul lançado com 9 faixas, explorando temas de caminho'),
+('Raiz Saudade', '2000-05-05', 'Bossa Nova', 'Álbum de Bossa Nova lançado com 10 faixas, explorando temas de coração'),
+('Memória Noite', '2011-06-18', 'Deep House', 'Álbum de Deep House lançado com 11 faixas, explorando temas de verão'),
+('Amor Vida', '2019-04-26', 'Pagode', 'Álbum de Pagode lançado com 8 faixas, explorando temas de caminho'),
+('Beleza Segredo', '2010-04-28', 'Alternative Rock', 'Álbum de Alternative Rock lançado com 14 faixas, explorando temas de manhã'),
+('Alegria Liberdade', '2017-10-23', 'Soul', 'Álbum de Soul lançado com 12 faixas, explorando temas de amor'),
+('Fogo Liberdade', '2014-01-16', 'Bluegrass', 'Álbum de Bluegrass lançado com 12 faixas, explorando temas de esperança'),
+('Caminho Segredo', '2018-09-26', 'Deep House', 'Álbum de Deep House lançado com 7 faixas, explorando temas de caminho'),
+('Amor Paixão', '2007-09-16', 'Phonk', 'Álbum de Phonk lançado com 13 faixas, explorando temas de segredo'),
+('Alegria Liberdade', '2019-08-04', 'Ska', 'Álbum de Ska lançado com 9 faixas, explorando temas de luz'),
+('Esperança Caminho', '2023-07-03', 'Country', 'Álbum de Country lançado com 12 faixas, explorando temas de fé'),
+('Distância Paixão', '2009-12-09', 'Drum and Bass', 'Álbum de Drum and Bass lançado com 18 faixas, explorando temas de chuva'),
+('Liberdade Dança', '2005-02-11', 'Emo', 'Álbum de Emo lançado com 14 faixas, explorando temas de coração'),
+('Memória Alegria', '2015-10-01', 'World Music', 'Álbum de World Music lançado com 8 faixas, explorando temas de estrada'),
+('Verão Noite', '2011-06-25', 'MPB', 'Álbum de MPB lançado com 8 faixas, explorando temas de raiz'),
+('Noite Memória', '2003-05-19', 'Pagode', 'Álbum de Pagode lançado com 18 faixas, explorando temas de brisa'),
+('Vida Fogo', '2020-02-19', 'Game Soundtrack', 'Álbum de Game Soundtrack lançado com 15 faixas, explorando temas de brisa'),
+('Brisa Raiz', '2014-07-01', 'Reggaeton', 'Álbum de Reggaeton lançado com 11 faixas, explorando temas de noite'),
+('Fogo Liberdade', '2021-01-12', 'Death Metal', 'Álbum de Death Metal lançado com 16 faixas, explorando temas de fé'),
+('Sonho Esperança', '2002-07-09', 'EDM', 'Álbum de EDM lançado com 14 faixas, explorando temas de liberdade'),
+('Fé Fogo', '2020-04-09', 'R&B', 'Álbum de R&B lançado com 6 faixas, explorando temas de alegria'),
+('Fé Liberdade', '2004-01-19', 'Grime', 'Álbum de Grime lançado com 15 faixas, explorando temas de dança'),
+('Caminho Fogo', '2024-11-11', 'Soul', 'Álbum de Soul lançado com 13 faixas, explorando temas de esperança'),
+('Brisa Coração', '2014-06-03', 'Drill', 'Álbum de Drill lançado com 13 faixas, explorando temas de dança'),
+('Noite Saudade', '2020-03-17', 'Ska', 'Álbum de Ska lançado com 18 faixas, explorando temas de paixão'),
+('Segredo Liberdade', '2022-08-19', 'World Music', 'Álbum de World Music lançado com 8 faixas, explorando temas de saudade'),
+('Estrada Segredo', '2019-08-21', 'Death Metal', 'Álbum de Death Metal lançado com 14 faixas, explorando temas de dança'),
+('Raiz Chuva', '2016-04-28', 'Lo-fi', 'Álbum de Lo-fi lançado com 10 faixas, explorando temas de caminho'),
+('Luz Memória', '2015-03-06', 'Anime', 'Álbum de Anime lançado com 15 faixas, explorando temas de saudade'),
+('Brisa Brisa', '2015-01-04', 'Jazz', 'Álbum de Jazz lançado com 11 faixas, explorando temas de verão'),
+('Beleza Manhã', '2017-05-04', 'House', 'Álbum de House lançado com 10 faixas, explorando temas de distância'),
+('Manhã Raiz', '2006-09-29', 'Drum and Bass', 'Álbum de Drum and Bass lançado com 7 faixas, explorando temas de esperança'),
+('Manhã Noite', '2015-09-10', 'Techno', 'Álbum de Techno lançado com 16 faixas, explorando temas de segredo'),
+('Manhã Caminho', '2005-10-13', 'Trap', 'Álbum de Trap lançado com 17 faixas, explorando temas de liberdade'),
+('Fé Beleza', '2016-11-23', 'World Music', 'Álbum de World Music lançado com 18 faixas, explorando temas de paixão'),
+('Noite Manhã', '2023-08-12', 'Folk', 'Álbum de Folk lançado com 16 faixas, explorando temas de manhã'),
+('Luz Dança', '2016-03-25', 'Hip Hop', 'Álbum de Hip Hop lançado com 11 faixas, explorando temas de fé'),
+('Chuva Coração', '2015-04-30', 'Punk', 'Álbum de Punk lançado com 9 faixas, explorando temas de estrada'),
+('Noite Noite', '2003-06-18', 'Deep House', 'Álbum de Deep House lançado com 18 faixas, explorando temas de verão'),
+('Dança Memória', '2024-03-18', 'Emo', 'Álbum de Emo lançado com 6 faixas, explorando temas de manhã'),
+('Paixão Memória', '2005-11-17', 'Trap', 'Álbum de Trap lançado com 12 faixas, explorando temas de noite'),
+('Chuva Chuva', '2007-06-05', 'Death Metal', 'Álbum de Death Metal lançado com 6 faixas, explorando temas de luz'),
+('Alegria Manhã', '2010-08-27', 'Death Metal', 'Álbum de Death Metal lançado com 15 faixas, explorando temas de fé'),
+('Memória Distância', '2020-02-20', 'Maracatu', 'Álbum de Maracatu lançado com 14 faixas, explorando temas de estrada'),
+('Fé Vida', '2008-09-13', 'Lo-fi', 'Álbum de Lo-fi lançado com 16 faixas, explorando temas de esperança'),
+('Fogo Fogo', '2012-08-21', 'Synthwave', 'Álbum de Synthwave lançado com 14 faixas, explorando temas de dança'),
+('Luz Chuva', '2008-12-15', 'Drill', 'Álbum de Drill lançado com 8 faixas, explorando temas de sonho'),
+('Saudade Brisa', '2021-07-22', 'Lo-fi', 'Álbum de Lo-fi lançado com 14 faixas, explorando temas de verão'),
+('Segredo Dança', '2005-08-04', 'House', 'Álbum de House lançado com 7 faixas, explorando temas de memória'),
+('Chuva Sonho', '2020-02-26', 'Indie Rock', 'Álbum de Indie Rock lançado com 8 faixas, explorando temas de luz'),
+('Liberdade Estrada', '2020-03-27', 'Hardstyle', 'Álbum de Hardstyle lançado com 6 faixas, explorando temas de luz'),
+('Saudade Caminho', '2022-07-08', 'Lo-fi', 'Álbum de Lo-fi lançado com 9 faixas, explorando temas de caminho'),
+('Liberdade Alegria', '2010-01-26', 'Rap', 'Álbum de Rap lançado com 11 faixas, explorando temas de verão'),
+('Segredo Brisa', '2015-01-15', 'Merengue', 'Álbum de Merengue lançado com 8 faixas, explorando temas de saudade'),
+('Fé Vida', '2006-03-23', 'Podcast', 'Álbum de Podcast lançado com 13 faixas, explorando temas de fogo'),
+('Raiz Amor', '2003-07-22', 'Hip Hop', 'Álbum de Hip Hop lançado com 10 faixas, explorando temas de coração'),
+('Noite Beleza', '2023-09-04', 'Heavy Metal', 'Álbum de Heavy Metal lançado com 7 faixas, explorando temas de memória'),
+('Fé Estrada', '2013-07-05', 'Dancehall', 'Álbum de Dancehall lançado com 6 faixas, explorando temas de estrada'),
+('Luz Brisa', '2020-07-03', 'Jazz', 'Álbum de Jazz lançado com 7 faixas, explorando temas de vida'),
+('Raiz Beleza', '2000-09-26', 'Reggaeton', 'Álbum de Reggaeton lançado com 14 faixas, explorando temas de esperança'),
+('Estrada Segredo', '2006-06-10', 'Deep House', 'Álbum de Deep House lançado com 12 faixas, explorando temas de amor'),
+('Raiz Alegria', '2010-10-16', 'Bluegrass', 'Álbum de Bluegrass lançado com 12 faixas, explorando temas de chuva'),
+('Manhã Manhã', '2003-11-03', 'Emo', 'Álbum de Emo lançado com 11 faixas, explorando temas de liberdade'),
+('Dança Beleza', '2022-10-04', 'Alternative Rock', 'Álbum de Alternative Rock lançado com 14 faixas, explorando temas de amor'),
+('Caminho Vida', '2001-12-14', 'Moombahton', 'Álbum de Moombahton lançado com 12 faixas, explorando temas de alegria'),
+('Sonho Distância', '2000-09-23', 'EDM', 'Álbum de EDM lançado com 18 faixas, explorando temas de liberdade'),
+('Alegria Estrada', '2004-08-25', 'Afrobeat', 'Álbum de Afrobeat lançado com 17 faixas, explorando temas de memória'),
+('Paixão Noite', '2001-12-27', 'EDM', 'Álbum de EDM lançado com 14 faixas, explorando temas de paixão'),
+('Brisa Chuva', '2020-11-03', 'Spoken Word', 'Álbum de Spoken Word lançado com 13 faixas, explorando temas de brisa'),
+('Chuva Noite', '2002-10-30', 'Other', 'Álbum de Other lançado com 18 faixas, explorando temas de fogo'),
+('Saudade Fé', '2009-01-15', 'Soul', 'Álbum de Soul lançado com 18 faixas, explorando temas de coração'),
+('Saudade Paixão', '2013-11-28', 'Indie Rock', 'Álbum de Indie Rock lançado com 12 faixas, explorando temas de beleza'),
+('Vida Sonho', '2001-08-22', 'World Music', 'Álbum de World Music lançado com 9 faixas, explorando temas de fé'),
+('Alegria Memória', '2002-02-22', 'Children', 'Álbum de Children lançado com 11 faixas, explorando temas de sonho'),
+('Verão Alegria', '2019-08-08', 'J-Pop', 'Álbum de J-Pop lançado com 17 faixas, explorando temas de fogo'),
+('Caminho Paixão', '2008-05-18', 'Pop Punk', 'Álbum de Pop Punk lançado com 17 faixas, explorando temas de vida'),
+('Alegria Dança', '2011-12-18', 'Country', 'Álbum de Country lançado com 17 faixas, explorando temas de luz'),
+('Liberdade Luz', '2008-02-04', 'Indie', 'Álbum de Indie lançado com 10 faixas, explorando temas de paixão'),
+('Verão Liberdade', '2014-09-16', 'Holiday', 'Álbum de Holiday lançado com 10 faixas, explorando temas de fé'),
+('Fogo Raiz', '2019-02-11', 'Samba', 'Álbum de Samba lançado com 17 faixas, explorando temas de fogo'),
+('Alegria Fogo', '2001-11-24', 'EDM', 'Álbum de EDM lançado com 15 faixas, explorando temas de luz'),
+('Sonho Brisa', '2002-07-28', 'Blues', 'Álbum de Blues lançado com 16 faixas, explorando temas de brisa'),
+('Caminho Alegria', '2023-01-06', 'Anime', 'Álbum de Anime lançado com 8 faixas, explorando temas de amor'),
+('Noite Raiz', '2019-08-28', 'R&B', 'Álbum de R&B lançado com 8 faixas, explorando temas de liberdade'),
+('Estrada Memória', '2016-06-06', 'Ambient', 'Álbum de Ambient lançado com 12 faixas, explorando temas de esperança'),
+('Saudade Raiz', '2006-11-18', 'Anime', 'Álbum de Anime lançado com 13 faixas, explorando temas de alegria'),
+('Alegria Fogo', '2003-06-13', 'Bluegrass', 'Álbum de Bluegrass lançado com 8 faixas, explorando temas de dança'),
+('Alegria Caminho', '2014-02-06', 'Children', 'Álbum de Children lançado com 10 faixas, explorando temas de estrada'),
+('Verão Amor', '2008-05-06', 'Pop Punk', 'Álbum de Pop Punk lançado com 14 faixas, explorando temas de caminho'),
+('Beleza Verão', '2011-09-28', 'Opera', 'Álbum de Opera lançado com 17 faixas, explorando temas de fogo'),
+('Coração Raiz', '2012-10-22', 'Comedy', 'Álbum de Comedy lançado com 13 faixas, explorando temas de coração'),
+('Verão Noite', '2003-04-28', 'Black Metal', 'Álbum de Black Metal lançado com 8 faixas, explorando temas de segredo'),
+('Fogo Liberdade', '2014-05-03', 'Soundtrack', 'Álbum de Soundtrack lançado com 11 faixas, explorando temas de segredo'),
+('Liberdade Beleza', '2024-04-26', 'Deep House', 'Álbum de Deep House lançado com 10 faixas, explorando temas de chuva'),
+('Segredo Segredo', '2007-10-23', 'Ambient', 'Álbum de Ambient lançado com 14 faixas, explorando temas de estrada'),
+('Verão Coração', '2006-03-25', 'Gospel', 'Álbum de Gospel lançado com 18 faixas, explorando temas de vida'),
+('Amor Alegria', '2024-11-07', 'Bluegrass', 'Álbum de Bluegrass lançado com 11 faixas, explorando temas de fogo'),
+('Beleza Noite', '2003-11-13', 'Jazz', 'Álbum de Jazz lançado com 10 faixas, explorando temas de caminho'),
+('Segredo Distância', '2021-06-21', 'Emo', 'Álbum de Emo lançado com 12 faixas, explorando temas de memória'),
+('Luz Esperança', '2003-04-23', 'Latin', 'Álbum de Latin lançado com 11 faixas, explorando temas de brisa');
+ 
+-- =========================
+-- Song
+-- =========================
+INSERT INTO Song (Title, Duration, Genre, IsExplicit) VALUES
+('Liberdade na Estrada', '00:05:43', 'Grunge', 0),
+('Noite em Paz', '00:06:11', 'Latin', 1),
+('Dança do Amanhã', '00:02:33', 'Bachata', 0),
+('Chuva Eterna', '00:04:59', 'Podcast', 0),
+('Alegria em Paz', '00:04:54', 'Country', 0),
+('Coração em Paz', '00:04:08', 'Reggaeton', 0),
+('Raiz em Paz', '00:02:32', 'World Music', 0),
+('Esperança ao Vivo', '00:03:10', 'Holiday', 0),
+('Esperança do Amanhã', '00:02:05', 'Soul', 0),
+('Brisa de Verão', '00:06:26', 'Phonk', 0),
+('Vida em Paz', '00:04:41', 'Tech House', 1),
+('Estrada Infinita', '00:04:29', 'Blues', 0),
+('Chuva na Estrada', '00:05:30', 'Progressive Metal', 0),
+('Paixão ao Vivo', '00:03:20', 'Other', 0),
+('Distância Renovada', '00:05:08', 'Lo-fi', 0),
+('Paixão de Verão', '00:05:07', 'Instrumental', 1),
+('Estrada Eterna', '00:02:03', 'Deep House', 1),
+('Raiz Infinita', '00:03:55', 'Tango', 0),
+('Esperança Renovada', '00:03:48', 'Tango', 1),
+('Dança na Estrada', '00:05:56', 'Techno', 1),
+('Amor sem Fim', '00:05:32', 'Power Metal', 0),
+('Coração ao Vivo', '00:04:03', 'Funk', 0),
+('Vida ao Vivo', '00:05:18', 'Alternative', 0),
+('Verão Infinita', '00:03:56', 'Opera', 0),
+('Memória Infinita', '00:04:02', 'J-Pop', 0),
+('Esperança em Paz', '00:03:23', 'Psychedelic Rock', 0),
+('Liberdade Infinita', '00:06:28', 'Psychedelic Rock', 0),
+('Raiz ao Vivo', '00:02:08', 'Reggae', 1),
+('Alegria Renovada', '00:06:23', 'Merengue', 0),
+('Raiz em Paz', '00:05:32', 'Soul', 0),
+('Saudade Eterna', '00:04:51', 'Metalcore', 1),
+('Noite ao Vivo', '00:06:08', 'Progressive House', 0),
+('Chuva Infinita', '00:06:47', 'Tech House', 0),
+('Dança em Paz', '00:06:31', 'Podcast', 0),
+('Vida do Amanhã', '00:04:21', 'Anime', 0),
+('Luz ao Vivo', '00:04:50', 'Comedy', 0),
+('Raiz na Estrada', '00:04:41', 'Afrobeat', 0),
+('Distância do Amanhã', '00:06:30', 'Samba', 1),
+('Noite de Verão', '00:02:36', 'Spoken Word', 0),
+('Coração do Amanhã', '00:05:20', 'Metal', 0),
+('Luz de Verão', '00:05:32', 'Grime', 1),
+('Distância do Amanhã', '00:03:33', 'Bossa Nova', 0),
+('Manhã na Estrada', '00:06:24', 'Trance', 0),
+('Fogo em Paz', '00:04:34', 'EDM', 0),
+('Raiz na Estrada', '00:03:15', 'Electronic', 0),
+('Estrada Perdida', '00:04:45', 'Bossa Nova', 1),
+('Paixão na Estrada', '00:04:35', 'Electronic', 0),
+('Verão ao Vivo', '00:06:24', 'K-Pop', 0),
+('Memória Eterna', '00:04:02', 'House', 0),
+('Alegria na Estrada', '00:04:47', 'Hard Rock', 0),
+('Coração em Paz', '00:04:59', 'Glam Rock', 0),
+('Noite sem Fim', '00:06:47', 'Afropop', 0),
+('Estrada do Amanhã', '00:06:14', 'Moombahton', 0),
+('Saudade sem Fim', '00:05:21', 'Other', 1),
+('Verão Eterna', '00:02:35', 'Tango', 1),
+('Brisa na Estrada', '00:05:41', 'MPB', 0),
+('Paixão Perdida', '00:02:58', 'Folk', 0),
+('Beleza do Amanhã', '00:03:26', 'Pagode', 0),
+('Caminho na Estrada', '00:03:59', 'Deep House', 0),
+('Amor Perdida', '00:06:38', 'Ska', 0),
+('Fé na Estrada', '00:06:33', 'Pop Punk', 0),
+('Dança na Estrada', '00:04:12', 'Dub', 0),
+('Chuva na Estrada', '00:04:45', 'Forró', 0),
+('Distância Renovada', '00:04:36', 'Anime', 0),
+('Chuva ao Vivo', '00:05:52', 'Heavy Metal', 0),
+('Liberdade Infinita', '00:02:11', 'Salsa', 1),
+('Paixão de Verão', '00:02:16', 'New Age', 0),
+('Fogo Perdida', '00:04:19', 'Afrobeat', 0),
+('Sonho Renovada', '00:03:03', 'Soundtrack', 0),
+('Fogo Perdida', '00:03:25', 'Game Soundtrack', 0),
+('Segredo sem Fim', '00:04:23', 'Grime', 0),
+('Estrada Eterna', '00:05:09', 'Power Metal', 0),
+('Luz em Paz', '00:05:48', 'Alternative', 0),
+('Memória de Verão', '00:06:55', 'Country', 1),
+('Dança Renovada', '00:02:58', 'Rockabilly', 0),
+('Saudade em Paz', '00:06:12', 'Bluegrass', 0),
+('Chuva Renovada', '00:06:28', 'Dub', 0),
+('Segredo ao Vivo', '00:05:05', 'Indie Rock', 1),
+('Saudade na Estrada', '00:03:32', 'Metal', 1),
+('Esperança do Amanhã', '00:06:29', 'Anime', 0),
+('Distância do Amanhã', '00:05:16', 'Pop', 0),
+('Esperança sem Fim', '00:02:27', 'Hardstyle', 0),
+('Beleza do Amanhã', '00:02:59', 'Metalcore', 0),
+('Fé Infinita', '00:03:49', 'Salsa', 1),
+('Alegria Infinita', '00:05:55', 'Synthwave', 1),
+('Liberdade em Paz', '00:03:41', 'Hardstyle', 0),
+('Chuva em Paz', '00:05:33', 'Latin', 0),
+('Amor do Amanhã', '00:04:29', 'Anime', 1),
+('Beleza Infinita', '00:03:15', 'Power Metal', 0),
+('Noite Perdida', '00:03:59', 'Dub', 0),
+('Manhã Infinita', '00:06:49', 'Hip Hop', 0),
+('Coração sem Fim', '00:02:38', 'R&B', 1),
+('Raiz do Amanhã', '00:03:47', 'Soul', 1),
+('Fogo de Verão', '00:06:13', 'Disco', 0),
+('Dança Perdida', '00:03:52', 'Bluegrass', 0),
+('Esperança ao Vivo', '00:04:15', 'Tech House', 0),
+('Manhã em Paz', '00:03:26', 'Tech House', 0),
+('Saudade em Paz', '00:06:56', 'Pagode', 1),
+('Beleza na Estrada', '00:02:22', 'World Music', 1),
+('Dança Renovada', '00:05:26', 'Bachata', 0);
+ 
+-- =========================
+-- Podcast
+-- =========================
+INSERT INTO Podcast (Title, DescriptionPodcasts, Category, Creator, Language) VALUES
+('Ponto de Vista 1', 'Episódios sobre sociedade com convidados e debates semanais', 'Ciência', 'Priscila Ribeiro', 'Português'),
+('Papo Reto 2', 'Episódios sobre sociedade com convidados e debates semanais', 'Negócios', 'Lucas Moreira', 'Inglês'),
+('Ponto de Vista 3', 'Episódios sobre ciência com convidados e debates semanais', 'Ciência', 'Larissa Barbosa', 'Português'),
+('Papo Reto 4', 'Episódios sobre tecnologia com convidados e debates semanais', 'Educação', 'Ricardo Almeida', 'Inglês'),
+('Conversa Franca 5', 'Episódios sobre entretenimento com convidados e debates semanais', 'Ciência', 'Vivian Monteiro', 'Português'),
+('Café da Manhã 6', 'Episódios sobre esportes com convidados e debates semanais', 'Saúde', 'Fernando Teixeira', 'Espanhol'),
+('Café da Manhã 7', 'Episódios sobre entretenimento com convidados e debates semanais', 'Tecnologia', 'Sabrina Cardoso', 'Espanhol'),
+('Radar Cultural 8', 'Episódios sobre tecnologia com convidados e debates semanais', 'Negócios', 'Felipe Duarte', 'Inglês'),
+('Papo Reto 9', 'Episódios sobre notícias com convidados e debates semanais', 'Tecnologia', 'Juliana Pinto', 'Português'),
+('Mundo Aberto 10', 'Episódios sobre tecnologia com convidados e debates semanais', 'Cultura', 'Paulo Santos', 'Inglês'),
+('Ideias Livres 11', 'Episódios sobre ciência com convidados e debates semanais', 'Educação', 'Sérgio Gomes', 'Inglês'),
+('Mundo Aberto 12', 'Episódios sobre ciência com convidados e debates semanais', 'Educação', 'Thiago Carvalho', 'Inglês'),
+('Radar Cultural 13', 'Episódios sobre negócios com convidados e debates semanais', 'Negócios', 'Beatriz Vieira', 'Espanhol'),
+('Mundo Aberto 14', 'Episódios sobre educação com convidados e debates semanais', 'Tecnologia', 'André Martins', 'Inglês'),
+('Café da Manhã 15', 'Episódios sobre cultura com convidados e debates semanais', 'Tecnologia', 'Cláudio Souza', 'Português'),
+('Papo Reto 16', 'Episódios sobre ciência com convidados e debates semanais', 'Cultura', 'Alexandre Pinto', 'Inglês'),
+('Papo Reto 17', 'Episódios sobre sociedade com convidados e debates semanais', 'Tecnologia', 'Marcelo Ribeiro', 'Inglês'),
+('Fala Sério 18', 'Episódios sobre tecnologia com convidados e debates semanais', 'Negócios', 'Fábio Lopes', 'Espanhol'),
+('Conversa Franca 19', 'Episódios sobre esportes com convidados e debates semanais', 'Negócios', 'Vivian Lopes', 'Espanhol'),
+('Mundo Aberto 20', 'Episódios sobre negócios com convidados e debates semanais', 'Sociedade', 'Vivian Vieira', 'Inglês'),
+('Mamilos 21', 'Episódios sobre sociedade com convidados e debates semanais', 'Ciência', 'Eduardo Oliveira', 'Espanhol'),
+('Café da Manhã 22', 'Episódios sobre ciência com convidados e debates semanais', 'Notícias', 'Ana Monteiro', 'Espanhol'),
+('Café da Manhã 23', 'Episódios sobre notícias com convidados e debates semanais', 'Saúde', 'Larissa Monteiro', 'Espanhol'),
+('Ideias Livres 24', 'Episódios sobre entretenimento com convidados e debates semanais', 'Sociedade', 'Mariana Santos', 'Espanhol'),
+('Mundo Aberto 25', 'Episódios sobre educação com convidados e debates semanais', 'Notícias', 'Daniel Lopes', 'Espanhol'),
+('Fala Sério 26', 'Episódios sobre negócios com convidados e debates semanais', 'Negócios', 'João Costa', 'Espanhol'),
+('Radar Cultural 27', 'Episódios sobre saúde com convidados e debates semanais', 'Notícias', 'João Andrade', 'Espanhol'),
+('Papo Reto 28', 'Episódios sobre ciência com convidados e debates semanais', 'Esportes', 'João Andrade', 'Espanhol'),
+('Ponto de Vista 29', 'Episódios sobre sociedade com convidados e debates semanais', 'Entretenimento', 'Beatriz Andrade', 'Português'),
+('Ideias Livres 30', 'Episódios sobre tecnologia com convidados e debates semanais', 'Cultura', 'Marcos Carvalho', 'Inglês'),
+('Papo Reto 31', 'Episódios sobre saúde com convidados e debates semanais', 'Entretenimento', 'André Barbosa', 'Inglês'),
+('Fala Sério 32', 'Episódios sobre tecnologia com convidados e debates semanais', 'Tecnologia', 'Thiago Machado', 'Português'),
+('Café da Manhã 33', 'Episódios sobre entretenimento com convidados e debates semanais', 'Saúde', 'Renata Barbosa', 'Espanhol'),
+('Mundo Aberto 34', 'Episódios sobre notícias com convidados e debates semanais', 'Notícias', 'Michele Oliveira', 'Português'),
+('Mundo Aberto 35', 'Episódios sobre saúde com convidados e debates semanais', 'Educação', 'Cristina Duarte', 'Português'),
+('Radar Cultural 36', 'Episódios sobre notícias com convidados e debates semanais', 'Tecnologia', 'Felipe Melo', 'Espanhol'),
+('Fala Sério 37', 'Episódios sobre negócios com convidados e debates semanais', 'Esportes', 'Sofia Freitas', 'Português'),
+('Papo Reto 38', 'Episódios sobre ciência com convidados e debates semanais', 'Cultura', 'Elaine Pereira', 'Português'),
+('Conversa Franca 39', 'Episódios sobre notícias com convidados e debates semanais', 'Tecnologia', 'Alexandre Souza', 'Espanhol'),
+('Ponto de Vista 40', 'Episódios sobre entretenimento com convidados e debates semanais', 'Esportes', 'Camila Cardoso', 'Português'),
+('Fala Sério 41', 'Episódios sobre saúde com convidados e debates semanais', 'Ciência', 'Marcelo Barbosa', 'Espanhol'),
+('Mamilos 42', 'Episódios sobre entretenimento com convidados e debates semanais', 'Ciência', 'Cláudio Araújo', 'Português'),
+('NerdCast 43', 'Episódios sobre saúde com convidados e debates semanais', 'Tecnologia', 'Ana Martins', 'Espanhol'),
+('Fala Sério 44', 'Episódios sobre cultura com convidados e debates semanais', 'Saúde', 'Sérgio Martins', 'Português'),
+('Papo Reto 45', 'Episódios sobre negócios com convidados e debates semanais', 'Negócios', 'Fernanda Araújo', 'Espanhol'),
+('Ponto de Vista 46', 'Episódios sobre saúde com convidados e debates semanais', 'Sociedade', 'Fernando Cardoso', 'Espanhol'),
+('Ponto de Vista 47', 'Episódios sobre entretenimento com convidados e debates semanais', 'Cultura', 'Patrícia Vieira', 'Português'),
+('NerdCast 48', 'Episódios sobre entretenimento com convidados e debates semanais', 'Esportes', 'Rafael Barbosa', 'Espanhol'),
+('Mamilos 49', 'Episódios sobre saúde com convidados e debates semanais', 'Educação', 'André Fernandes', 'Português'),
+('Café da Manhã 50', 'Episódios sobre esportes com convidados e debates semanais', 'Negócios', 'André Cavalcanti', 'Inglês'),
+('NerdCast 51', 'Episódios sobre sociedade com convidados e debates semanais', 'Entretenimento', 'Bruno Rocha', 'Inglês'),
+('Radar Cultural 52', 'Episódios sobre ciência com convidados e debates semanais', 'Ciência', 'Isabela Fernandes', 'Português'),
+('NerdCast 53', 'Episódios sobre educação com convidados e debates semanais', 'Ciência', 'Pedro Teixeira', 'Espanhol'),
+('Conversa Franca 54', 'Episódios sobre saúde com convidados e debates semanais', 'Notícias', 'Patrícia Rocha', 'Inglês'),
+('NerdCast 55', 'Episódios sobre ciência com convidados e debates semanais', 'Tecnologia', 'Cristina Andrade', 'Português'),
+('Ponto de Vista 56', 'Episódios sobre sociedade com convidados e debates semanais', 'Sociedade', 'Diego Gomes', 'Inglês'),
+('Mundo Aberto 57', 'Episódios sobre sociedade com convidados e debates semanais', 'Entretenimento', 'Camila Rocha', 'Inglês'),
+('Ponto de Vista 58', 'Episódios sobre esportes com convidados e debates semanais', 'Negócios', 'Ana Araújo', 'Inglês'),
+('Ideias Livres 59', 'Episódios sobre negócios com convidados e debates semanais', 'Cultura', 'Daniel Santos', 'Inglês'),
+('NerdCast 60', 'Episódios sobre sociedade com convidados e debates semanais', 'Esportes', 'Mariana Barbosa', 'Inglês'),
+('Fala Sério 61', 'Episódios sobre saúde com convidados e debates semanais', 'Educação', 'Aline Martins', 'Inglês'),
+('Fala Sério 62', 'Episódios sobre sociedade com convidados e debates semanais', 'Esportes', 'Carolina Teixeira', 'Espanhol'),
+('Ideias Livres 63', 'Episódios sobre negócios com convidados e debates semanais', 'Educação', 'Bruno Barbosa', 'Inglês'),
+('Papo Reto 64', 'Episódios sobre negócios com convidados e debates semanais', 'Cultura', 'Rodrigo Martins', 'Inglês'),
+('Papo Reto 65', 'Episódios sobre saúde com convidados e debates semanais', 'Educação', 'Gabriel Freitas', 'Espanhol'),
+('Ideias Livres 66', 'Episódios sobre cultura com convidados e debates semanais', 'Ciência', 'Bruno Machado', 'Espanhol'),
+('Café da Manhã 67', 'Episódios sobre negócios com convidados e debates semanais', 'Tecnologia', 'Aline Vieira', 'Inglês'),
+('NerdCast 68', 'Episódios sobre saúde com convidados e debates semanais', 'Negócios', 'Larissa Lopes', 'Inglês'),
+('Ideias Livres 69', 'Episódios sobre esportes com convidados e debates semanais', 'Sociedade', 'Paulo Rocha', 'Inglês'),
+('NerdCast 70', 'Episódios sobre negócios com convidados e debates semanais', 'Cultura', 'Priscila Cardoso', 'Inglês'),
+('Radar Cultural 71', 'Episódios sobre ciência com convidados e debates semanais', 'Saúde', 'Tatiane Pereira', 'Inglês'),
+('Radar Cultural 72', 'Episódios sobre cultura com convidados e debates semanais', 'Entretenimento', 'Beatriz Cavalcanti', 'Português'),
+('Conversa Franca 73', 'Episódios sobre sociedade com convidados e debates semanais', 'Cultura', 'Sofia Cardoso', 'Espanhol'),
+('Ponto de Vista 74', 'Episódios sobre educação com convidados e debates semanais', 'Saúde', 'Beatriz Costa', 'Português'),
+('Papo Reto 75', 'Episódios sobre tecnologia com convidados e debates semanais', 'Ciência', 'Cláudio Andrade', 'Espanhol'),
+('Fala Sério 76', 'Episódios sobre cultura com convidados e debates semanais', 'Tecnologia', 'Aline Araújo', 'Inglês'),
+('Mundo Aberto 77', 'Episódios sobre cultura com convidados e debates semanais', 'Ciência', 'Rafael Araújo', 'Português'),
+('Mundo Aberto 78', 'Episódios sobre entretenimento com convidados e debates semanais', 'Esportes', 'Isabela Freitas', 'Português'),
+('NerdCast 79', 'Episódios sobre sociedade com convidados e debates semanais', 'Educação', 'Thiago Martins', 'Inglês'),
+('Ideias Livres 80', 'Episódios sobre ciência com convidados e debates semanais', 'Negócios', 'Vanessa Nascimento', 'Português'),
+('Mundo Aberto 81', 'Episódios sobre negócios com convidados e debates semanais', 'Educação', 'Ana Gomes', 'Português'),
+('NerdCast 82', 'Episódios sobre notícias com convidados e debates semanais', 'Educação', 'Ricardo Fernandes', 'Espanhol'),
+('Mamilos 83', 'Episódios sobre tecnologia com convidados e debates semanais', 'Ciência', 'Bruno Moreira', 'Português'),
+('Conversa Franca 84', 'Episódios sobre ciência com convidados e debates semanais', 'Saúde', 'Vinícius Ribeiro', 'Inglês'),
+('Mamilos 85', 'Episódios sobre sociedade com convidados e debates semanais', 'Saúde', 'Gustavo Costa', 'Espanhol'),
+('Fala Sério 86', 'Episódios sobre tecnologia com convidados e debates semanais', 'Negócios', 'Alexandre Rocha', 'Inglês'),
+('Café da Manhã 87', 'Episódios sobre tecnologia com convidados e debates semanais', 'Tecnologia', 'Diego Cavalcanti', 'Espanhol'),
+('NerdCast 88', 'Episódios sobre cultura com convidados e debates semanais', 'Entretenimento', 'Tatiane Oliveira', 'Inglês'),
+('Conversa Franca 89', 'Episódios sobre tecnologia com convidados e debates semanais', 'Negócios', 'Gabriel Carvalho', 'Espanhol'),
+('Mundo Aberto 90', 'Episódios sobre ciência com convidados e debates semanais', 'Educação', 'Simone Barbosa', 'Espanhol'),
+('Ponto de Vista 91', 'Episódios sobre cultura com convidados e debates semanais', 'Entretenimento', 'Vanessa Araújo', 'Inglês'),
+('Fala Sério 92', 'Episódios sobre sociedade com convidados e debates semanais', 'Esportes', 'Daniel Cardoso', 'Português'),
+('Mamilos 93', 'Episódios sobre educação com convidados e debates semanais', 'Entretenimento', 'Rodrigo Gomes', 'Português'),
+('Mamilos 94', 'Episódios sobre educação com convidados e debates semanais', 'Sociedade', 'Débora Barbosa', 'Inglês'),
+('Fala Sério 95', 'Episódios sobre sociedade com convidados e debates semanais', 'Cultura', 'Renata Rocha', 'Português'),
+('Mundo Aberto 96', 'Episódios sobre ciência com convidados e debates semanais', 'Sociedade', 'Fábio Oliveira', 'Inglês'),
+('Papo Reto 97', 'Episódios sobre sociedade com convidados e debates semanais', 'Sociedade', 'Carolina Monteiro', 'Inglês'),
+('Fala Sério 98', 'Episódios sobre notícias com convidados e debates semanais', 'Educação', 'Mariana Nascimento', 'Português'),
+('Ideias Livres 99', 'Episódios sobre saúde com convidados e debates semanais', 'Ciência', 'Débora Lopes', 'Inglês'),
+('Ponto de Vista 100', 'Episódios sobre negócios com convidados e debates semanais', 'Saúde', 'Paulo Monteiro', 'Inglês');
+ 
+-- =========================
+-- Episode
+-- =========================
+INSERT INTO Episode (Title, DescriptionEpisodes, Duration, PublicationDate, PodcastID, EpisodeNumber) VALUES
+('Episódio 1: Vida', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:27:01', '2020-06-22', 38, 17),
+('Episódio 2: Sonho', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:36:49', '2023-02-17', 73, 254),
+('Episódio 3: Beleza', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:28:07', '2021-01-02', 100, 279),
+('Episódio 4: Alegria', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:11:34', '2020-06-14', 55, 53),
+('Episódio 5: Distância', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:19:28', '2020-12-12', 45, 45),
+('Episódio 6: Fogo', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:41:51', '2024-08-05', 89, 180),
+('Episódio 7: Segredo', 'Discussão aprofundada sobre cultura e seus desdobramentos', '01:10:39', '2019-07-25', 27, 106),
+('Episódio 8: Saudade', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:23:17', '2024-09-10', 69, 87),
+('Episódio 9: Paixão', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:28:17', '2023-10-09', 87, 49),
+('Episódio 10: Noite', 'Discussão aprofundada sobre saúde e seus desdobramentos', '00:50:55', '2019-06-04', 90, 68),
+('Episódio 11: Estrada', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:46:48', '2022-05-28', 63, 73),
+('Episódio 12: Esperança', 'Discussão aprofundada sobre esportes e seus desdobramentos', '01:24:28', '2018-11-06', 82, 48),
+('Episódio 13: Caminho', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:10:29', '2023-06-23', 42, 298),
+('Episódio 14: Amor', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '01:40:42', '2022-01-07', 9, 274),
+('Episódio 15: Caminho', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '01:52:13', '2023-07-20', 35, 166),
+('Episódio 16: Fé', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:27:54', '2023-06-11', 44, 25),
+('Episódio 17: Saudade', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '01:10:07', '2019-10-10', 57, 234),
+('Episódio 18: Amor', 'Discussão aprofundada sobre saúde e seus desdobramentos', '00:31:56', '2021-05-21', 21, 141),
+('Episódio 19: Liberdade', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:25:23', '2019-11-09', 7, 203),
+('Episódio 20: Brisa', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:10:41', '2019-01-09', 91, 49),
+('Episódio 21: Amor', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '01:10:08', '2024-08-28', 29, 266),
+('Episódio 22: Manhã', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:16:44', '2021-11-08', 16, 217),
+('Episódio 23: Segredo', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '01:10:14', '2022-04-19', 12, 53),
+('Episódio 24: Verão', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:53:08', '2022-04-17', 100, 69),
+('Episódio 25: Brisa', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:22:36', '2018-02-04', 79, 85),
+('Episódio 26: Fogo', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:34:58', '2022-08-14', 79, 227),
+('Episódio 27: Coração', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:32:48', '2019-05-20', 76, 197),
+('Episódio 28: Alegria', 'Discussão aprofundada sobre saúde e seus desdobramentos', '00:32:15', '2021-02-08', 83, 44),
+('Episódio 29: Estrada', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:18:54', '2021-05-20', 27, 266),
+('Episódio 30: Raiz', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:10:18', '2018-08-12', 31, 254),
+('Episódio 31: Caminho', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:18:40', '2024-08-29', 10, 271),
+('Episódio 32: Amor', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:31:24', '2024-05-17', 54, 188),
+('Episódio 33: Beleza', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '01:49:04', '2018-03-10', 76, 35),
+('Episódio 34: Amor', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:20:59', '2018-09-05', 51, 260),
+('Episódio 35: Fé', 'Discussão aprofundada sobre ciência e seus desdobramentos', '01:27:44', '2022-07-06', 11, 275),
+('Episódio 36: Beleza', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:50:05', '2021-06-23', 11, 262),
+('Episódio 37: Coração', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:10:37', '2018-09-28', 40, 224),
+('Episódio 38: Distância', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:46:05', '2022-11-15', 15, 233),
+('Episódio 39: Raiz', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:54:42', '2019-12-21', 16, 7),
+('Episódio 40: Segredo', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:35:31', '2021-11-21', 67, 265),
+('Episódio 41: Distância', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:10:08', '2021-01-05', 94, 61),
+('Episódio 42: Memória', 'Discussão aprofundada sobre notícias e seus desdobramentos', '00:10:17', '2023-11-16', 9, 135),
+('Episódio 43: Segredo', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:18:29', '2023-09-24', 47, 29),
+('Episódio 44: Vida', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:10:10', '2020-11-10', 99, 53),
+('Episódio 45: Esperança', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:20:00', '2018-06-30', 2, 126),
+('Episódio 46: Saudade', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:10:58', '2019-09-07', 23, 19),
+('Episódio 47: Beleza', 'Discussão aprofundada sobre saúde e seus desdobramentos', '00:56:15', '2022-09-01', 93, 164),
+('Episódio 48: Sonho', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:30:32', '2018-08-04', 23, 115),
+('Episódio 49: Dança', 'Discussão aprofundada sobre notícias e seus desdobramentos', '01:10:56', '2023-03-21', 37, 160),
+('Episódio 50: Paixão', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '01:10:23', '2020-04-01', 38, 289),
+('Episódio 51: Fé', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:14:23', '2024-08-20', 64, 101),
+('Episódio 52: Distância', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:34:00', '2022-08-07', 4, 120),
+('Episódio 53: Beleza', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:57:00', '2022-03-22', 95, 158),
+('Episódio 54: Verão', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:10:31', '2018-09-03', 19, 144),
+('Episódio 55: Liberdade', 'Discussão aprofundada sobre notícias e seus desdobramentos', '00:21:26', '2022-03-06', 59, 44),
+('Episódio 56: Esperança', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:10:04', '2024-08-21', 73, 32),
+('Episódio 57: Luz', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:52:16', '2021-07-14', 51, 168),
+('Episódio 58: Paixão', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:44:04', '2020-04-10', 18, 300),
+('Episódio 59: Verão', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:36:28', '2023-03-24', 41, 209),
+('Episódio 60: Verão', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:41:28', '2021-06-16', 60, 136),
+('Episódio 61: Verão', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:53:52', '2024-10-07', 6, 111),
+('Episódio 62: Paixão', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:46:22', '2022-06-12', 66, 26),
+('Episódio 63: Manhã', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:37:01', '2022-07-15', 58, 285),
+('Episódio 64: Distância', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:27:29', '2019-02-22', 18, 63),
+('Episódio 65: Amor', 'Discussão aprofundada sobre notícias e seus desdobramentos', '00:31:12', '2022-06-29', 48, 44),
+('Episódio 66: Esperança', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:24:01', '2018-09-22', 26, 228),
+('Episódio 67: Noite', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:30:02', '2023-03-04', 7, 87),
+('Episódio 68: Esperança', 'Discussão aprofundada sobre saúde e seus desdobramentos', '01:31:01', '2022-04-17', 88, 219),
+('Episódio 69: Chuva', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:38:17', '2021-02-20', 58, 77),
+('Episódio 70: Saudade', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:52:31', '2022-08-15', 71, 246),
+('Episódio 71: Saudade', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:10:08', '2022-09-14', 26, 270),
+('Episódio 72: Estrada', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:10:50', '2022-01-10', 62, 279),
+('Episódio 73: Vida', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:10:17', '2020-01-07', 4, 164),
+('Episódio 74: Raiz', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:50:03', '2023-04-17', 68, 184),
+('Episódio 75: Memória', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:35:06', '2020-10-12', 85, 124),
+('Episódio 76: Sonho', 'Discussão aprofundada sobre ciência e seus desdobramentos', '00:43:36', '2022-05-10', 46, 89),
+('Episódio 77: Chuva', 'Discussão aprofundada sobre tecnologia e seus desdobramentos', '00:10:58', '2024-08-20', 4, 181),
+('Episódio 78: Esperança', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:27:12', '2023-07-10', 70, 159),
+('Episódio 79: Chuva', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:26:03', '2020-08-10', 78, 113),
+('Episódio 80: Amor', 'Discussão aprofundada sobre ciência e seus desdobramentos', '01:10:21', '2024-11-20', 26, 67),
+('Episódio 81: Paixão', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '00:22:01', '2019-08-29', 76, 73),
+('Episódio 82: Memória', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:24:23', '2022-06-09', 76, 52),
+('Episódio 83: Paixão', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:32:10', '2022-11-25', 82, 250),
+('Episódio 84: Brisa', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:26:44', '2024-11-18', 46, 115),
+('Episódio 85: Manhã', 'Discussão aprofundada sobre cultura e seus desdobramentos', '00:10:19', '2021-04-21', 17, 91),
+('Episódio 86: Distância', 'Discussão aprofundada sobre notícias e seus desdobramentos', '01:54:49', '2024-05-13', 5, 94),
+('Episódio 87: Raiz', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:27:06', '2023-07-26', 19, 170),
+('Episódio 88: Distância', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:59:20', '2019-11-19', 82, 46),
+('Episódio 89: Segredo', 'Discussão aprofundada sobre educação e seus desdobramentos', '01:10:16', '2020-05-08', 32, 35),
+('Episódio 90: Alegria', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:15:03', '2022-04-30', 57, 215),
+('Episódio 91: Chuva', 'Discussão aprofundada sobre saúde e seus desdobramentos', '01:56:24', '2021-12-09', 70, 193),
+('Episódio 92: Verão', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:35:28', '2018-10-29', 5, 151),
+('Episódio 93: Amor', 'Discussão aprofundada sobre educação e seus desdobramentos', '00:28:04', '2021-11-01', 22, 193),
+('Episódio 94: Chuva', 'Discussão aprofundada sobre entretenimento e seus desdobramentos', '00:58:38', '2024-11-18', 62, 16),
+('Episódio 95: Luz', 'Discussão aprofundada sobre sociedade e seus desdobramentos', '01:10:03', '2019-02-19', 43, 106),
+('Episódio 96: Coração', 'Discussão aprofundada sobre saúde e seus desdobramentos', '00:51:19', '2020-08-30', 13, 26),
+('Episódio 97: Caminho', 'Discussão aprofundada sobre cultura e seus desdobramentos', '01:10:03', '2022-01-17', 1, 219),
+('Episódio 98: Liberdade', 'Discussão aprofundada sobre esportes e seus desdobramentos', '01:12:06', '2018-04-16', 27, 88),
+('Episódio 99: Brisa', 'Discussão aprofundada sobre esportes e seus desdobramentos', '00:15:54', '2019-04-19', 40, 204),
+('Episódio 100: Vida', 'Discussão aprofundada sobre negócios e seus desdobramentos', '00:26:41', '2024-02-07', 50, 95);
+ 
+-- =========================
+-- Playlist
+-- =========================
+INSERT INTO Playlist (PlaylistName, CreationDate, Public, UserID, UpdatedAt) VALUES
+('Playlist Alegria 1', '2023-12-19', 1, 48, '2023-07-11 14:02:00'),
+('Playlist Sonho 2', '2021-06-19', 1, 34, '2023-08-20 08:36:00'),
+('Playlist Saudade 3', '2019-11-06', 0, 11, '2024-11-15 11:51:00'),
+('Playlist Beleza 4', '2021-04-27', 0, 71, '2023-03-04 12:52:00'),
+('Playlist Dança 5', '2021-05-07', 1, 74, '2023-08-30 15:19:00'),
+('Playlist Liberdade 6', '2021-03-19', 0, 65, '2024-08-07 16:51:00'),
+('Playlist Esperança 7', '2022-10-19', 0, 16, '2024-04-04 05:10:00'),
+('Playlist Coração 8', '2023-07-14', 0, 17, '2023-02-13 13:05:00'),
+('Playlist Manhã 9', '2021-06-10', 0, 81, '2023-06-01 19:16:00'),
+('Playlist Paixão 10', '2023-01-29', 0, 12, '2024-02-02 17:25:00'),
+('Playlist Beleza 11', '2020-10-29', 1, 67, '2024-04-14 00:50:00'),
+('Playlist Segredo 12', '2022-06-30', 1, 15, '2024-02-29 04:09:00'),
+('Playlist Esperança 13', '2022-04-19', 0, 14, '2024-07-30 03:50:00'),
+('Playlist Fé 14', '2023-11-12', 1, 53, '2023-09-28 12:41:00'),
+('Playlist Vida 15', '2022-03-17', 1, 5, '2023-06-26 08:25:00'),
+('Playlist Noite 16', '2022-06-20', 1, 5, '2024-02-10 10:44:00'),
+('Playlist Estrada 17', '2019-04-11', 1, 35, '2024-01-17 00:21:00'),
+('Playlist Fé 18', '2020-09-28', 1, 63, '2024-12-13 21:06:00'),
+('Playlist Estrada 19', '2019-10-03', 1, 96, '2024-03-29 10:17:00'),
+('Playlist Distância 20', '2021-05-03', 0, 25, '2024-03-28 06:58:00'),
+('Playlist Luz 21', '2023-02-26', 1, 98, '2024-06-12 11:52:00'),
+('Playlist Saudade 22', '2021-11-21', 0, 9, '2023-11-15 22:32:00'),
+('Playlist Caminho 23', '2019-10-05', 0, 23, '2023-07-17 06:53:00'),
+('Playlist Saudade 24', '2020-05-25', 0, 59, '2023-02-21 11:45:00'),
+('Playlist Coração 25', '2020-07-15', 1, 60, '2024-06-01 12:40:00'),
+('Playlist Verão 26', '2022-10-27', 0, 31, '2024-01-17 15:38:00'),
+('Playlist Fogo 27', '2019-12-30', 1, 76, '2024-07-18 11:22:00'),
+('Playlist Chuva 28', '2023-09-12', 1, 96, '2024-12-06 02:18:00'),
+('Playlist Amor 29', '2021-03-02', 0, 21, '2024-08-08 06:54:00'),
+('Playlist Estrada 30', '2022-08-18', 0, 87, '2023-07-31 08:41:00'),
+('Playlist Luz 31', '2021-11-17', 0, 100, '2024-11-29 00:30:00'),
+('Playlist Noite 32', '2022-08-18', 0, 77, '2023-01-09 07:16:00'),
+('Playlist Raiz 33', '2023-07-07', 1, 92, '2024-12-27 20:17:00'),
+('Playlist Luz 34', '2021-02-10', 1, 59, '2023-09-16 06:29:00'),
+('Playlist Fé 35', '2022-10-18', 1, 75, '2023-04-15 00:32:00'),
+('Playlist Manhã 36', '2023-09-24', 1, 72, '2024-10-24 19:38:00'),
+('Playlist Fé 37', '2020-09-03', 0, 62, '2023-03-07 10:17:00'),
+('Playlist Brisa 38', '2020-10-27', 1, 34, '2024-11-02 22:57:00'),
+('Playlist Brisa 39', '2020-09-03', 0, 20, '2024-06-13 07:57:00'),
+('Playlist Saudade 40', '2023-07-08', 1, 85, '2023-11-24 21:08:00'),
+('Playlist Distância 41', '2019-02-22', 1, 38, '2023-09-23 13:25:00'),
+('Playlist Caminho 42', '2023-02-17', 0, 75, '2024-12-26 18:52:00'),
+('Playlist Coração 43', '2020-12-03', 0, 88, '2024-07-01 20:50:00'),
+('Playlist Vida 44', '2022-10-07', 1, 65, '2023-11-04 05:53:00'),
+('Playlist Manhã 45', '2023-12-01', 0, 38, '2023-04-10 15:08:00'),
+('Playlist Distância 46', '2020-06-13', 0, 88, '2023-12-10 20:05:00'),
+('Playlist Estrada 47', '2020-12-28', 0, 96, '2023-11-11 13:50:00'),
+('Playlist Paixão 48', '2021-01-31', 1, 75, '2023-10-29 14:54:00'),
+('Playlist Verão 49', '2021-08-21', 0, 82, '2024-08-20 18:39:00'),
+('Playlist Liberdade 50', '2021-08-25', 0, 65, '2023-05-03 21:24:00'),
+('Playlist Dança 51', '2020-09-03', 1, 7, '2023-06-04 04:12:00'),
+('Playlist Paixão 52', '2021-04-18', 1, 19, '2023-11-20 22:11:00'),
+('Playlist Memória 53', '2019-06-15', 1, 43, '2024-10-08 05:20:00'),
+('Playlist Brisa 54', '2019-04-29', 0, 58, '2023-10-08 06:48:00'),
+('Playlist Memória 55', '2019-12-12', 0, 63, '2023-04-01 04:39:00'),
+('Playlist Luz 56', '2022-07-21', 1, 52, '2024-03-15 15:24:00'),
+('Playlist Amor 57', '2019-03-19', 0, 94, '2024-01-18 00:57:00'),
+('Playlist Paixão 58', '2023-03-31', 0, 3, '2024-11-23 00:40:00'),
+('Playlist Distância 59', '2020-05-24', 0, 89, '2023-12-19 09:08:00'),
+('Playlist Verão 60', '2021-02-24', 1, 22, '2023-03-08 01:19:00'),
+('Playlist Fé 61', '2021-07-22', 1, 56, '2024-12-04 04:21:00'),
+('Playlist Vida 62', '2021-01-05', 0, 22, '2024-02-18 00:14:00'),
+('Playlist Estrada 63', '2023-01-29', 0, 28, '2023-01-23 18:32:00'),
+('Playlist Chuva 64', '2019-09-10', 1, 92, '2024-10-28 01:24:00'),
+('Playlist Brisa 65', '2020-06-07', 0, 77, '2023-02-19 21:06:00'),
+('Playlist Brisa 66', '2023-09-09', 0, 7, '2024-12-07 03:26:00'),
+('Playlist Fogo 67', '2021-02-17', 0, 71, '2023-09-16 15:44:00'),
+('Playlist Noite 68', '2020-02-25', 0, 39, '2024-03-06 21:06:00'),
+('Playlist Manhã 69', '2021-12-01', 1, 80, '2024-09-12 22:08:00'),
+('Playlist Luz 70', '2023-08-29', 0, 66, '2024-09-24 03:18:00'),
+('Playlist Verão 71', '2023-05-27', 0, 64, '2023-07-23 19:12:00'),
+('Playlist Memória 72', '2020-06-22', 0, 46, '2024-12-21 13:18:00'),
+('Playlist Chuva 73', '2019-03-22', 1, 27, '2024-12-05 15:21:00'),
+('Playlist Estrada 74', '2019-01-06', 0, 86, '2023-04-02 03:53:00'),
+('Playlist Esperança 75', '2022-10-02', 1, 20, '2023-04-03 16:04:00'),
+('Playlist Distância 76', '2023-01-21', 0, 33, '2024-10-21 07:29:00'),
+('Playlist Fé 77', '2020-06-24', 1, 7, '2023-04-13 05:55:00'),
+('Playlist Saudade 78', '2023-10-12', 1, 47, '2024-11-24 10:27:00'),
+('Playlist Distância 79', '2019-08-26', 0, 98, '2023-02-16 00:54:00'),
+('Playlist Noite 80', '2022-09-20', 0, 43, '2024-01-02 14:39:00'),
+('Playlist Sonho 81', '2023-12-05', 0, 48, '2023-12-17 05:07:00'),
+('Playlist Caminho 82', '2021-03-30', 1, 35, '2024-01-30 22:54:00'),
+('Playlist Vida 83', '2023-06-27', 1, 84, '2023-06-20 03:08:00'),
+('Playlist Segredo 84', '2023-01-27', 0, 21, '2023-04-17 13:58:00'),
+('Playlist Esperança 85', '2021-09-15', 1, 24, '2024-09-17 12:49:00'),
+('Playlist Alegria 86', '2022-06-06', 0, 88, '2023-05-14 15:58:00'),
+('Playlist Vida 87', '2019-08-20', 1, 57, '2023-02-17 02:16:00'),
+('Playlist Brisa 88', '2020-10-05', 0, 91, '2024-11-25 16:49:00'),
+('Playlist Distância 89', '2022-03-26', 0, 86, '2023-12-13 16:33:00'),
+('Playlist Segredo 90', '2022-12-05', 0, 56, '2024-11-08 23:15:00'),
+('Playlist Vida 91', '2020-12-09', 1, 20, '2024-07-25 19:03:00'),
+('Playlist Amor 92', '2022-08-10', 0, 65, '2024-04-25 15:55:00'),
+('Playlist Chuva 93', '2019-06-03', 1, 42, '2023-09-04 10:17:00'),
+('Playlist Saudade 94', '2021-11-04', 0, 71, '2024-10-20 12:25:00'),
+('Playlist Estrada 95', '2019-06-11', 1, 57, '2024-08-09 14:05:00'),
+('Playlist Vida 96', '2021-07-04', 1, 16, '2024-05-24 23:41:00'),
+('Playlist Amor 97', '2019-07-30', 1, 53, '2023-02-06 17:35:00'),
+('Playlist Amor 98', '2023-08-19', 0, 78, '2024-09-25 20:19:00'),
+('Playlist Dança 99', '2022-02-25', 0, 84, '2024-11-18 14:21:00'),
+('Playlist Alegria 100', '2023-08-18', 0, 29, '2024-04-10 10:35:00');
+ 
+-- =========================
+-- PlaylistSongs
+-- =========================
+INSERT INTO PlaylistSongs (DateAdded, PlaylistID, SongID, AddedByUserID) VALUES
+('2024-04-21', 92, 85, 47),
+('2024-01-28', 15, 13, 98),
+('2021-06-27', 1, 44, 46),
+('2022-04-10', 71, 67, 48),
+('2020-03-11', 6, 22, 64),
+('2020-07-29', 92, 96, 93),
+('2023-08-04', 14, 33, 79),
+('2021-03-13', 25, 16, 51),
+('2021-06-02', 59, 25, 92),
+('2022-10-16', 14, 97, 54),
+('2019-07-10', 82, 87, 76),
+('2020-05-19', 99, 58, 59),
+('2024-08-27', 18, 64, 1),
+('2024-12-12', 95, 7, 71),
+('2023-11-08', 75, 62, 66),
+('2020-12-26', 89, 75, 23),
+('2020-06-09', 14, 50, 85),
+('2022-08-11', 65, 50, 54),
+('2021-10-13', 36, 51, 44),
+('2022-04-19', 58, 18, 18),
+('2023-08-18', 78, 90, 96),
+('2024-09-29', 39, 90, 71),
+('2022-07-09', 92, 95, 71),
+('2021-06-09', 26, 27, 80),
+('2022-04-05', 88, 45, 87),
+('2020-06-27', 91, 84, 23),
+('2024-08-25', 70, 89, 82),
+('2022-08-13', 91, 15, 98),
+('2022-12-13', 72, 62, 75),
+('2023-09-06', 87, 96, 69),
+('2022-03-17', 55, 2, 67),
+('2020-03-12', 4, 49, 19),
+('2019-08-06', 86, 8, 26),
+('2021-12-29', 97, 21, 37),
+('2021-10-23', 19, 8, 89),
+('2022-04-23', 27, 97, 70),
+('2019-05-13', 46, 58, 14),
+('2021-07-07', 96, 83, 72),
+('2023-05-12', 31, 66, 90),
+('2022-03-24', 89, 86, 7),
+('2023-04-12', 50, 54, 88),
+('2022-07-04', 71, 7, 2),
+('2021-10-26', 26, 80, 100),
+('2023-12-20', 29, 82, 91),
+('2023-02-15', 97, 76, 70),
+('2021-03-15', 100, 93, 25),
+('2022-04-19', 58, 23, 88),
+('2019-11-02', 24, 23, 95),
+('2024-10-05', 16, 49, 6),
+('2023-10-22', 36, 72, 34),
+('2020-06-16', 21, 75, 33),
+('2019-01-24', 43, 60, 91),
+('2020-09-26', 6, 20, 42),
+('2019-07-28', 100, 81, 79),
+('2022-05-18', 63, 74, 71),
+('2023-01-06', 10, 91, 41),
+('2024-11-22', 29, 24, 67),
+('2019-10-07', 65, 21, 54),
+('2023-07-11', 12, 45, 29),
+('2021-05-23', 85, 43, 43),
+('2023-01-17', 38, 28, 97),
+('2024-12-12', 61, 72, 97),
+('2019-02-06', 15, 86, 45),
+('2023-12-31', 31, 83, 79),
+('2021-09-25', 6, 88, 42),
+('2023-04-12', 15, 50, 33),
+('2022-03-04', 4, 67, 99),
+('2023-03-16', 66, 66, 58),
+('2024-06-16', 6, 38, 84),
+('2021-02-27', 42, 66, 11),
+('2020-01-29', 22, 99, 69),
+('2024-12-24', 1, 81, 9),
+('2021-05-13', 86, 81, 100),
+('2021-05-23', 88, 55, 14),
+('2021-04-22', 69, 90, 95),
+('2023-11-18', 83, 10, 96),
+('2020-09-21', 4, 59, 92),
+('2022-09-20', 5, 12, 10),
+('2019-08-11', 23, 33, 72),
+('2019-10-16', 74, 30, 34),
+('2023-07-28', 50, 58, 81),
+('2023-07-15', 56, 41, 3),
+('2023-05-15', 87, 16, 69),
+('2019-01-25', 83, 93, 80),
+('2019-09-17', 97, 96, 75),
+('2019-07-06', 90, 10, 46),
+('2024-08-21', 14, 38, 88),
+('2022-05-19', 78, 12, 37),
+('2023-11-28', 49, 51, 85),
+('2019-05-07', 61, 21, 69),
+('2021-06-19', 18, 96, 51),
+('2022-04-23', 82, 19, 39),
+('2023-03-09', 2, 71, 72),
+('2020-08-02', 16, 6, 1),
+('2023-06-03', 69, 71, 11),
+('2022-06-02', 27, 96, 95),
+('2022-11-09', 28, 53, 83),
+('2024-09-30', 19, 21, 24),
+('2021-06-23', 79, 33, 25),
+('2020-04-14', 24, 86, 73);
+ 
+-- =========================
+-- PodcastHistory
+-- =========================
+INSERT INTO PodcastHistory (PlaybackDate, ListeningTime, UserID, EpisodeID, DeviceType) VALUES
+('2022-04-22 17:29:00', '00:52:42', 9, 33, 'Smartphone Android'),
+('2023-02-09 23:37:00', '01:21:22', 17, 86, 'Notebook'),
+('2023-04-26 03:18:00', '00:39:20', 63, 58, 'Desktop'),
+('2023-09-19 22:37:00', '00:27:36', 47, 41, 'Tablet'),
+('2022-12-12 00:20:00', '00:43:45', 95, 83, 'Tablet'),
+('2023-07-21 11:08:00', '00:16:29', 58, 46, 'Desktop'),
+('2024-09-24 17:06:00', '00:25:53', 36, 18, 'Smart TV'),
+('2023-02-07 08:46:00', '00:24:57', 3, 65, 'Notebook'),
+('2022-03-05 18:37:00', '01:49:37', 28, 5, 'Smart TV'),
+('2023-06-18 17:57:00', '01:41:49', 20, 47, 'Tablet'),
+('2023-04-03 18:46:00', '00:32:29', 65, 66, 'Smartphone Android'),
+('2024-03-23 11:32:00', '00:45:54', 79, 88, 'iPhone'),
+('2024-11-18 04:28:00', '00:37:36', 73, 85, 'iPhone'),
+('2024-09-17 11:02:00', '00:17:14', 9, 34, 'Desktop'),
+('2023-04-25 01:42:00', '00:21:58', 47, 50, 'Tablet'),
+('2024-07-20 01:02:00', '00:28:45', 67, 82, 'Desktop'),
+('2023-06-24 18:34:00', '00:10:41', 49, 47, 'Smart TV'),
+('2022-06-09 16:16:00', '01:58:14', 67, 52, 'Desktop'),
+('2023-12-08 15:50:00', '01:56:38', 1, 65, 'iPhone'),
+('2024-06-19 05:14:00', '00:20:41', 36, 28, 'iPhone'),
+('2023-01-18 05:23:00', '00:44:26', 43, 93, 'Smartphone Android'),
+('2024-09-13 21:30:00', '01:13:37', 21, 83, 'Tablet'),
+('2022-02-15 07:02:00', '00:28:37', 21, 18, 'Notebook'),
+('2024-11-15 01:57:00', '00:22:10', 34, 24, 'Smart TV'),
+('2024-04-10 19:36:00', '00:51:05', 28, 58, 'Smart TV'),
+('2024-08-23 15:10:00', '00:10:38', 19, 75, 'iPhone'),
+('2024-11-12 08:10:00', '00:13:38', 76, 9, 'iPhone'),
+('2024-02-14 12:08:00', '00:17:12', 67, 65, 'Notebook'),
+('2024-05-09 04:38:00', '00:37:30', 79, 77, 'Smartphone Android'),
+('2024-12-24 16:48:00', '00:26:30', 85, 17, 'Smart TV'),
+('2022-01-03 21:41:00', '01:33:26', 48, 6, 'Notebook'),
+('2024-12-21 13:14:00', '01:50:49', 49, 45, 'Smart TV'),
+('2022-07-20 13:08:00', '00:16:49', 30, 11, 'Desktop'),
+('2024-04-16 08:12:00', '00:15:36', 67, 16, 'Smart TV'),
+('2022-01-15 12:41:00', '00:55:26', 47, 14, 'iPhone'),
+('2024-05-22 20:37:00', '00:48:54', 69, 55, 'Smart TV'),
+('2024-01-19 19:17:00', '01:48:13', 53, 71, 'Smart TV'),
+('2024-09-15 05:23:00', '01:16:19', 74, 45, 'Notebook'),
+('2024-03-26 23:08:00', '00:44:28', 90, 21, 'Smartphone Android'),
+('2023-03-16 16:25:00', '00:25:39', 90, 88, 'Notebook'),
+('2022-04-17 05:24:00', '00:26:52', 19, 61, 'Smart TV'),
+('2024-06-10 02:04:00', '00:43:23', 11, 78, 'Smartphone Android'),
+('2024-02-27 12:39:00', '00:22:49', 23, 82, 'Tablet'),
+('2024-06-18 00:12:00', '00:39:02', 77, 66, 'Smart TV'),
+('2023-04-20 19:10:00', '00:10:15', 84, 1, 'iPhone'),
+('2022-06-27 08:49:00', '01:22:42', 51, 52, 'Smart TV'),
+('2023-02-15 16:00:00', '00:26:35', 37, 93, 'Smart TV'),
+('2023-12-14 11:52:00', '00:43:38', 25, 59, 'Tablet'),
+('2022-01-10 08:11:00', '01:32:06', 72, 10, 'Smart TV'),
+('2023-08-26 10:07:00', '00:23:52', 74, 33, 'Notebook'),
+('2024-06-25 12:36:00', '01:49:15', 97, 44, 'Tablet'),
+('2024-08-01 18:55:00', '00:16:07', 34, 9, 'Tablet'),
+('2023-03-28 21:44:00', '00:55:26', 46, 67, 'Smart TV'),
+('2022-01-20 22:53:00', '00:46:18', 12, 52, 'Notebook'),
+('2023-12-02 02:35:00', '00:15:20', 46, 28, 'Smart TV'),
+('2023-07-06 05:47:00', '00:18:47', 26, 31, 'Notebook'),
+('2023-05-11 08:13:00', '00:40:53', 32, 80, 'Desktop'),
+('2022-11-16 03:07:00', '00:18:39', 1, 98, 'Smart TV'),
+('2022-03-28 15:23:00', '00:18:57', 74, 36, 'Tablet'),
+('2023-01-10 16:17:00', '01:14:48', 74, 17, 'Smartphone Android'),
+('2024-12-12 13:30:00', '00:19:22', 51, 88, 'iPhone'),
+('2024-07-25 03:44:00', '01:20:44', 2, 2, 'Notebook'),
+('2023-03-08 12:37:00', '00:56:23', 79, 34, 'iPhone'),
+('2023-06-23 07:17:00', '01:39:21', 47, 24, 'Tablet'),
+('2024-05-18 06:26:00', '00:10:54', 52, 36, 'Tablet'),
+('2023-01-04 18:08:00', '00:27:46', 35, 31, 'Smart TV'),
+('2024-06-04 12:12:00', '00:34:30', 2, 23, 'Tablet'),
+('2024-10-20 04:57:00', '00:17:19', 33, 72, 'Smart TV'),
+('2022-04-08 12:06:00', '00:22:13', 33, 61, 'Notebook'),
+('2022-07-17 14:47:00', '00:48:23', 47, 72, 'Smart TV'),
+('2023-06-12 11:01:00', '01:10:22', 87, 78, 'iPhone'),
+('2022-12-24 09:22:00', '00:20:31', 100, 95, 'Tablet'),
+('2022-06-10 12:39:00', '00:14:40', 19, 22, 'Notebook'),
+('2023-11-22 13:40:00', '01:54:58', 10, 11, 'iPhone'),
+('2023-12-05 07:20:00', '00:52:45', 35, 78, 'Notebook'),
+('2024-03-20 08:56:00', '01:49:55', 47, 96, 'Smart TV'),
+('2024-12-02 14:26:00', '00:38:54', 3, 17, 'Notebook'),
+('2023-04-26 21:16:00', '00:41:10', 51, 14, 'Smartphone Android'),
+('2022-05-11 15:35:00', '00:18:49', 51, 68, 'Smartphone Android'),
+('2022-08-01 08:39:00', '00:25:41', 50, 40, 'iPhone'),
+('2023-05-22 23:18:00', '01:40:08', 17, 68, 'iPhone'),
+('2022-02-28 01:42:00', '00:56:55', 61, 60, 'Smart TV'),
+('2023-07-12 17:28:00', '00:24:11', 76, 77, 'Tablet'),
+('2024-06-09 16:40:00', '00:59:30', 70, 30, 'Smartphone Android'),
+('2024-06-23 09:23:00', '01:16:09', 39, 2, 'Smartphone Android'),
+('2024-12-07 04:22:00', '00:15:34', 2, 89, 'Tablet'),
+('2024-09-04 09:00:00', '01:51:18', 77, 30, 'Smartphone Android'),
+('2024-02-05 06:26:00', '01:25:15', 21, 92, 'Notebook'),
+('2024-03-09 12:14:00', '00:25:27', 81, 31, 'Smart TV'),
+('2023-07-11 09:41:00', '00:10:12', 9, 24, 'iPhone'),
+('2023-08-17 03:40:00', '01:39:28', 35, 90, 'Smart TV'),
+('2024-10-04 06:20:00', '00:34:03', 69, 3, 'iPhone'),
+('2022-07-29 09:17:00', '00:11:46', 2, 30, 'Smartphone Android'),
+('2022-11-05 00:31:00', '00:58:26', 40, 64, 'Desktop'),
+('2024-08-07 22:50:00', '00:57:05', 97, 19, 'Smartphone Android'),
+('2023-06-30 12:04:00', '01:11:12', 33, 49, 'Smartphone Android'),
+('2022-09-07 22:15:00', '01:49:28', 32, 95, 'Smartphone Android'),
+('2023-02-12 14:47:00', '00:21:42', 27, 61, 'Tablet'),
+('2023-10-02 10:10:00', '00:25:33', 16, 33, 'Tablet'),
+('2023-09-04 06:23:00', '00:42:07', 31, 82, 'Tablet');
+ 
+-- =========================
+-- Subscription
+-- =========================
+INSERT INTO Subscription (StartDate, EndDate, StatusSubscriptions, UserID, PlanID, AutoRenew) VALUES
+('2021-10-26', NULL, 'ativa', 1, 22, 1),
+('2021-07-19', '2022-05-17', 'expirada', 2, 32, 0),
+('2020-01-19', NULL, 'ativa', 3, 75, 1),
+('2023-11-15', NULL, 'ativa', 4, 89, 1),
+('2023-05-06', NULL, 'ativa', 5, 48, 1),
+('2020-07-02', NULL, 'ativa', 6, 21, 1),
+('2022-10-20', NULL, 'ativa', 7, 88, 1),
+('2023-06-20', NULL, 'ativa', 8, 98, 1),
+('2023-07-04', NULL, 'ativa', 9, 8, 1),
+('2021-12-29', '2022-12-01', 'suspensa', 10, 69, 0),
+('2020-08-07', NULL, 'ativa', 11, 63, 1),
+('2021-04-21', NULL, 'ativa', 12, 72, 1),
+('2023-08-13', NULL, 'ativa', 13, 57, 1),
+('2021-01-30', NULL, 'ativa', 14, 89, 1),
+('2022-02-12', NULL, 'ativa', 15, 93, 1),
+('2020-10-02', NULL, 'ativa', 16, 6, 1),
+('2022-09-20', '2024-06-09', 'suspensa', 17, 38, 0),
+('2023-01-16', '2024-11-27', 'cancelada', 18, 73, 0),
+('2021-01-17', '2022-07-07', 'expirada', 19, 94, 0),
+('2022-08-17', NULL, 'ativa', 20, 77, 1),
+('2023-02-09', NULL, 'ativa', 21, 9, 1),
+('2022-12-23', NULL, 'ativa', 22, 58, 1),
+('2021-08-28', NULL, 'ativa', 23, 70, 1),
+('2022-01-21', NULL, 'ativa', 24, 1, 1),
+('2023-07-30', '2025-02-17', 'suspensa', 25, 24, 0),
+('2020-02-08', '2021-08-13', 'suspensa', 26, 31, 0),
+('2021-10-18', '2022-06-19', 'suspensa', 27, 69, 0),
+('2022-03-04', NULL, 'ativa', 28, 68, 1),
+('2023-10-31', NULL, 'ativa', 29, 99, 1),
+('2023-02-03', NULL, 'ativa', 30, 79, 1),
+('2021-08-02', NULL, 'ativa', 31, 53, 1),
+('2023-08-05', NULL, 'ativa', 32, 15, 1),
+('2020-07-16', '2021-03-21', 'cancelada', 33, 17, 0),
+('2020-12-31', NULL, 'ativa', 34, 26, 1),
+('2020-08-07', NULL, 'ativa', 35, 25, 1),
+('2020-07-21', NULL, 'ativa', 36, 74, 1),
+('2023-08-07', NULL, 'ativa', 37, 85, 1),
+('2022-09-30', '2023-12-16', 'cancelada', 38, 47, 0),
+('2021-03-28', '2021-12-05', 'cancelada', 39, 27, 0),
+('2023-09-04', NULL, 'ativa', 40, 11, 1),
+('2022-08-16', '2023-04-15', 'expirada', 41, 72, 0),
+('2022-05-01', NULL, 'ativa', 42, 91, 1),
+('2020-04-29', '2021-07-25', 'suspensa', 43, 6, 0),
+('2020-05-24', NULL, 'ativa', 44, 10, 1),
+('2021-03-18', '2021-12-22', 'cancelada', 45, 93, 0),
+('2021-04-18', '2022-11-13', 'cancelada', 46, 25, 0),
+('2022-12-13', '2024-02-20', 'suspensa', 47, 81, 0),
+('2021-01-01', '2022-08-29', 'suspensa', 48, 14, 0),
+('2023-07-31', '2025-01-27', 'suspensa', 49, 59, 0),
+('2023-12-09', '2025-08-17', 'cancelada', 50, 22, 0),
+('2021-01-04', '2022-08-18', 'suspensa', 51, 44, 0),
+('2023-09-08', NULL, 'ativa', 52, 69, 1),
+('2023-05-13', NULL, 'ativa', 53, 46, 1),
+('2021-10-07', '2023-03-03', 'expirada', 54, 53, 0),
+('2023-07-20', NULL, 'ativa', 55, 93, 1),
+('2021-10-24', '2022-12-24', 'suspensa', 56, 70, 0),
+('2021-03-14', NULL, 'ativa', 57, 99, 1),
+('2023-01-31', '2024-04-15', 'expirada', 58, 58, 0),
+('2022-07-05', NULL, 'ativa', 59, 1, 1),
+('2020-03-11', NULL, 'ativa', 60, 77, 1),
+('2020-02-03', '2020-12-17', 'expirada', 61, 1, 0),
+('2021-09-07', NULL, 'ativa', 62, 28, 1),
+('2021-10-06', NULL, 'ativa', 63, 99, 1),
+('2023-11-13', NULL, 'ativa', 64, 71, 1),
+('2022-11-13', '2023-10-17', 'cancelada', 65, 5, 0),
+('2022-07-31', NULL, 'ativa', 66, 20, 1),
+('2020-10-10', NULL, 'ativa', 67, 47, 1),
+('2023-04-07', NULL, 'ativa', 68, 30, 1),
+('2021-06-08', NULL, 'ativa', 69, 12, 1),
+('2023-03-14', NULL, 'ativa', 70, 73, 1),
+('2021-03-21', '2021-12-05', 'suspensa', 71, 42, 0),
+('2022-09-15', NULL, 'ativa', 72, 63, 1),
+('2023-11-13', '2024-08-16', 'suspensa', 73, 83, 0),
+('2021-09-07', NULL, 'ativa', 74, 94, 1),
+('2023-03-26', NULL, 'ativa', 75, 11, 1),
+('2020-04-24', NULL, 'ativa', 76, 45, 1),
+('2022-06-08', NULL, 'ativa', 77, 16, 1),
+('2021-04-09', '2021-10-17', 'suspensa', 78, 100, 0),
+('2023-07-18', NULL, 'ativa', 79, 7, 1),
+('2021-09-16', '2022-04-26', 'expirada', 80, 70, 0),
+('2023-03-02', NULL, 'ativa', 81, 42, 1),
+('2022-10-25', '2023-12-05', 'cancelada', 82, 7, 0),
+('2023-10-11', '2025-05-15', 'expirada', 83, 97, 0),
+('2023-05-03', '2025-03-29', 'cancelada', 84, 29, 0),
+('2022-06-03', NULL, 'ativa', 85, 51, 1),
+('2020-10-30', NULL, 'ativa', 86, 44, 1),
+('2020-06-18', NULL, 'ativa', 87, 74, 1),
+('2020-04-10', '2021-11-19', 'expirada', 88, 11, 0),
+('2022-03-27', '2023-12-11', 'suspensa', 89, 17, 0),
+('2020-10-03', NULL, 'ativa', 90, 72, 1),
+('2021-02-09', NULL, 'ativa', 91, 51, 1),
+('2023-08-28', '2024-09-11', 'suspensa', 92, 79, 0),
+('2022-12-09', NULL, 'ativa', 93, 32, 1),
+('2020-05-26', NULL, 'ativa', 94, 100, 1),
+('2022-05-30', NULL, 'ativa', 95, 88, 1),
+('2023-03-25', NULL, 'ativa', 96, 15, 1),
+('2023-10-07', NULL, 'ativa', 97, 55, 1),
+('2022-01-18', NULL, 'ativa', 98, 25, 1),
+('2021-10-18', NULL, 'ativa', 99, 77, 1),
+('2023-09-04', NULL, 'ativa', 100, 99, 1);
+ 
+-- =========================
+-- Payment
+-- =========================
+INSERT INTO Payment (Amount, PaymentMethod, PaymentDate, StatusPayments, SubscriptionID, TransactionReference) VALUES
+(16.00, 'Boleto', '2023-06-16', 'estornado', 1, 'TXN-00001-2023'),
+(22.36, 'PayPal', '2020-04-01', 'pendente', 2, 'TXN-00002-2020'),
+(13.89, 'Boleto', '2020-11-15', 'aprovado', 3, 'TXN-00003-2020'),
+(12.15, 'Cartão de crédito', '2021-05-12', 'pendente', 4, 'TXN-00004-2021'),
+(27.28, 'Boleto', '2020-01-29', 'recusado', 5, 'TXN-00005-2020'),
+(23.78, 'Cartão de crédito', '2021-09-16', 'estornado', 6, 'TXN-00006-2021'),
+(19.32, 'Boleto', '2021-03-04', 'pendente', 7, 'TXN-00007-2021'),
+(13.98, 'Débito automático', '2024-03-16', 'recusado', 8, 'TXN-00008-2024'),
+(20.88, 'Débito automático', '2024-02-03', 'pendente', 9, 'TXN-00009-2024'),
+(23.80, 'Cartão de crédito', '2022-02-10', 'aprovado', 10, 'TXN-00010-2022'),
+(15.01, 'Cartão de crédito', '2021-08-04', 'pendente', 11, 'TXN-00011-2021'),
+(25.68, 'Débito automático', '2021-07-09', 'aprovado', 12, 'TXN-00012-2021'),
+(19.20, 'Cartão de crédito', '2020-05-16', 'estornado', 13, 'TXN-00013-2020'),
+(23.11, 'Boleto', '2024-11-05', 'aprovado', 14, 'TXN-00014-2024'),
+(10.28, 'PayPal', '2021-04-18', 'estornado', 15, 'TXN-00015-2021'),
+(20.07, 'Cartão de crédito', '2021-10-08', 'estornado', 16, 'TXN-00016-2021'),
+(27.24, 'Débito automático', '2020-06-29', 'pendente', 17, 'TXN-00017-2020'),
+(13.88, 'PayPal', '2023-02-22', 'aprovado', 18, 'TXN-00018-2023'),
+(10.70, 'Débito automático', '2021-09-16', 'recusado', 19, 'TXN-00019-2021'),
+(19.70, 'Pix', '2020-02-07', 'recusado', 20, 'TXN-00020-2020'),
+(23.59, 'Boleto', '2023-07-04', 'recusado', 21, 'TXN-00021-2023'),
+(14.62, 'Débito automático', '2021-07-18', 'aprovado', 22, 'TXN-00022-2021'),
+(22.42, 'PayPal', '2024-12-28', 'aprovado', 23, 'TXN-00023-2024'),
+(28.78, 'Boleto', '2021-04-06', 'pendente', 24, 'TXN-00024-2021'),
+(16.74, 'PayPal', '2023-09-07', 'pendente', 25, 'TXN-00025-2023'),
+(11.66, 'PayPal', '2022-12-02', 'pendente', 26, 'TXN-00026-2022'),
+(18.25, 'Débito automático', '2020-11-08', 'estornado', 27, 'TXN-00027-2020'),
+(29.31, 'Débito automático', '2021-11-05', 'estornado', 28, 'TXN-00028-2021'),
+(20.74, 'Pix', '2023-08-29', 'pendente', 29, 'TXN-00029-2023'),
+(21.52, 'Pix', '2024-11-01', 'pendente', 30, 'TXN-00030-2024'),
+(16.08, 'Débito automático', '2020-10-03', 'estornado', 31, 'TXN-00031-2020'),
+(29.81, 'Pix', '2023-09-05', 'pendente', 32, 'TXN-00032-2023'),
+(16.25, 'Débito automático', '2022-12-27', 'aprovado', 33, 'TXN-00033-2022'),
+(13.58, 'Pix', '2024-01-29', 'aprovado', 34, 'TXN-00034-2024'),
+(25.21, 'PayPal', '2022-04-22', 'recusado', 35, 'TXN-00035-2022'),
+(18.76, 'Boleto', '2020-11-07', 'pendente', 36, 'TXN-00036-2020'),
+(12.04, 'Pix', '2020-02-23', 'recusado', 37, 'TXN-00037-2020'),
+(22.01, 'Débito automático', '2021-04-17', 'pendente', 38, 'TXN-00038-2021'),
+(14.52, 'Cartão de crédito', '2022-01-05', 'aprovado', 39, 'TXN-00039-2022'),
+(23.66, 'PayPal', '2020-10-01', 'estornado', 40, 'TXN-00040-2020'),
+(24.14, 'Boleto', '2021-01-11', 'estornado', 41, 'TXN-00041-2021'),
+(19.73, 'Pix', '2020-12-01', 'pendente', 42, 'TXN-00042-2020'),
+(14.43, 'PayPal', '2024-04-14', 'aprovado', 43, 'TXN-00043-2024'),
+(28.41, 'PayPal', '2021-03-31', 'pendente', 44, 'TXN-00044-2021'),
+(25.06, 'Cartão de crédito', '2020-12-28', 'estornado', 45, 'TXN-00045-2020'),
+(27.24, 'PayPal', '2023-11-09', 'recusado', 46, 'TXN-00046-2023'),
+(27.24, 'Pix', '2022-05-25', 'estornado', 47, 'TXN-00047-2022'),
+(25.42, 'Débito automático', '2024-02-14', 'estornado', 48, 'TXN-00048-2024'),
+(24.30, 'PayPal', '2023-06-06', 'aprovado', 49, 'TXN-00049-2023'),
+(20.31, 'PayPal', '2022-07-24', 'aprovado', 50, 'TXN-00050-2022'),
+(27.46, 'Pix', '2022-11-28', 'estornado', 51, 'TXN-00051-2022'),
+(29.58, 'Cartão de crédito', '2023-02-16', 'estornado', 52, 'TXN-00052-2023'),
+(20.22, 'Cartão de crédito', '2021-01-23', 'recusado', 53, 'TXN-00053-2021'),
+(18.69, 'Boleto', '2024-05-03', 'recusado', 54, 'TXN-00054-2024'),
+(19.13, 'PayPal', '2021-08-25', 'aprovado', 55, 'TXN-00055-2021'),
+(23.70, 'Pix', '2022-08-07', 'estornado', 56, 'TXN-00056-2022'),
+(11.71, 'Débito automático', '2020-08-19', 'pendente', 57, 'TXN-00057-2020'),
+(25.47, 'Débito automático', '2020-10-04', 'estornado', 58, 'TXN-00058-2020'),
+(18.17, 'PayPal', '2020-02-21', 'pendente', 59, 'TXN-00059-2020'),
+(18.97, 'Pix', '2024-12-12', 'estornado', 60, 'TXN-00060-2024'),
+(11.70, 'Boleto', '2023-11-17', 'pendente', 61, 'TXN-00061-2023'),
+(24.27, 'Cartão de crédito', '2020-07-05', 'aprovado', 62, 'TXN-00062-2020'),
+(24.02, 'Boleto', '2020-06-23', 'estornado', 63, 'TXN-00063-2020'),
+(24.44, 'Débito automático', '2023-06-07', 'pendente', 64, 'TXN-00064-2023'),
+(17.47, 'PayPal', '2020-03-30', 'pendente', 65, 'TXN-00065-2020'),
+(28.15, 'Débito automático', '2024-11-19', 'pendente', 66, 'TXN-00066-2024'),
+(13.14, 'Pix', '2021-01-01', 'aprovado', 67, 'TXN-00067-2021'),
+(18.29, 'Boleto', '2024-02-04', 'estornado', 68, 'TXN-00068-2024'),
+(15.68, 'Pix', '2020-08-28', 'pendente', 69, 'TXN-00069-2020'),
+(29.11, 'Cartão de crédito', '2023-06-29', 'recusado', 70, 'TXN-00070-2023'),
+(10.14, 'PayPal', '2024-10-17', 'estornado', 71, 'TXN-00071-2024'),
+(20.77, 'Cartão de crédito', '2023-05-30', 'estornado', 72, 'TXN-00072-2023'),
+(14.66, 'Débito automático', '2023-09-12', 'estornado', 73, 'TXN-00073-2023'),
+(18.97, 'PayPal', '2020-06-11', 'aprovado', 74, 'TXN-00074-2020'),
+(14.79, 'Débito automático', '2021-07-23', 'pendente', 75, 'TXN-00075-2021'),
+(10.88, 'Pix', '2020-04-22', 'recusado', 76, 'TXN-00076-2020'),
+(10.63, 'Cartão de crédito', '2023-09-28', 'recusado', 77, 'TXN-00077-2023'),
+(16.52, 'Cartão de crédito', '2020-04-10', 'aprovado', 78, 'TXN-00078-2020'),
+(18.24, 'Pix', '2020-11-26', 'recusado', 79, 'TXN-00079-2020'),
+(22.12, 'Débito automático', '2023-03-18', 'pendente', 80, 'TXN-00080-2023'),
+(29.23, 'Débito automático', '2022-01-07', 'aprovado', 81, 'TXN-00081-2022'),
+(11.76, 'Boleto', '2021-10-23', 'recusado', 82, 'TXN-00082-2021'),
+(27.85, 'Cartão de crédito', '2024-04-02', 'estornado', 83, 'TXN-00083-2024'),
+(26.77, 'Cartão de crédito', '2021-08-22', 'estornado', 84, 'TXN-00084-2021'),
+(12.59, 'Boleto', '2021-11-05', 'estornado', 85, 'TXN-00085-2021'),
+(20.39, 'Pix', '2023-06-07', 'aprovado', 86, 'TXN-00086-2023'),
+(12.09, 'Débito automático', '2020-06-28', 'estornado', 87, 'TXN-00087-2020'),
+(24.38, 'Débito automático', '2024-06-02', 'recusado', 88, 'TXN-00088-2024'),
+(18.44, 'Boleto', '2021-06-15', 'recusado', 89, 'TXN-00089-2021'),
+(28.44, 'Débito automático', '2023-02-26', 'estornado', 90, 'TXN-00090-2023'),
+(20.29, 'PayPal', '2022-10-05', 'pendente', 91, 'TXN-00091-2022'),
+(27.57, 'Pix', '2023-12-22', 'recusado', 92, 'TXN-00092-2023'),
+(29.49, 'Cartão de crédito', '2020-08-30', 'aprovado', 93, 'TXN-00093-2020'),
+(19.20, 'Cartão de crédito', '2024-02-19', 'pendente', 94, 'TXN-00094-2024'),
+(25.89, 'PayPal', '2022-04-27', 'aprovado', 95, 'TXN-00095-2022'),
+(16.58, 'Débito automático', '2024-07-08', 'pendente', 96, 'TXN-00096-2024'),
+(10.13, 'Pix', '2023-11-14', 'recusado', 97, 'TXN-00097-2023'),
+(14.99, 'Cartão de crédito', '2021-09-22', 'recusado', 98, 'TXN-00098-2021'),
+(20.03, 'Boleto', '2024-04-19', 'aprovado', 99, 'TXN-00099-2024'),
+(12.18, 'Boleto', '2021-11-30', 'estornado', 100, 'TXN-00100-2021');
+ 
+-- =========================
+-- Royaltie
+-- =========================
+INSERT INTO Royaltie (ReferenceMonth, TotalStreams, AmountPaid, PaymentDate, ArtistID, Notes) VALUES
+('2023-03-01', 1637520, 4357.49, '2023-04-05', 1, 'Pagamento referente ao streaming de 03/2023'),
+('2024-08-01', 308284, 1014.66, '2024-09-07', 2, 'Pagamento referente ao streaming de 08/2024'),
+('2023-11-01', 3873943, 14659.45, '2023-12-09', 3, 'Pagamento referente ao streaming de 11/2023'),
+('2024-08-01', 3482489, 13427.01, '2024-08-31', 4, 'Pagamento referente ao streaming de 08/2024'),
+('2024-10-01', 2656629, 8263.06, '2024-10-31', 5, 'Pagamento referente ao streaming de 10/2024'),
+('2023-10-01', 2792663, 10050.99, '2023-11-05', 6, 'Pagamento referente ao streaming de 10/2023'),
+('2023-03-01', 2362669, 8698.11, '2023-04-05', 7, 'Pagamento referente ao streaming de 03/2023'),
+('2024-11-01', 4491808, 16551.47, '2024-12-10', 8, 'Pagamento referente ao streaming de 11/2024'),
+('2024-03-01', 990163, 3692.50, '2024-04-04', 9, 'Pagamento referente ao streaming de 03/2024'),
+('2024-12-01', 275316, 700.13, '2025-01-01', 10, 'Pagamento referente ao streaming de 12/2024'),
+('2024-04-01', 3127068, 9080.42, '2024-05-05', 11, 'Pagamento referente ao streaming de 04/2024'),
+('2023-09-01', 2546029, 5983.23, '2023-10-06', 12, 'Pagamento referente ao streaming de 09/2023'),
+('2023-04-01', 786819, 2271.98, '2023-05-01', 13, 'Pagamento referente ao streaming de 04/2023'),
+('2024-09-01', 1302498, 3100.50, '2024-10-08', 14, 'Pagamento referente ao streaming de 09/2024'),
+('2024-06-01', 1212045, 4289.38, '2024-07-02', 15, 'Pagamento referente ao streaming de 06/2024'),
+('2023-04-01', 316624, 924.14, '2023-05-09', 16, 'Pagamento referente ao streaming de 04/2023'),
+('2023-01-01', 2618700, 10120.42, '2023-02-10', 17, 'Pagamento referente ao streaming de 01/2023'),
+('2023-06-01', 3926438, 14835.54, '2023-07-02', 18, 'Pagamento referente ao streaming de 06/2023'),
+('2024-01-01', 4854923, 17074.70, '2024-02-10', 19, 'Pagamento referente ao streaming de 01/2024'),
+('2023-06-01', 1692381, 4036.48, '2023-07-05', 20, 'Pagamento referente ao streaming de 06/2023'),
+('2024-08-01', 996926, 2537.48, '2024-09-02', 21, 'Pagamento referente ao streaming de 08/2024'),
+('2024-02-01', 137982, 540.42, '2024-03-10', 22, 'Pagamento referente ao streaming de 02/2024'),
+('2023-04-01', 4561060, 12317.76, '2023-05-06', 23, 'Pagamento referente ao streaming de 04/2023'),
+('2024-03-01', 2386221, 7512.22, '2024-04-02', 24, 'Pagamento referente ao streaming de 03/2024'),
+('2023-05-01', 2851547, 8786.06, '2023-05-31', 25, 'Pagamento referente ao streaming de 05/2023'),
+('2023-01-01', 3958816, 15069.57, '2023-01-31', 26, 'Pagamento referente ao streaming de 01/2023'),
+('2023-07-01', 461306, 1002.07, '2023-08-06', 27, 'Pagamento referente ao streaming de 07/2023'),
+('2023-12-01', 4982399, 16237.35, '2024-01-07', 28, 'Pagamento referente ao streaming de 12/2023'),
+('2024-05-01', 2797803, 10169.69, '2024-06-10', 29, 'Pagamento referente ao streaming de 05/2024'),
+('2023-08-01', 4772961, 10804.03, '2023-09-07', 30, 'Pagamento referente ao streaming de 08/2023'),
+('2023-08-01', 2613754, 8805.62, '2023-09-07', 31, 'Pagamento referente ao streaming de 08/2023'),
+('2024-04-01', 1887323, 4317.14, '2024-05-10', 32, 'Pagamento referente ao streaming de 04/2024'),
+('2024-06-01', 3298979, 7807.71, '2024-07-11', 33, 'Pagamento referente ao streaming de 06/2024'),
+('2024-06-01', 3812413, 11341.98, '2024-07-02', 34, 'Pagamento referente ao streaming de 06/2024'),
+('2024-02-01', 2958099, 8748.00, '2024-03-04', 35, 'Pagamento referente ao streaming de 02/2024'),
+('2024-06-01', 4830750, 10892.32, '2024-07-02', 36, 'Pagamento referente ao streaming de 06/2024'),
+('2024-12-01', 907424, 2406.25, '2025-01-10', 37, 'Pagamento referente ao streaming de 12/2024'),
+('2023-05-01', 4478993, 13087.39, '2023-06-09', 38, 'Pagamento referente ao streaming de 05/2023'),
+('2024-04-01', 2054228, 6359.68, '2024-05-08', 39, 'Pagamento referente ao streaming de 04/2024'),
+('2024-02-01', 2868117, 6930.74, '2024-03-11', 40, 'Pagamento referente ao streaming de 02/2024'),
+('2024-07-01', 4768112, 17044.35, '2024-08-08', 41, 'Pagamento referente ao streaming de 07/2024'),
+('2023-03-01', 663425, 2307.88, '2023-04-09', 42, 'Pagamento referente ao streaming de 03/2023'),
+('2024-02-01', 4977424, 15888.69, '2024-03-07', 43, 'Pagamento referente ao streaming de 02/2024'),
+('2023-08-01', 1487854, 3892.33, '2023-09-06', 44, 'Pagamento referente ao streaming de 08/2023'),
+('2023-10-01', 922216, 3108.81, '2023-11-09', 45, 'Pagamento referente ao streaming de 10/2023'),
+('2024-06-01', 4156448, 13674.62, '2024-07-01', 46, 'Pagamento referente ao streaming de 06/2024'),
+('2023-04-01', 1175318, 4436.26, '2023-05-11', 47, 'Pagamento referente ao streaming de 04/2023'),
+('2023-03-01', 1261718, 3666.49, '2023-04-04', 48, 'Pagamento referente ao streaming de 03/2023'),
+('2024-10-01', 4858040, 14060.72, '2024-11-03', 49, 'Pagamento referente ao streaming de 10/2024'),
+('2024-05-01', 4793825, 17203.57, '2024-06-10', 50, 'Pagamento referente ao streaming de 05/2024'),
+('2024-07-01', 2897900, 11535.32, '2024-08-09', 51, 'Pagamento referente ao streaming de 07/2024'),
+('2023-10-01', 4291745, 12052.91, '2023-11-02', 52, 'Pagamento referente ao streaming de 10/2023'),
+('2024-01-01', 3107266, 11814.30, '2024-01-31', 53, 'Pagamento referente ao streaming de 01/2024'),
+('2023-12-01', 4707874, 17143.75, '2024-01-05', 54, 'Pagamento referente ao streaming de 12/2023'),
+('2023-05-01', 271596, 670.97, '2023-06-09', 55, 'Pagamento referente ao streaming de 05/2023'),
+('2024-11-01', 2678645, 9170.47, '2024-12-07', 56, 'Pagamento referente ao streaming de 11/2024'),
+('2024-07-01', 4582787, 11101.49, '2024-08-02', 57, 'Pagamento referente ao streaming de 07/2024'),
+('2024-03-01', 1588961, 4943.01, '2024-04-05', 58, 'Pagamento referente ao streaming de 03/2024'),
+('2024-03-01', 2429869, 9707.11, '2024-04-10', 59, 'Pagamento referente ao streaming de 03/2024'),
+('2023-03-01', 107330, 230.06, '2023-03-31', 60, 'Pagamento referente ao streaming de 03/2023'),
+('2023-12-01', 4092746, 13570.95, '2024-01-02', 61, 'Pagamento referente ao streaming de 12/2023'),
+('2023-03-01', 3498448, 13015.30, '2023-04-09', 62, 'Pagamento referente ao streaming de 03/2023'),
+('2024-10-01', 1518249, 4416.27, '2024-11-06', 63, 'Pagamento referente ao streaming de 10/2024'),
+('2024-07-01', 2990533, 7331.24, '2024-08-06', 64, 'Pagamento referente ao streaming de 07/2024'),
+('2023-10-01', 4188843, 15471.94, '2023-11-03', 65, 'Pagamento referente ao streaming de 10/2023'),
+('2024-07-01', 4591574, 14475.88, '2024-07-31', 66, 'Pagamento referente ao streaming de 07/2024'),
+('2023-10-01', 4063946, 13857.10, '2023-11-01', 67, 'Pagamento referente ao streaming de 10/2023'),
+('2024-12-01', 681618, 1556.93, '2025-01-08', 68, 'Pagamento referente ao streaming de 12/2024'),
+('2024-08-01', 4346487, 9373.07, '2024-09-09', 69, 'Pagamento referente ao streaming de 08/2024'),
+('2023-04-01', 3973211, 12957.94, '2023-05-11', 70, 'Pagamento referente ao streaming de 04/2023'),
+('2023-11-01', 4533114, 16301.97, '2023-12-05', 71, 'Pagamento referente ao streaming de 11/2023'),
+('2023-06-01', 4498184, 16000.28, '2023-07-08', 72, 'Pagamento referente ao streaming de 06/2023'),
+('2024-09-01', 3946206, 12422.38, '2024-10-06', 73, 'Pagamento referente ao streaming de 09/2024'),
+('2024-06-01', 2481434, 6398.17, '2024-07-01', 74, 'Pagamento referente ao streaming de 06/2024'),
+('2024-12-01', 4738710, 11945.75, '2025-01-10', 75, 'Pagamento referente ao streaming de 12/2024'),
+('2024-10-01', 1428339, 4493.15, '2024-11-10', 76, 'Pagamento referente ao streaming de 10/2024'),
+('2024-12-01', 238992, 615.08, '2025-01-01', 77, 'Pagamento referente ao streaming de 12/2024'),
+('2023-09-01', 654767, 2424.53, '2023-10-05', 78, 'Pagamento referente ao streaming de 09/2023'),
+('2024-03-01', 2366963, 6036.78, '2024-04-04', 79, 'Pagamento referente ao streaming de 03/2024'),
+('2023-12-01', 945744, 3033.61, '2024-01-09', 80, 'Pagamento referente ao streaming de 12/2023'),
+('2023-11-01', 3756798, 10291.87, '2023-12-03', 81, 'Pagamento referente ao streaming de 11/2023'),
+('2024-12-01', 1991354, 5914.00, '2025-01-08', 82, 'Pagamento referente ao streaming de 12/2024'),
+('2023-06-01', 718010, 2825.15, '2023-07-10', 83, 'Pagamento referente ao streaming de 06/2023'),
+('2023-08-01', 3474057, 12300.72, '2023-09-03', 84, 'Pagamento referente ao streaming de 08/2023'),
+('2024-12-01', 1413273, 3422.54, '2025-01-05', 85, 'Pagamento referente ao streaming de 12/2024'),
+('2023-11-01', 2227910, 7822.12, '2023-12-02', 86, 'Pagamento referente ao streaming de 11/2023'),
+('2023-03-01', 3902439, 10917.03, '2023-04-04', 87, 'Pagamento referente ao streaming de 03/2023'),
+('2024-12-01', 4477108, 11046.47, '2025-01-10', 88, 'Pagamento referente ao streaming de 12/2024'),
+('2024-08-01', 2213059, 5068.57, '2024-09-06', 89, 'Pagamento referente ao streaming de 08/2024'),
+('2023-05-01', 3774980, 10434.08, '2023-06-05', 90, 'Pagamento referente ao streaming de 05/2023'),
+('2023-02-01', 4466811, 14628.13, '2023-03-09', 91, 'Pagamento referente ao streaming de 02/2023'),
+('2024-06-01', 2277659, 5771.99, '2024-07-02', 92, 'Pagamento referente ao streaming de 06/2024'),
+('2024-11-01', 4910430, 13662.33, '2024-12-11', 93, 'Pagamento referente ao streaming de 11/2024'),
+('2023-12-01', 4948577, 17522.88, '2024-01-08', 94, 'Pagamento referente ao streaming de 12/2023'),
+('2024-11-01', 1519250, 3990.37, '2024-12-01', 95, 'Pagamento referente ao streaming de 11/2024'),
+('2023-02-01', 110339, 311.43, '2023-03-11', 96, 'Pagamento referente ao streaming de 02/2023'),
+('2023-11-01', 3750834, 10138.63, '2023-12-05', 97, 'Pagamento referente ao streaming de 11/2023'),
+('2024-04-01', 295563, 605.14, '2024-05-02', 98, 'Pagamento referente ao streaming de 04/2024'),
+('2023-10-01', 1828857, 7134.33, '2023-11-10', 99, 'Pagamento referente ao streaming de 10/2023'),
+('2023-12-01', 1016440, 2208.49, '2024-01-09', 100, 'Pagamento referente ao streaming de 12/2023');
+ 
+ 
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_RegisterUser$$
+CREATE PROCEDURE sp_RegisterUser(
+    IN p_UserName VARCHAR(100),
+    IN p_Email VARCHAR(100),
+    IN p_Password VARCHAR(255),
+    IN p_DateOfBirth DATE,
+    IN p_Phone VARCHAR(20),
+    IN p_Country VARCHAR(50),
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_EmailCount INT DEFAULT 0;
+    DECLARE v_PhoneCount INT DEFAULT 0;
+    DECLARE v_NewUserID INT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao cadastrar usuário. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO v_EmailCount FROM _User WHERE Email = p_Email;
+    SELECT COUNT(*) INTO v_PhoneCount FROM _User WHERE Phone = p_Phone;
+
+    START TRANSACTION;
+
+    IF v_EmailCount > 0 THEN
+        SET p_Message = 'Erro: e-mail já cadastrado.';
+        ROLLBACK;
+    ELSEIF v_PhoneCount > 0 THEN
+        SET p_Message = 'Erro: telefone já cadastrado.';
+        ROLLBACK;
+    ELSE
+        INSERT INTO _User (UserName, Email, UsersPassword, DateOfBirth, Phone, Country)
+        VALUES (p_UserName, p_Email, p_Password, p_DateOfBirth, p_Phone, p_Country);
+
+        SET v_NewUserID = LAST_INSERT_ID();
+
+        -- Assina automaticamente o plano gratuito
+        INSERT INTO Subscription (StartDate, StatusSubscriptions, UserID, PlanID, AutoRenew)
+        SELECT CURDATE(), 'ativa', v_NewUserID, PlanID, FALSE
+        FROM Plan WHERE PlanName = 'free' LIMIT 1;
+
+        COMMIT;
+        SET p_Message = CONCAT('Usuário cadastrado com sucesso. ID: ', v_NewUserID);
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_RegisterArtist$$
+CREATE PROCEDURE sp_RegisterArtist(
+    IN p_StageName VARCHAR(100),
+    IN p_RealName VARCHAR(100),
+    IN p_Country VARCHAR(50),
+    IN p_MusicGenre VARCHAR(50),
+    IN p_Email VARCHAR(100),
+    IN p_Phone VARCHAR(20),
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_EmailCount INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao cadastrar artista. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO v_EmailCount FROM Artist WHERE Email = p_Email;
+
+    START TRANSACTION;
+
+    IF v_EmailCount > 0 THEN
+        SET p_Message = 'Erro: e-mail já cadastrado para outro artista.';
+        ROLLBACK;
+    ELSE
+        INSERT INTO Artist (StageName, RealName, Country, MusicGenre, Email, Phone)
+        VALUES (p_StageName, p_RealName, p_Country, p_MusicGenre, p_Email, p_Phone);
+
+        COMMIT;
+        SET p_Message = CONCAT('Artista cadastrado com sucesso. ID: ', LAST_INSERT_ID());
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_CreateSubscription$$
+CREATE PROCEDURE sp_CreateSubscription(
+    IN p_UserID INT,
+    IN p_PlanID INT,
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_ActiveCount INT DEFAULT 0;
+    DECLARE v_UserExists INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao criar assinatura. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO v_UserExists FROM _User WHERE UserID = p_UserID;
+    SELECT COUNT(*) INTO v_ActiveCount
+    FROM Subscription
+    WHERE UserID = p_UserID AND StatusSubscriptions = 'ativa';
+
+    START TRANSACTION;
+
+    IF v_UserExists = 0 THEN
+        SET p_Message = 'Erro: usuário não encontrado.';
+        ROLLBACK;
+    ELSE
+        IF v_ActiveCount > 0 THEN
+            UPDATE Subscription
+            SET StatusSubscriptions = 'cancelada', EndDate = CURDATE(), AutoRenew = FALSE
+            WHERE UserID = p_UserID AND StatusSubscriptions = 'ativa';
+        END IF;
+
+        INSERT INTO Subscription (StartDate, StatusSubscriptions, UserID, PlanID, AutoRenew)
+        VALUES (CURDATE(), 'ativa', p_UserID, p_PlanID, TRUE);
+
+        COMMIT;
+        SET p_Message = CONCAT('Assinatura criada com sucesso. ID: ', LAST_INSERT_ID());
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_ProcessPayment$$
+CREATE PROCEDURE sp_ProcessPayment(
+    IN p_SubscriptionID INT,
+    IN p_PaymentMethod VARCHAR(30),
+    IN p_TransactionReference VARCHAR(100),
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_PlanPrice DECIMAL(10,2);
+    DECLARE v_SubStatus VARCHAR(30);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao processar pagamento. Operação revertida.';
+    END;
+
+    SELECT pl.Price, s.StatusSubscriptions
+    INTO v_PlanPrice, v_SubStatus
+    FROM Subscription s
+    JOIN Plan pl ON pl.PlanID = s.PlanID
+    WHERE s.SubscriptionID = p_SubscriptionID;
+
+    START TRANSACTION;
+
+    IF v_SubStatus IS NULL THEN
+        SET p_Message = 'Erro: assinatura não encontrada.';
+        ROLLBACK;
+    ELSEIF v_SubStatus <> 'ativa' THEN
+        SET p_Message = 'Erro: não é possível pagar uma assinatura inativa.';
+        ROLLBACK;
+    ELSE
+        INSERT INTO Payment (Amount, PaymentMethod, PaymentDate, StatusPayments, SubscriptionID, TransactionReference)
+        VALUES (v_PlanPrice, p_PaymentMethod, CURDATE(), 'aprovado', p_SubscriptionID, p_TransactionReference);
+
+        UPDATE Subscription
+        SET EndDate = DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+        WHERE SubscriptionID = p_SubscriptionID;
+
+        COMMIT;
+        SET p_Message = CONCAT('Pagamento de R$ ', v_PlanPrice, ' processado com sucesso.');
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_AddSongToPlaylist$$
+CREATE PROCEDURE sp_AddSongToPlaylist(
+    IN p_PlaylistID INT,
+    IN p_SongID INT,
+    IN p_UserID INT,
+    OUT p_Message VARCHAR(255)
+)
+BEGIN
+    DECLARE v_AlreadyExists INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao adicionar música à playlist. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO v_AlreadyExists
+    FROM PlaylistSongs
+    WHERE PlaylistID = p_PlaylistID
+      AND SongID = (SELECT SongID FROM Song WHERE SongID = p_SongID);
+
+    START TRANSACTION;
+
+    IF v_AlreadyExists > 0 THEN
+        SET p_Message = 'Aviso: esta música já está na playlist.';
+        ROLLBACK;
+    ELSE
+        INSERT INTO PlaylistSongs (DateAdded, PlaylistID, SongID, AddedByUserID)
+        VALUES (CURDATE(), p_PlaylistID, p_SongID, p_UserID);
+
+        UPDATE Playlist SET UpdatedAt = NOW() WHERE PlaylistID = p_PlaylistID;
+
+        COMMIT;
+        SET p_Message = 'Música adicionada à playlist com sucesso.';
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_LogPodcastPlayback$$
+CREATE PROCEDURE sp_LogPodcastPlayback(
+    IN p_UserID INT,
+    IN p_EpisodeID INT,
+    IN p_ListeningTime TIME,
+    IN p_DeviceType VARCHAR(50),
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_EpisodeDuration TIME;
+    DECLARE v_PodcastTitle VARCHAR(100);
+    DECLARE v_CompletionStatus VARCHAR(20);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao registrar reprodução. Operação revertida.';
+    END;
+
+    SELECT e.Duration, p.Title INTO v_EpisodeDuration, v_PodcastTitle
+    FROM Episode e
+    JOIN Podcast p ON p.PodcastID = e.PodcastID
+    WHERE e.EpisodeID = p_EpisodeID;
+
+    START TRANSACTION;
+
+    IF v_EpisodeDuration IS NULL THEN
+        SET p_Message = 'Erro: episódio não encontrado.';
+        ROLLBACK;
+    ELSE
+        IF p_ListeningTime >= v_EpisodeDuration THEN
+            SET v_CompletionStatus = 'completo';
+        ELSE
+            SET v_CompletionStatus = 'parcial';
+        END IF;
+
+        INSERT INTO PodcastHistory (PlaybackDate, ListeningTime, UserID, EpisodeID, DeviceType)
+        VALUES (NOW(), p_ListeningTime, p_UserID, p_EpisodeID, p_DeviceType);
+
+        COMMIT;
+        SET p_Message = CONCAT('Reprodução (', v_CompletionStatus, ') registrada no podcast "', v_PodcastTitle, '".');
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_CalculateAndPayRoyalties$$
+CREATE PROCEDURE sp_CalculateAndPayRoyalties(
+    IN p_ArtistID INT,
+    IN p_ReferenceMonth DATE,
+    IN p_TotalStreams INT,
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_Rate DECIMAL(6,4);
+    DECLARE v_Amount DECIMAL(10,2);
+    DECLARE v_ArtistExists INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao calcular royalties. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO v_ArtistExists FROM Artist WHERE ArtistID = p_ArtistID;
+
+    START TRANSACTION;
+
+    IF v_ArtistExists = 0 THEN
+        SET p_Message = 'Erro: artista não encontrado.';
+        ROLLBACK;
+    ELSE
+        IF p_TotalStreams >= 1000000 THEN
+            SET v_Rate = 0.0040;
+        ELSEIF p_TotalStreams >= 100000 THEN
+            SET v_Rate = 0.0030;
+        ELSE
+            SET v_Rate = 0.0020;
+        END IF;
+
+        SET v_Amount = ROUND(p_TotalStreams * v_Rate, 2);
+
+        INSERT INTO Royaltie (ReferenceMonth, TotalStreams, AmountPaid, PaymentDate, ArtistID, Notes)
+        VALUES (p_ReferenceMonth, p_TotalStreams, v_Amount, CURDATE(), p_ArtistID,
+                CONCAT('Cálculo automático com taxa de ', v_Rate, ' por stream'));
+
+        COMMIT;
+        SET p_Message = CONCAT('Royalties calculados e registrados: R$ ', v_Amount);
+    END IF;
+END$$
+
+
+DROP PROCEDURE IF EXISTS sp_TogglePlaylistVisibility$$
+CREATE PROCEDURE sp_TogglePlaylistVisibility(
+    IN p_PlaylistID INT,
+    OUT p_Message VARCHAR(255)
+)
+
+BEGIN
+    DECLARE v_Exists INT DEFAULT 0;
+    DECLARE v_CurrentVisibility BOOLEAN;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_Message = 'Erro ao alterar visibilidade da playlist. Operação revertida.';
+    END;
+
+    SELECT COUNT(*), MAX(Public) INTO v_Exists, v_CurrentVisibility
+    FROM Playlist WHERE PlaylistID = p_PlaylistID;
+
+    START TRANSACTION;
+
+    IF v_Exists = 0 THEN
+        SET p_Message = 'Erro: playlist não encontrada.';
+        ROLLBACK;
+    ELSE
+        IF v_CurrentVisibility = TRUE THEN
+            UPDATE Playlist SET Public = FALSE, UpdatedAt = NOW() WHERE PlaylistID = p_PlaylistID;
+            SET p_Message = 'Playlist alterada para privada.';
+        ELSE
+            UPDATE Playlist SET Public = TRUE, UpdatedAt = NOW() WHERE PlaylistID = p_PlaylistID;
+            SET p_Message = 'Playlist alterada para pública.';
+        END IF;
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
