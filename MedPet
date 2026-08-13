@@ -1,0 +1,1178 @@
+CREATE DATABASE MedPet;
+USE MedPet;
+
+CREATE TABLE Customer (
+CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+CustomerName VARCHAR (50) NOT NULL,
+Email VARCHAR (150) NOT NULL,
+CONSTRAINT uc_email UNIQUE (Email),
+Phone VARCHAR (15) NOT NULL,
+CONSTRAINT uc_phone UNIQUE (Phone),
+PasswordCustomer VARCHAR (150) NOT NULL
+);
+
+CREATE TABLE Pet (
+PetID INT PRIMARY KEY AUTO_INCREMENT,
+PetName VARCHAR (100) NOT NULL,
+Age VARCHAR (4) NOT NULL,
+Gender VARCHAR (15) NOT NULL,
+Animal VARCHAR (50) NOT NULL,
+Race VARCHAR (150) NOT NULL,
+Size VARCHAR (20) NOT NULL,
+CustomerID INT,
+    FOREIGN KEY (CustomerID) 
+    REFERENCES Customer (CustomerID)
+);
+
+CREATE TABLE Scheduling (
+SchedulingID INT PRIMARY KEY AUTO_INCREMENT,
+SchedulingDate DATE NOT NULL,
+SchedulingHour TIME NOT NULL,
+PetID INT,
+    FOREIGN KEY (PetID)
+    REFERENCES Pet (PetID)
+);
+
+CREATE TABLE Appointment (
+ AppointmentID INT PRIMARY KEY AUTO_INCREMENT,
+AppointmentValue DECIMAL,
+SchedulingID INT,
+    FOREIGN KEY (SchedulingID)
+    REFERENCES Scheduling (SchedulingID)
+);
+
+CREATE TABLE Billing (
+BillingID INT PRIMARY KEY AUTO_INCREMENT,
+AmountRaised DECIMAL,
+SalesMade INT (200),
+AppointmentID INT,
+	FOREIGN KEY (AppointmentID)
+    REFERENCES Appointment (AppointmentID)
+);
+
+CREATE TABLE MedicalHistory (
+MedicalHistoryID INT PRIMARY KEY AUTO_INCREMENT,
+Consultations TEXT NOT NULL,
+Diagnosis VARCHAR (200) NOT NULL,
+Tests VARCHAR (200) NOT NULL,
+Vaccines VARCHAR (100) NOT NULL,
+Procedures VARCHAR (150) NOT NULL,
+Allergies VARCHAR (100) NOT NULL,
+ClinicalObservations VARCHAR (300) NOT NULL,
+PetID INT,
+    FOREIGN KEY (PetID)
+    REFERENCES Pet (PetID)
+);
+
+CREATE TABLE HospitalizedPatients (
+HospitalizedPatientsID INT PRIMARY KEY AUTO_INCREMENT,
+Date_Of_Entry DATE NOT NULL,
+Check_in_time TIME NOT NULL,
+DischargeDate DATE NOT NULL,
+DischargeTime TIME NOT NULL,
+ReasonForAdmission VARCHAR (250) NOT NULL,
+Diagnosis TEXT NOT NULL,
+Tests VARCHAR (200) NOT NULL,
+MedicalHistoryID INT,
+     FOREIGN KEY (MedicalHistoryID)
+    REFERENCES MedicalHistory (MedicalHistoryID)
+);
+
+ALTER TABLE Customer
+ADD COLUMN RegistrationDate DATE NOT NULL;
+
+ALTER TABLE Pet
+ADD COLUMN Weight DECIMAL(5,2);
+
+ALTER TABLE Scheduling
+ADD COLUMN StatusPet VARCHAR(30) NOT NULL DEFAULT 'Agendado';
+
+ALTER TABLE Appointment
+ADD COLUMN VeterinarianName VARCHAR(150);
+
+ALTER TABLE Billing
+ADD COLUMN PaymentMethod VARCHAR(50);
+
+ALTER TABLE MedicalHistory
+ADD COLUMN Weight DECIMAL(5,2);
+
+ALTER TABLE HospitalizedPatients
+ADD COLUMN AttendingVeterinarian VARCHAR(150);
+
+ 
+-- ===== CUSTOMER =====
+INSERT INTO Customer (CustomerID, CustomerName, Email, Phone, PasswordCustomer, RegistrationDate) VALUES
+(1, 'Henrique Silva', 'henrique.silva1@email.com', '11999529223', 'Senha@5506', '2020-04-05'),
+(2, 'Gabriela Alves', 'gabriela.alves2@email.com', '11911668732', 'Senha@7912', '2019-01-03'),
+(3, 'Nuno Almeida', 'nuno.almeida3@email.com', '11967827638', 'Senha@1434', '2023-04-23'),
+(4, 'Kelly Gomes', 'kelly.gomes4@email.com', '11929587039', 'Senha@8359', '2023-05-26'),
+(5, 'Ana Costa', 'ana.costa5@email.com', '11993702683', 'Senha@7924', '2021-05-05'),
+(6, 'Nuno Araujo', 'nuno.araujo6@email.com', '11913718431', 'Senha@2519', '2022-02-12'),
+(7, 'Wanda Barros', 'wanda.barros7@email.com', '11935503389', 'Senha@1711', '2024-08-18'),
+(8, 'Henrique Carvalho', 'henrique.carvalho8@email.com', '11910576383', 'Senha@5803', '2025-11-20'),
+(9, 'Xavier Monteiro', 'xavier.monteiro9@email.com', '11925808537', 'Senha@2139', '2019-11-08'),
+(10, 'Sofia Oliveira', 'sofia.oliveira10@email.com', '11931244663', 'Senha@2654', '2022-05-15'),
+(11, 'Xavier Costa', 'xavier.costa11@email.com', '11949684848', 'Senha@6820', '2020-11-09'),
+(12, 'Eduarda Barros', 'eduarda.barros12@email.com', '11985225343', 'Senha@3803', '2023-12-08'),
+(13, 'Karina Martins', 'karina.martins13@email.com', '11950929647', 'Senha@5422', '2024-12-18'),
+(14, 'Olivia Araujo', 'olivia.araujo14@email.com', '11907507864', 'Senha@4752', '2025-01-26'),
+(15, 'Ursula Carvalho', 'ursula.carvalho15@email.com', '11935935572', 'Senha@2084', '2020-10-23'),
+(16, 'Ursula Rodrigues', 'ursula.rodrigues16@email.com', '11987971488', 'Senha@9179', '2022-11-15'),
+(17, 'João Nascimento', 'joão.nascimento17@email.com', '11918740864', 'Senha@5040', '2024-09-18'),
+(18, 'Queila Monteiro', 'queila.monteiro18@email.com', '11957503414', 'Senha@7543', '2021-04-05'),
+(19, 'Ingrid Rocha', 'ingrid.rocha19@email.com', '11912201654', 'Senha@1771', '2025-02-05'),
+(20, 'Karina Gomes', 'karina.gomes20@email.com', '11980048665', 'Senha@2040', '2022-07-20'),
+(21, 'Fabio Ribeiro', 'fabio.ribeiro21@email.com', '11933744231', 'Senha@1188', '2024-12-04'),
+(22, 'Kelly Nascimento', 'kelly.nascimento22@email.com', '11986028436', 'Senha@6573', '2019-05-14'),
+(23, 'Karina Martins', 'karina.martins23@email.com', '11900435578', 'Senha@5315', '2023-03-17'),
+(24, 'Gabriela Lima', 'gabriela.lima24@email.com', '11985758349', 'Senha@9317', '2023-04-05'),
+(25, 'Xavier Costa', 'xavier.costa25@email.com', '11972394227', 'Senha@9689', '2019-10-11'),
+(26, 'Hugo Silva', 'hugo.silva26@email.com', '11915014631', 'Senha@6947', '2025-05-08'),
+(27, 'Daniel Almeida', 'daniel.almeida27@email.com', '11976149359', 'Senha@2290', '2019-12-16'),
+(28, 'Eduarda Alves', 'eduarda.alves28@email.com', '11916879290', 'Senha@3103', '2024-08-18'),
+(29, 'Karina Nascimento', 'karina.nascimento29@email.com', '11970823176', 'Senha@7932', '2020-09-25'),
+(30, 'Mariana Lima', 'mariana.lima30@email.com', '11953551839', 'Senha@7118', '2022-09-15'),
+(31, 'Henrique Almeida', 'henrique.almeida31@email.com', '11930158366', 'Senha@2049', '2021-01-19'),
+(32, 'Leonardo Almeida', 'leonardo.almeida32@email.com', '11978979095', 'Senha@4608', '2019-02-23'),
+(33, 'Daniel Almeida', 'daniel.almeida33@email.com', '11909046318', 'Senha@1514', '2025-06-03'),
+(34, 'Ingrid Almeida', 'ingrid.almeida34@email.com', '11937376585', 'Senha@8953', '2020-09-05'),
+(35, 'Marcia Monteiro', 'marcia.monteiro35@email.com', '11963440831', 'Senha@4981', '2025-08-26'),
+(36, 'Camila Rodrigues', 'camila.rodrigues36@email.com', '11912660194', 'Senha@2588', '2024-07-12'),
+(37, 'Diego Gomes', 'diego.gomes37@email.com', '11962682989', 'Senha@1887', '2024-11-21'),
+(38, 'Gabriela Souza', 'gabriela.souza38@email.com', '11954038913', 'Senha@6559', '2025-02-08'),
+(39, 'Mariana Rodrigues', 'mariana.rodrigues39@email.com', '11971979055', 'Senha@8350', '2020-07-06'),
+(40, 'Rafael Martins', 'rafael.martins40@email.com', '11933528453', 'Senha@2235', '2022-09-04'),
+(41, 'Daniel Alves', 'daniel.alves41@email.com', '11901980765', 'Senha@2528', '2025-04-06'),
+(42, 'Camila Rocha', 'camila.rocha42@email.com', '11964606833', 'Senha@4502', '2025-07-02'),
+(43, 'Karina Carvalho', 'karina.carvalho43@email.com', '11900289289', 'Senha@7396', '2021-08-10'),
+(44, 'Diego Alves', 'diego.alves44@email.com', '11988834863', 'Senha@8973', '2020-04-10'),
+(45, 'Nuno Souza', 'nuno.souza45@email.com', '11977736262', 'Senha@9883', '2019-12-11'),
+(46, 'Daniel Souza', 'daniel.souza46@email.com', '11978406989', 'Senha@8811', '2023-09-06'),
+(47, 'Daniel Ribeiro', 'daniel.ribeiro47@email.com', '11910752378', 'Senha@4044', '2019-10-03'),
+(48, 'Pedro Carvalho', 'pedro.carvalho48@email.com', '11916090908', 'Senha@5033', '2023-10-02'),
+(49, 'Paula Oliveira', 'paula.oliveira49@email.com', '11956267415', 'Senha@9565', '2021-05-07'),
+(50, 'Ursula Almeida', 'ursula.almeida50@email.com', '11935650176', 'Senha@7484', '2020-11-21'),
+(51, 'Tiago Martins', 'tiago.martins51@email.com', '11942436584', 'Senha@2188', '2019-08-20'),
+(52, 'Marcia Santos', 'marcia.santos52@email.com', '11909832887', 'Senha@9808', '2020-09-09'),
+(53, 'Isabela Fernandes', 'isabela.fernandes53@email.com', '11909233013', 'Senha@5002', '2021-05-06'),
+(54, 'Elisa Alves', 'elisa.alves54@email.com', '11994427530', 'Senha@5956', '2023-11-17'),
+(55, 'Ana Alves', 'ana.alves55@email.com', '11940181935', 'Senha@2697', '2020-05-04'),
+(56, 'Gabriela Alves', 'gabriela.alves56@email.com', '11920863865', 'Senha@5462', '2021-10-07'),
+(57, 'Vitor Rodrigues', 'vitor.rodrigues57@email.com', '11992274302', 'Senha@5325', '2023-08-09'),
+(58, 'Daniel Oliveira', 'daniel.oliveira58@email.com', '11985132217', 'Senha@7939', '2025-05-02'),
+(59, 'Ana Araujo', 'ana.araujo59@email.com', '11917558317', 'Senha@5291', '2020-12-15'),
+(60, 'Leonardo Gomes', 'leonardo.gomes60@email.com', '11975283645', 'Senha@1158', '2019-02-23'),
+(61, 'João Alves', 'joão.alves61@email.com', '11904835614', 'Senha@7049', '2023-09-05'),
+(62, 'Diego Pereira', 'diego.pereira62@email.com', '11905614174', 'Senha@6050', '2021-01-12'),
+(63, 'Nuno Almeida', 'nuno.almeida63@email.com', '11989514287', 'Senha@2684', '2021-09-28'),
+(64, 'Camila Barros', 'camila.barros64@email.com', '11920743797', 'Senha@4878', '2025-03-26'),
+(65, 'Lucas Gomes', 'lucas.gomes65@email.com', '11903326769', 'Senha@3938', '2024-06-26'),
+(66, 'Camila Almeida', 'camila.almeida66@email.com', '11935810056', 'Senha@3608', '2025-12-04'),
+(67, 'Yasmin Souza', 'yasmin.souza67@email.com', '11963174945', 'Senha@4644', '2020-08-12'),
+(68, 'Tiago Almeida', 'tiago.almeida68@email.com', '11929920292', 'Senha@1387', '2024-04-13'),
+(69, 'Vitor Nascimento', 'vitor.nascimento69@email.com', '11909317495', 'Senha@5573', '2021-11-17'),
+(70, 'Zeca Alves', 'zeca.alves70@email.com', '11944446182', 'Senha@1452', '2019-05-06'),
+(71, 'Natalia Nascimento', 'natalia.nascimento71@email.com', '11905134794', 'Senha@2776', '2023-07-12'),
+(72, 'Ursula Gomes', 'ursula.gomes72@email.com', '11981363974', 'Senha@9379', '2019-07-19'),
+(73, 'Mariana Nascimento', 'mariana.nascimento73@email.com', '11905957459', 'Senha@8144', '2019-09-26'),
+(74, 'Kelly Rodrigues', 'kelly.rodrigues74@email.com', '11948884978', 'Senha@8066', '2019-11-11'),
+(75, 'Paula Araujo', 'paula.araujo75@email.com', '11989038359', 'Senha@3041', '2024-05-17'),
+(76, 'Tiago Gomes', 'tiago.gomes76@email.com', '11943779528', 'Senha@7592', '2024-05-18'),
+(77, 'Isabela Rodrigues', 'isabela.rodrigues77@email.com', '11956431351', 'Senha@7211', '2024-12-06'),
+(78, 'Paula Monteiro', 'paula.monteiro78@email.com', '11940392808', 'Senha@7653', '2023-01-10'),
+(79, 'Sofia Rodrigues', 'sofia.rodrigues79@email.com', '11957698610', 'Senha@6279', '2022-08-15'),
+(80, 'Nuno Ribeiro', 'nuno.ribeiro80@email.com', '11963509974', 'Senha@3780', '2024-02-10'),
+(81, 'Ingrid Barros', 'ingrid.barros81@email.com', '11944988206', 'Senha@2530', '2025-04-22'),
+(82, 'Tiago Almeida', 'tiago.almeida82@email.com', '11926726767', 'Senha@3414', '2019-01-08'),
+(83, 'Giovana Barros', 'giovana.barros83@email.com', '11909774839', 'Senha@8461', '2022-11-19'),
+(84, 'Mariana Carvalho', 'mariana.carvalho84@email.com', '11966354180', 'Senha@7547', '2020-03-21'),
+(85, 'Ana Santos', 'ana.santos85@email.com', '11957062156', 'Senha@4585', '2020-12-17'),
+(86, 'Fabio Souza', 'fabio.souza86@email.com', '11974813739', 'Senha@5082', '2025-02-15'),
+(87, 'Isabela Martins', 'isabela.martins87@email.com', '11989600766', 'Senha@9702', '2023-10-11'),
+(88, 'Elisa Barros', 'elisa.barros88@email.com', '11996539316', 'Senha@9270', '2022-09-15'),
+(89, 'Karina Rocha', 'karina.rocha89@email.com', '11960407340', 'Senha@5246', '2025-04-27'),
+(90, 'Rafael Ribeiro', 'rafael.ribeiro90@email.com', '11965041510', 'Senha@4919', '2021-08-03'),
+(91, 'Sofia Almeida', 'sofia.almeida91@email.com', '11936468984', 'Senha@6502', '2021-09-03'),
+(92, 'Isabela Pereira', 'isabela.pereira92@email.com', '11931039390', 'Senha@7275', '2024-03-23'),
+(93, 'Nuno Oliveira', 'nuno.oliveira93@email.com', '11955682626', 'Senha@7678', '2021-09-15'),
+(94, 'Camila Souza', 'camila.souza94@email.com', '11927760841', 'Senha@7883', '2022-10-23'),
+(95, 'Bruno Monteiro', 'bruno.monteiro95@email.com', '11951053877', 'Senha@8814', '2019-06-10'),
+(96, 'Yasmin Gomes', 'yasmin.gomes96@email.com', '11972238741', 'Senha@9947', '2025-10-08'),
+(97, 'Hugo Almeida', 'hugo.almeida97@email.com', '11936632757', 'Senha@8140', '2022-01-13'),
+(98, 'Vitor Carvalho', 'vitor.carvalho98@email.com', '11997197979', 'Senha@3704', '2025-08-05'),
+(99, 'Paula Alves', 'paula.alves99@email.com', '11903619375', 'Senha@7455', '2023-10-22'),
+(100, 'Bruno Oliveira', 'bruno.oliveira100@email.com', '11986268397', 'Senha@8022', '2020-08-06');
+ 
+-- ===== PET =====
+INSERT INTO Pet (PetID, PetName, Age, Gender, Animal, Race, Size, CustomerID, Weight) VALUES
+(1, 'Bidu', '6', 'Macho', 'Ave', 'Canario', 'Pequeno', 44, 34.37),
+(2, 'Fred', '14', 'Femea', 'Coelho', 'Angora', 'Pequeno', 61, 1.36),
+(3, 'Zeus3', '6', 'Macho', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 100, 43.1),
+(4, 'Bidu', '4', 'Macho', 'Cachorro', 'Bulldog', 'Pequeno', 17, 21.57),
+(5, 'Thor', '4', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 99, 16.92),
+(6, 'Chico', '12', 'Macho', 'Gato', 'Vira-lata', 'Pequeno', 75, 1.64),
+(7, 'Simba', '15', 'Femea', 'Ave', 'Periquito', 'Pequeno', 10, 26.85),
+(8, 'Nala', '2', 'Femea', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 16, 35.93),
+(9, 'Pipoca', '6', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 9, 23.02),
+(10, 'Amora10', '7', 'Femea', 'Cachorro', 'Shih Tzu', 'Medio', 82, 40.18),
+(11, 'Nino', '7', 'Macho', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 84, 12.52),
+(12, 'Bolt', '13', 'Femea', 'Ave', 'Papagaio', 'Pequeno', 94, 26.87),
+(13, 'Amora', '14', 'Macho', 'Coelho', 'Rex', 'Pequeno', 32, 33.9),
+(14, 'Pipoca', '7', 'Femea', 'Cachorro', 'Beagle', 'Medio', 24, 22.2),
+(15, 'Toby', '6', 'Femea', 'Hamster', 'Roborovski', 'Pequeno', 36, 25.23),
+(16, 'Kira', '2', 'Macho', 'Tartaruga', 'Jabuti', 'Pequeno', 63, 25.21),
+(17, 'Max', '11', 'Femea', 'Ave', 'Calopsita', 'Pequeno', 12, 13.59),
+(18, 'Fred', '5', 'Femea', 'Ave', 'Canario', 'Pequeno', 55, 44.85),
+(19, 'Zeus', '12', 'Femea', 'Coelho', 'Holandes', 'Pequeno', 33, 10.76),
+(20, 'Apollo', '2', 'Macho', 'Gato', 'Persa', 'Grande', 62, 12.8),
+(21, 'Pipoca', '9', 'Femea', 'Cachorro', 'Vira-lata', 'Medio', 30, 16.56),
+(22, 'Simba22', '9', 'Macho', 'Coelho', 'Angora', 'Pequeno', 7, 25.12),
+(23, 'Frida', '11', 'Femea', 'Cachorro', 'Labrador', 'Grande', 37, 21.39),
+(24, 'Nino', '1', 'Femea', 'Ave', 'Calopsita', 'Pequeno', 9, 18.33),
+(25, 'Mel', '11', 'Macho', 'Gato', 'Persa', 'Grande', 39, 4.29),
+(26, 'Max26', '13', 'Femea', 'Hamster', 'Roborovski', 'Pequeno', 80, 10.54),
+(27, 'Kira', '15', 'Femea', 'Coelho', 'Rex', 'Pequeno', 40, 25.8),
+(28, 'Bidu', '12', 'Macho', 'Gato', 'Sphynx', 'Pequeno', 34, 29.89),
+(29, 'Luna', '9', 'Macho', 'Gato', 'Siames', 'Medio', 58, 31.18),
+(30, 'Duque', '4', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 90, 38.75),
+(31, 'Mel', '15', 'Femea', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 85, 36.27),
+(32, 'Bob', '9', 'Macho', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 35, 37.29),
+(33, 'Mel33', '13', 'Femea', 'Hamster', 'Roborovski', 'Pequeno', 73, 41.49),
+(34, 'Nino34', '12', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 35, 22.77),
+(35, 'Duque', '10', 'Macho', 'Ave', 'Canario', 'Pequeno', 78, 11.64),
+(36, 'Mel', '11', 'Macho', 'Tartaruga', 'Jabuti', 'Pequeno', 74, 2.29),
+(37, 'Sasha', '9', 'Femea', 'Coelho', 'Mini Lop', 'Pequeno', 75, 19.9),
+(38, 'Nala', '2', 'Femea', 'Coelho', 'Rex', 'Pequeno', 43, 14.79),
+(39, 'Thor', '6', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 37, 29.98),
+(40, 'Fred', '9', 'Macho', 'Ave', 'Calopsita', 'Pequeno', 41, 11.73),
+(41, 'Thor', '7', 'Macho', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 60, 18.89),
+(42, 'Bob', '10', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 98, 2.8),
+(43, 'Bella', '15', 'Femea', 'Ave', 'Papagaio', 'Pequeno', 16, 1.78),
+(44, 'Mia', '4', 'Macho', 'Coelho', 'Angora', 'Pequeno', 71, 18.66),
+(45, 'Max', '15', 'Macho', 'Ave', 'Calopsita', 'Pequeno', 83, 37.53),
+(46, 'Duque', '5', 'Femea', 'Ave', 'Papagaio', 'Pequeno', 61, 11.35),
+(47, 'Zeus47', '4', 'Macho', 'Cachorro', 'Golden Retriever', 'Medio', 44, 42.07),
+(48, 'Kira', '1', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 76, 26.31),
+(49, 'Bento', '3', 'Femea', 'Hamster', 'Anao Russo', 'Pequeno', 45, 15.29),
+(50, 'Sasha', '8', 'Femea', 'Gato', 'Sphynx', 'Pequeno', 74, 17.54),
+(51, 'Oreo', '1', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 91, 41.15),
+(52, 'Fred', '11', 'Macho', 'Ave', 'Calopsita', 'Pequeno', 17, 22.85),
+(53, 'Pipoca', '2', 'Femea', 'Cachorro', 'Beagle', 'Pequeno', 93, 6.91),
+(54, 'Oreo', '3', 'Macho', 'Ave', 'Canario', 'Pequeno', 44, 28.24),
+(55, 'Fred', '14', 'Femea', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 49, 42.96),
+(56, 'Mia', '13', 'Femea', 'Hamster', 'Sirio', 'Pequeno', 80, 3.54),
+(57, 'Mia', '5', 'Macho', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 56, 44.04),
+(58, 'Sasha', '14', 'Macho', 'Ave', 'Periquito', 'Pequeno', 89, 13.83),
+(59, 'Rex59', '13', 'Macho', 'Coelho', 'Holandes', 'Pequeno', 48, 19.67),
+(60, 'Max', '10', 'Macho', 'Gato', 'Persa', 'Pequeno', 79, 39.25),
+(61, 'Chico', '8', 'Macho', 'Gato', 'Maine Coon', 'Grande', 33, 20.95),
+(62, 'Bento62', '13', 'Femea', 'Coelho', 'Mini Lop', 'Pequeno', 10, 20.16),
+(63, 'Toby', '5', 'Femea', 'Tartaruga', 'Jabuti', 'Pequeno', 59, 38.12),
+(64, 'Bob', '14', 'Femea', 'Cachorro', 'Vira-lata', 'Medio', 74, 16.47),
+(65, 'Simba', '5', 'Macho', 'Tartaruga', 'Jabuti', 'Pequeno', 36, 0.86),
+(66, 'Oreo', '12', 'Macho', 'Hamster', 'Roborovski', 'Pequeno', 64, 37.56),
+(67, 'Chuck', '13', 'Macho', 'Hamster', 'Anao Russo', 'Pequeno', 29, 28.83),
+(68, 'Chico', '13', 'Macho', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 81, 29.26),
+(69, 'Simba', '1', 'Femea', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 12, 40.98),
+(70, 'Amora', '3', 'Macho', 'Gato', 'Angora', 'Medio', 68, 22.83),
+(71, 'Bella', '5', 'Femea', 'Coelho', 'Holandes', 'Pequeno', 15, 21.34),
+(72, 'Mel72', '4', 'Femea', 'Hamster', 'Anao Russo', 'Pequeno', 12, 35.69),
+(73, 'Rex', '2', 'Femea', 'Coelho', 'Holandes', 'Pequeno', 75, 17.46),
+(74, 'Mia', '2', 'Macho', 'Ave', 'Calopsita', 'Pequeno', 80, 39.85),
+(75, 'Zeus', '10', 'Macho', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 82, 37.16),
+(76, 'Perola', '11', 'Femea', 'Cachorro', 'Bulldog', 'Pequeno', 5, 14.04),
+(77, 'Duque77', '4', 'Macho', 'Ave', 'Papagaio', 'Pequeno', 48, 30.34),
+(78, 'Apollo', '9', 'Femea', 'Hamster', 'Roborovski', 'Pequeno', 94, 7.38),
+(79, 'Lola', '14', 'Femea', 'Hamster', 'Anao Russo', 'Pequeno', 36, 1.96),
+(80, 'Toby', '8', 'Macho', 'Coelho', 'Angora', 'Pequeno', 88, 16.85),
+(81, 'Chuck', '6', 'Macho', 'Ave', 'Canario', 'Pequeno', 25, 43.59),
+(82, 'Oreo', '2', 'Macho', 'Tartaruga', 'Perna-vermelha', 'Pequeno', 77, 43.71),
+(83, 'Bidu', '4', 'Macho', 'Hamster', 'Sirio', 'Pequeno', 9, 37.43),
+(84, 'Zeus', '4', 'Macho', 'Coelho', 'Mini Lop', 'Pequeno', 77, 0.63),
+(85, 'Oreo', '3', 'Femea', 'Gato', 'Siames', 'Grande', 4, 6.37),
+(86, 'Toby', '4', 'Femea', 'Cachorro', 'Bulldog', 'Medio', 7, 6.14),
+(87, 'Lola', '12', 'Macho', 'Ave', 'Papagaio', 'Pequeno', 100, 16.61),
+(88, 'Pipoca88', '9', 'Macho', 'Hamster', 'Sirio', 'Pequeno', 94, 35.35),
+(89, 'Oreo', '5', 'Femea', 'Tartaruga', 'Tigre-d''agua', 'Pequeno', 8, 44.94),
+(90, 'Oreo', '11', 'Macho', 'Ave', 'Papagaio', 'Pequeno', 10, 40.52),
+(91, 'Amora', '2', 'Macho', 'Coelho', 'Holandes', 'Pequeno', 49, 44.76),
+(92, 'Kira', '9', 'Femea', 'Cachorro', 'Poodle', 'Grande', 84, 39.56),
+(93, 'Zeus', '4', 'Femea', 'Ave', 'Periquito', 'Pequeno', 53, 15.58),
+(94, 'Nino', '12', 'Macho', 'Coelho', 'Rex', 'Pequeno', 41, 30.1),
+(95, 'Toby', '11', 'Femea', 'Cachorro', 'Poodle', 'Pequeno', 12, 19.72),
+(96, 'Apollo', '13', 'Macho', 'Hamster', 'Sirio', 'Pequeno', 76, 43.07),
+(97, 'Zeus', '2', 'Femea', 'Coelho', 'Rex', 'Pequeno', 93, 2.79),
+(98, 'Simba', '6', 'Macho', 'Hamster', 'Roborovski', 'Pequeno', 28, 7.39),
+(99, 'Duque', '2', 'Femea', 'Hamster', 'Anao Russo', 'Pequeno', 15, 34.44),
+(100, 'Pipoca', '7', 'Macho', 'Hamster', 'Roborovski', 'Pequeno', 89, 12.4);
+ 
+-- ===== SCHEDULING =====
+INSERT INTO Scheduling (SchedulingID, SchedulingDate, SchedulingHour, PetID, StatusPet) VALUES
+(1, '2026-12-25', '12:30:00', 24, 'Concluido'),
+(2, '2025-03-19', '18:45:00', 1, 'Agendado'),
+(3, '2025-02-24', '16:15:00', 19, 'Cancelado'),
+(4, '2026-06-06', '13:30:00', 54, 'Concluido'),
+(5, '2025-01-05', '10:00:00', 100, 'Agendado'),
+(6, '2026-11-14', '15:45:00', 35, 'Cancelado'),
+(7, '2025-09-04', '13:45:00', 35, 'Agendado'),
+(8, '2026-09-22', '12:00:00', 37, 'Confirmado'),
+(9, '2025-01-07', '12:15:00', 51, 'Confirmado'),
+(10, '2026-05-11', '09:00:00', 98, 'Cancelado'),
+(11, '2026-03-05', '14:15:00', 96, 'Remarcado'),
+(12, '2026-02-13', '08:45:00', 72, 'Agendado'),
+(13, '2025-06-19', '14:45:00', 59, 'Cancelado'),
+(14, '2025-07-01', '13:15:00', 38, 'Remarcado'),
+(15, '2026-02-14', '09:15:00', 59, 'Cancelado'),
+(16, '2026-09-03', '14:30:00', 76, 'Concluido'),
+(17, '2026-03-03', '16:00:00', 29, 'Remarcado'),
+(18, '2025-06-12', '18:15:00', 66, 'Confirmado'),
+(19, '2025-05-07', '10:15:00', 14, 'Agendado'),
+(20, '2026-08-25', '17:45:00', 23, 'Remarcado'),
+(21, '2026-11-11', '10:45:00', 83, 'Agendado'),
+(22, '2026-11-10', '12:00:00', 61, 'Concluido'),
+(23, '2025-05-15', '15:00:00', 65, 'Agendado'),
+(24, '2026-02-21', '09:45:00', 48, 'Cancelado'),
+(25, '2025-08-26', '17:15:00', 75, 'Concluido'),
+(26, '2026-09-05', '08:45:00', 78, 'Agendado'),
+(27, '2025-09-21', '10:00:00', 44, 'Confirmado'),
+(28, '2026-08-17', '16:15:00', 91, 'Concluido'),
+(29, '2026-07-14', '13:00:00', 48, 'Concluido'),
+(30, '2026-02-18', '18:45:00', 9, 'Concluido'),
+(31, '2025-06-03', '17:15:00', 33, 'Concluido'),
+(32, '2026-03-20', '09:30:00', 40, 'Remarcado'),
+(33, '2026-03-22', '18:00:00', 49, 'Cancelado'),
+(34, '2026-01-12', '12:15:00', 66, 'Confirmado'),
+(35, '2026-04-08', '10:15:00', 44, 'Agendado'),
+(36, '2025-09-25', '16:00:00', 38, 'Concluido'),
+(37, '2025-10-13', '10:15:00', 99, 'Confirmado'),
+(38, '2025-12-15', '08:45:00', 89, 'Concluido'),
+(39, '2025-08-20', '12:45:00', 87, 'Confirmado'),
+(40, '2025-05-26', '15:15:00', 69, 'Concluido'),
+(41, '2026-08-25', '12:45:00', 87, 'Remarcado'),
+(42, '2026-03-27', '11:15:00', 68, 'Concluido'),
+(43, '2026-06-18', '09:00:00', 7, 'Concluido'),
+(44, '2025-05-15', '16:15:00', 11, 'Cancelado'),
+(45, '2025-08-12', '08:45:00', 12, 'Agendado'),
+(46, '2026-04-13', '09:30:00', 51, 'Confirmado'),
+(47, '2026-02-27', '18:30:00', 4, 'Confirmado'),
+(48, '2025-05-27', '15:15:00', 18, 'Cancelado'),
+(49, '2025-02-01', '12:15:00', 58, 'Confirmado'),
+(50, '2026-02-25', '12:15:00', 71, 'Concluido'),
+(51, '2025-04-14', '18:45:00', 16, 'Agendado'),
+(52, '2026-10-18', '08:15:00', 15, 'Confirmado'),
+(53, '2026-01-20', '13:15:00', 38, 'Remarcado'),
+(54, '2025-11-22', '09:30:00', 54, 'Agendado'),
+(55, '2025-07-28', '15:00:00', 68, 'Cancelado'),
+(56, '2026-12-01', '13:00:00', 48, 'Concluido'),
+(57, '2025-10-24', '13:15:00', 31, 'Agendado'),
+(58, '2026-11-06', '18:45:00', 46, 'Cancelado'),
+(59, '2025-03-03', '15:00:00', 81, 'Concluido'),
+(60, '2025-04-02', '13:30:00', 26, 'Remarcado'),
+(61, '2026-05-02', '18:15:00', 51, 'Concluido'),
+(62, '2025-11-11', '12:00:00', 46, 'Concluido'),
+(63, '2026-12-15', '14:30:00', 56, 'Confirmado'),
+(64, '2026-06-26', '16:30:00', 64, 'Agendado'),
+(65, '2026-02-14', '17:15:00', 94, 'Remarcado'),
+(66, '2026-02-03', '13:30:00', 38, 'Concluido'),
+(67, '2026-03-23', '15:30:00', 58, 'Cancelado'),
+(68, '2026-10-14', '12:00:00', 6, 'Agendado'),
+(69, '2026-06-17', '18:15:00', 86, 'Agendado'),
+(70, '2026-01-05', '09:15:00', 19, 'Concluido'),
+(71, '2026-10-02', '17:15:00', 47, 'Cancelado'),
+(72, '2026-08-25', '09:15:00', 48, 'Remarcado'),
+(73, '2026-06-21', '12:15:00', 47, 'Agendado'),
+(74, '2025-08-17', '14:00:00', 4, 'Concluido'),
+(75, '2026-12-15', '11:30:00', 100, 'Cancelado'),
+(76, '2025-03-28', '09:45:00', 26, 'Confirmado'),
+(77, '2026-02-26', '18:30:00', 92, 'Concluido'),
+(78, '2025-09-18', '12:30:00', 91, 'Confirmado'),
+(79, '2025-06-17', '11:00:00', 92, 'Confirmado'),
+(80, '2025-08-01', '13:30:00', 18, 'Cancelado'),
+(81, '2025-10-03', '09:30:00', 71, 'Cancelado'),
+(82, '2026-09-14', '14:00:00', 92, 'Confirmado'),
+(83, '2025-08-15', '18:30:00', 41, 'Confirmado'),
+(84, '2025-03-14', '16:00:00', 100, 'Agendado'),
+(85, '2025-05-06', '10:30:00', 67, 'Confirmado'),
+(86, '2026-02-09', '11:30:00', 45, 'Confirmado'),
+(87, '2026-10-18', '09:15:00', 81, 'Remarcado'),
+(88, '2025-03-22', '17:30:00', 75, 'Remarcado'),
+(89, '2025-02-02', '18:30:00', 6, 'Confirmado'),
+(90, '2026-10-21', '08:45:00', 99, 'Remarcado'),
+(91, '2026-08-08', '18:45:00', 38, 'Concluido'),
+(92, '2025-12-02', '10:45:00', 59, 'Cancelado'),
+(93, '2026-04-11', '17:15:00', 62, 'Concluido'),
+(94, '2026-12-28', '13:45:00', 92, 'Confirmado'),
+(95, '2026-09-18', '09:30:00', 98, 'Confirmado'),
+(96, '2025-05-15', '11:15:00', 60, 'Agendado'),
+(97, '2026-07-28', '17:45:00', 7, 'Confirmado'),
+(98, '2026-10-24', '13:15:00', 21, 'Confirmado'),
+(99, '2026-08-10', '15:00:00', 64, 'Agendado'),
+(100, '2026-04-07', '17:30:00', 51, 'Agendado');
+ 
+-- ===== APPOINTMENT =====
+INSERT INTO Appointment (AppointmentID, AppointmentValue, SchedulingID, VeterinarianName) VALUES
+(1, 98.7, 64, 'Dra. Vanessa Freitas'),
+(2, 185.73, 2, 'Dra. Fernanda Cavalcanti'),
+(3, 129.56, 34, 'Dra. Camila Cavalcanti'),
+(4, 215.4, 52, 'Dr. Marcos Lopes'),
+(5, 214.13, 37, 'Dra. Fernanda Cavalcanti'),
+(6, 266.57, 98, 'Dr. Sergio Teixeira'),
+(7, 385.37, 80, 'Dra. Vanessa Ferreira'),
+(8, 127.61, 13, 'Dr. Rodrigo Moraes'),
+(9, 374.11, 44, 'Dr. Sergio Moraes'),
+(10, 359.34, 26, 'Dra. Vanessa Cavalcanti'),
+(11, 265.03, 6, 'Dr. Marcos Cardoso'),
+(12, 344.03, 61, 'Dr. Sergio Freitas'),
+(13, 135.11, 66, 'Dr. Ricardo Moraes'),
+(14, 424.61, 41, 'Dr. Ricardo Cavalcanti'),
+(15, 446.53, 95, 'Dr. Andre Moraes'),
+(16, 267.71, 66, 'Dr. Sergio Freitas'),
+(17, 342.23, 39, 'Dra. Beatriz Almeida'),
+(18, 216.29, 87, 'Dra. Fernanda Cavalcanti'),
+(19, 295.97, 93, 'Dr. Marcos Freitas'),
+(20, 178.25, 84, 'Dra. Vanessa Lopes'),
+(21, 346.92, 75, 'Dra. Beatriz Cardoso'),
+(22, 273.97, 93, 'Dra. Vanessa Cavalcanti'),
+(23, 134.68, 88, 'Dra. Patricia Almeida'),
+(24, 291.85, 90, 'Dra. Fernanda Lopes'),
+(25, 87.01, 41, 'Dr. Rodrigo Cardoso'),
+(26, 232.8, 27, 'Dr. Rodrigo Freitas'),
+(27, 402.94, 95, 'Dr. Marcos Cardoso'),
+(28, 271.91, 72, 'Dra. Camila Freitas'),
+(29, 274.43, 41, 'Dr. Ricardo Freitas'),
+(30, 417.49, 44, 'Dr. Sergio Moraes'),
+(31, 330.07, 93, 'Dr. Andre Freitas'),
+(32, 151.14, 32, 'Dr. Andre Teixeira'),
+(33, 163.2, 39, 'Dr. Andre Lopes'),
+(34, 335.39, 63, 'Dra. Camila Freitas'),
+(35, 209.06, 93, 'Dr. Andre Teixeira'),
+(36, 125.09, 87, 'Dr. Sergio Cavalcanti'),
+(37, 411.43, 51, 'Dra. Camila Cardoso'),
+(38, 187.47, 37, 'Dra. Fernanda Moraes'),
+(39, 421.88, 84, 'Dr. Andre Freitas'),
+(40, 159.18, 69, 'Dr. Andre Teixeira'),
+(41, 130.79, 79, 'Dra. Vanessa Lopes'),
+(42, 169.71, 86, 'Dr. Sergio Lopes'),
+(43, 316.04, 7, 'Dra. Fernanda Cavalcanti'),
+(44, 202.21, 61, 'Dra. Fernanda Cardoso'),
+(45, 81.92, 71, 'Dr. Ricardo Cavalcanti'),
+(46, 321.57, 61, 'Dra. Beatriz Lopes'),
+(47, 359.69, 37, 'Dra. Camila Teixeira'),
+(48, 318.98, 99, 'Dra. Fernanda Lopes'),
+(49, 278.01, 93, 'Dr. Marcos Cardoso'),
+(50, 234.62, 23, 'Dr. Marcos Cavalcanti'),
+(51, 371.55, 24, 'Dr. Andre Almeida'),
+(52, 83.43, 73, 'Dra. Vanessa Ferreira'),
+(53, 423.53, 43, 'Dr. Andre Freitas'),
+(54, 445.97, 70, 'Dr. Sergio Freitas'),
+(55, 409.03, 18, 'Dr. Sergio Freitas'),
+(56, 180.95, 15, 'Dra. Camila Cardoso'),
+(57, 350.51, 83, 'Dr. Andre Cardoso'),
+(58, 85.21, 44, 'Dr. Andre Lopes'),
+(59, 144.93, 82, 'Dr. Rodrigo Cavalcanti'),
+(60, 270.65, 12, 'Dr. Rodrigo Ferreira'),
+(61, 148.37, 18, 'Dra. Beatriz Moraes'),
+(62, 426.26, 1, 'Dr. Andre Cavalcanti'),
+(63, 167.14, 97, 'Dr. Andre Moraes'),
+(64, 191.72, 93, 'Dra. Vanessa Almeida'),
+(65, 176.77, 47, 'Dra. Patricia Almeida'),
+(66, 327.08, 60, 'Dr. Andre Cardoso'),
+(67, 230.0, 65, 'Dr. Andre Ferreira'),
+(68, 316.32, 38, 'Dra. Camila Lopes'),
+(69, 161.08, 18, 'Dra. Beatriz Cardoso'),
+(70, 248.34, 78, 'Dra. Camila Cavalcanti'),
+(71, 339.72, 61, 'Dr. Sergio Lopes'),
+(72, 361.89, 88, 'Dra. Vanessa Ferreira'),
+(73, 274.44, 68, 'Dra. Camila Ferreira'),
+(74, 419.38, 15, 'Dr. Marcos Lopes'),
+(75, 291.9, 20, 'Dr. Ricardo Moraes'),
+(76, 396.16, 57, 'Dra. Fernanda Lopes'),
+(77, 345.26, 63, 'Dra. Fernanda Freitas'),
+(78, 379.22, 59, 'Dr. Ricardo Cavalcanti'),
+(79, 249.02, 8, 'Dr. Sergio Freitas'),
+(80, 328.92, 40, 'Dr. Marcos Cavalcanti'),
+(81, 174.15, 1, 'Dra. Patricia Ferreira'),
+(82, 96.76, 45, 'Dra. Fernanda Almeida'),
+(83, 425.8, 9, 'Dra. Beatriz Almeida'),
+(84, 186.22, 24, 'Dr. Ricardo Cavalcanti'),
+(85, 218.55, 49, 'Dra. Beatriz Cavalcanti'),
+(86, 218.99, 88, 'Dr. Sergio Cardoso'),
+(87, 321.81, 45, 'Dra. Fernanda Cardoso'),
+(88, 447.35, 51, 'Dr. Sergio Cardoso'),
+(89, 349.31, 29, 'Dr. Marcos Almeida'),
+(90, 442.04, 60, 'Dr. Sergio Cavalcanti'),
+(91, 276.82, 30, 'Dra. Patricia Freitas'),
+(92, 208.08, 36, 'Dra. Patricia Ferreira'),
+(93, 91.92, 85, 'Dr. Rodrigo Almeida'),
+(94, 169.05, 9, 'Dra. Fernanda Almeida'),
+(95, 245.18, 87, 'Dr. Marcos Lopes'),
+(96, 354.0, 52, 'Dra. Beatriz Lopes'),
+(97, 279.71, 97, 'Dr. Marcos Cardoso'),
+(98, 266.44, 38, 'Dra. Patricia Moraes'),
+(99, 293.67, 99, 'Dra. Camila Lopes'),
+(100, 191.65, 19, 'Dr. Sergio Lopes');
+ 
+-- ===== BILLING =====
+INSERT INTO Billing (BillingID, AmountRaised, SalesMade, AppointmentID, PaymentMethod) VALUES
+(1, 233.02, 3, 8, 'Boleto'),
+(2, 430.95, 2, 81, 'Dinheiro'),
+(3, 285.66, 1, 45, 'Dinheiro'),
+(4, 370.75, 3, 90, 'Dinheiro'),
+(5, 231.06, 3, 49, 'Cartao de Debito'),
+(6, 359.13, 4, 31, 'Cartao de Debito'),
+(7, 191.27, 2, 60, 'Cartao de Credito'),
+(8, 288.08, 4, 72, 'Boleto'),
+(9, 129.61, 2, 33, 'Cartao de Debito'),
+(10, 202.2, 1, 58, 'Pix'),
+(11, 114.21, 2, 7, 'Pix'),
+(12, 219.55, 5, 78, 'Cartao de Credito'),
+(13, 403.24, 2, 98, 'Boleto'),
+(14, 347.99, 5, 28, 'Dinheiro'),
+(15, 157.29, 3, 39, 'Cartao de Credito'),
+(16, 158.37, 2, 95, 'Cartao de Credito'),
+(17, 356.35, 4, 32, 'Boleto'),
+(18, 340.39, 4, 31, 'Boleto'),
+(19, 199.0, 3, 49, 'Dinheiro'),
+(20, 277.45, 3, 40, 'Pix'),
+(21, 213.07, 4, 60, 'Cartao de Credito'),
+(22, 377.04, 4, 98, 'Pix'),
+(23, 418.3, 3, 41, 'Dinheiro'),
+(24, 96.91, 2, 95, 'Cartao de Debito'),
+(25, 86.0, 5, 75, 'Boleto'),
+(26, 346.4, 3, 20, 'Cartao de Debito'),
+(27, 202.05, 4, 73, 'Cartao de Debito'),
+(28, 264.74, 3, 33, 'Dinheiro'),
+(29, 437.61, 4, 59, 'Cartao de Debito'),
+(30, 351.13, 3, 22, 'Cartao de Debito'),
+(31, 346.52, 4, 24, 'Boleto'),
+(32, 446.42, 1, 68, 'Cartao de Credito'),
+(33, 390.46, 1, 86, 'Cartao de Credito'),
+(34, 362.81, 4, 18, 'Cartao de Debito'),
+(35, 105.15, 2, 2, 'Cartao de Debito'),
+(36, 267.12, 3, 8, 'Boleto'),
+(37, 315.96, 5, 62, 'Dinheiro'),
+(38, 85.82, 5, 71, 'Dinheiro'),
+(39, 84.38, 5, 93, 'Pix'),
+(40, 278.22, 3, 3, 'Boleto'),
+(41, 380.87, 4, 23, 'Cartao de Credito'),
+(42, 419.68, 5, 20, 'Cartao de Debito'),
+(43, 151.01, 5, 33, 'Pix'),
+(44, 178.91, 4, 11, 'Pix'),
+(45, 434.94, 4, 73, 'Cartao de Debito'),
+(46, 446.39, 2, 39, 'Cartao de Credito'),
+(47, 321.88, 1, 12, 'Dinheiro'),
+(48, 220.33, 5, 61, 'Cartao de Credito'),
+(49, 315.6, 2, 11, 'Dinheiro'),
+(50, 392.77, 3, 73, 'Cartao de Credito'),
+(51, 411.07, 1, 30, 'Cartao de Debito'),
+(52, 413.47, 5, 61, 'Pix'),
+(53, 97.23, 1, 88, 'Pix'),
+(54, 412.75, 5, 85, 'Cartao de Credito'),
+(55, 146.36, 3, 3, 'Cartao de Debito'),
+(56, 297.2, 4, 10, 'Pix'),
+(57, 140.11, 2, 73, 'Dinheiro'),
+(58, 330.5, 5, 43, 'Dinheiro'),
+(59, 359.58, 2, 89, 'Cartao de Credito'),
+(60, 265.29, 3, 7, 'Cartao de Credito'),
+(61, 241.72, 1, 44, 'Boleto'),
+(62, 364.53, 5, 51, 'Pix'),
+(63, 90.96, 3, 58, 'Dinheiro'),
+(64, 164.41, 5, 49, 'Dinheiro'),
+(65, 148.72, 5, 85, 'Dinheiro'),
+(66, 111.71, 5, 38, 'Cartao de Debito'),
+(67, 343.85, 1, 35, 'Cartao de Debito'),
+(68, 220.6, 2, 95, 'Dinheiro'),
+(69, 197.17, 1, 12, 'Cartao de Credito'),
+(70, 428.9, 4, 47, 'Pix'),
+(71, 117.83, 1, 24, 'Dinheiro'),
+(72, 246.07, 5, 66, 'Dinheiro'),
+(73, 118.22, 1, 46, 'Boleto'),
+(74, 114.43, 5, 42, 'Dinheiro'),
+(75, 84.57, 4, 50, 'Cartao de Credito'),
+(76, 348.19, 5, 32, 'Boleto'),
+(77, 272.81, 4, 22, 'Cartao de Debito'),
+(78, 179.5, 3, 64, 'Cartao de Debito'),
+(79, 103.41, 4, 36, 'Dinheiro'),
+(80, 190.91, 1, 47, 'Pix'),
+(81, 429.36, 4, 77, 'Boleto'),
+(82, 152.35, 1, 18, 'Pix'),
+(83, 82.5, 4, 43, 'Boleto'),
+(84, 220.56, 3, 57, 'Pix'),
+(85, 239.33, 5, 18, 'Pix'),
+(86, 198.65, 2, 62, 'Pix'),
+(87, 145.73, 4, 41, 'Pix'),
+(88, 351.9, 4, 74, 'Cartao de Debito'),
+(89, 200.58, 3, 51, 'Pix'),
+(90, 122.14, 5, 26, 'Boleto'),
+(91, 448.99, 2, 88, 'Boleto'),
+(92, 89.96, 4, 91, 'Cartao de Debito'),
+(93, 242.23, 3, 89, 'Cartao de Credito'),
+(94, 383.02, 4, 87, 'Dinheiro'),
+(95, 131.5, 3, 31, 'Pix'),
+(96, 323.71, 4, 49, 'Cartao de Credito'),
+(97, 246.15, 5, 62, 'Boleto'),
+(98, 228.3, 5, 89, 'Dinheiro'),
+(99, 281.15, 3, 90, 'Boleto'),
+(100, 299.71, 1, 14, 'Cartao de Debito');
+ 
+-- ===== MEDICAL HISTORY =====
+INSERT INTO MedicalHistory (MedicalHistoryID, Consultations, Diagnosis, Tests, Vaccines, Procedures, Allergies, ClinicalObservations, PetID, Weight) VALUES
+(1, 'Consulta de rotina realizada em 22/11/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Eletrocardiograma', 'Leishmaniose', 'Vermifugacao', 'Alergia a medicamento', 'Recomendado acompanhamento nutricional', 97, 15.26),
+(2, 'Consulta de rotina realizada em 26/07/2024, paciente avaliado clinicamente.', 'Otite', 'Hemograma completo', 'Giardia', 'Limpeza dentaria', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 72, 26.33),
+(3, 'Consulta de rotina realizada em 19/04/2025, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Exame de urina', 'V4 Felina', 'Cirurgia ortopedica', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 20, 15.85),
+(4, 'Consulta de rotina realizada em 01/08/2024, paciente avaliado clinicamente.', 'Verminose', 'Exame de urina', 'V10', 'Vermifugacao', 'Alergia a proteina', 'Boa resposta ao tratamento', 40, 15.77),
+(5, 'Consulta de rotina realizada em 26/04/2025, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Exame de urina', 'V10', 'Curativo', 'Alergia a polen', 'Boa resposta ao tratamento', 9, 13.86),
+(6, 'Consulta de rotina realizada em 26/12/2024, paciente avaliado clinicamente.', 'Otite', 'Ultrassom abdominal', 'Gripe canina', 'Vermifugacao', 'Alergia a proteina', 'Necessita retorno em 15 dias', 67, 8.26),
+(7, 'Consulta de rotina realizada em 06/06/2025, paciente avaliado clinicamente.', 'Conjuntivite', 'Raio-X', 'V4 Felina', 'Cirurgia ortopedica', 'Alergia a proteina', 'Necessita retorno em 15 dias', 82, 29.75),
+(8, 'Consulta de rotina realizada em 13/01/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Exame de fezes', 'V4 Felina', 'Curativo', 'Nenhuma conhecida', 'Necessita retorno em 15 dias', 27, 12.89),
+(9, 'Consulta de rotina realizada em 23/02/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Raio-X', 'Giardia', 'Castracao', 'Alergia a proteina', 'Recomendado acompanhamento nutricional', 15, 12.17),
+(10, 'Consulta de rotina realizada em 28/08/2025, paciente avaliado clinicamente.', 'Obesidade', 'Exame de urina', 'Leishmaniose', 'Curativo', 'Alergia a medicamento', 'Animal calmo durante consulta', 45, 16.16),
+(11, 'Consulta de rotina realizada em 15/10/2024, paciente avaliado clinicamente.', 'Verminose', 'Exame de fezes', 'Leishmaniose', 'Vermifugacao', 'Alergia a proteina', 'Boa resposta ao tratamento', 16, 11.12),
+(12, 'Consulta de rotina realizada em 04/03/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Exame de fezes', 'V4 Felina', 'Curativo', 'Alergia a medicamento', 'Necessita retorno em 15 dias', 74, 17.58),
+(13, 'Consulta de rotina realizada em 06/08/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Raio-X', 'V4 Felina', 'Castracao', 'Alergia a proteina', 'Necessita retorno em 15 dias', 41, 37.97),
+(14, 'Consulta de rotina realizada em 20/01/2025, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'Antirrabica', 'Limpeza dentaria', 'Alergia a polen', 'Tutor orientado sobre cuidados pos-procedimento', 65, 29.56),
+(15, 'Consulta de rotina realizada em 14/11/2025, paciente avaliado clinicamente.', 'Infeccao urinaria', 'Eletrocardiograma', 'V4 Felina', 'Curativo', 'Alergia a proteina', 'Animal calmo durante consulta', 73, 1.87),
+(16, 'Consulta de rotina realizada em 25/04/2025, paciente avaliado clinicamente.', 'Otite', 'Ultrassom abdominal', 'Antirrabica', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 100, 20.85),
+(17, 'Consulta de rotina realizada em 24/08/2024, paciente avaliado clinicamente.', 'Obesidade', 'Hemograma completo', 'Giardia', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 97, 2.35),
+(18, 'Consulta de rotina realizada em 24/08/2024, paciente avaliado clinicamente.', 'Infeccao urinaria', 'Hemograma completo', 'Gripe canina', 'Cirurgia ortopedica', 'Alergia a proteina', 'Boa resposta ao tratamento', 5, 20.51),
+(19, 'Consulta de rotina realizada em 12/02/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Raio-X', 'Antirrabica', 'Cirurgia ortopedica', 'Alergia a medicamento', 'Boa resposta ao tratamento', 91, 27.66),
+(20, 'Consulta de rotina realizada em 14/03/2024, paciente avaliado clinicamente.', 'Gastrite', 'Raio-X', 'V10', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 36, 27.06),
+(21, 'Consulta de rotina realizada em 06/06/2025, paciente avaliado clinicamente.', 'Verminose', 'Exame de fezes', 'Giardia', 'Aplicacao de vacina', 'Nenhuma conhecida', 'Necessita retorno em 15 dias', 97, 35.46),
+(22, 'Consulta de rotina realizada em 02/05/2024, paciente avaliado clinicamente.', 'Fratura leve', 'Raio-X', 'Antirrabica', 'Cirurgia ortopedica', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 98, 38.04),
+(23, 'Consulta de rotina realizada em 13/08/2024, paciente avaliado clinicamente.', 'Obesidade', 'Eletrocardiograma', 'Giardia', 'Cirurgia ortopedica', 'Alergia a polen', 'Recomendado acompanhamento nutricional', 58, 3.86),
+(24, 'Consulta de rotina realizada em 26/02/2025, paciente avaliado clinicamente.', 'Doenca periodontal', 'Eletrocardiograma', 'Giardia', 'Cirurgia ortopedica', 'Alergia a picada de pulga', 'Recomendado acompanhamento nutricional', 63, 15.06),
+(25, 'Consulta de rotina realizada em 01/12/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Eletrocardiograma', 'Gripe canina', 'Cirurgia ortopedica', 'Alergia a picada de pulga', 'Animal calmo durante consulta', 69, 18.2),
+(26, 'Consulta de rotina realizada em 14/04/2025, paciente avaliado clinicamente.', 'Verminose', 'Ultrassom abdominal', 'Giardia', 'Castracao', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 17, 25.69),
+(27, 'Consulta de rotina realizada em 16/06/2024, paciente avaliado clinicamente.', 'Otite', 'Hemograma completo', 'Gripe canina', 'Curativo', 'Nenhuma conhecida', 'Animal calmo durante consulta', 21, 20.14),
+(28, 'Consulta de rotina realizada em 01/07/2024, paciente avaliado clinicamente.', 'Fratura leve', 'Eletrocardiograma', 'Giardia', 'Limpeza dentaria', 'Alergia a picada de pulga', 'Animal calmo durante consulta', 84, 16.54),
+(29, 'Consulta de rotina realizada em 03/06/2024, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'Gripe canina', 'Castracao', 'Alergia a proteina', 'Recomendado acompanhamento nutricional', 84, 4.56),
+(30, 'Consulta de rotina realizada em 04/01/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Hemograma completo', 'Antirrabica', 'Aplicacao de vacina', 'Alergia a proteina', 'Tutor orientado sobre cuidados pos-procedimento', 88, 20.31),
+(31, 'Consulta de rotina realizada em 01/12/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Exame de urina', 'Gripe canina', 'Limpeza dentaria', 'Alergia a polen', 'Animal calmo durante consulta', 30, 17.55),
+(32, 'Consulta de rotina realizada em 24/02/2024, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Ultrassom abdominal', 'Giardia', 'Limpeza dentaria', 'Alergia a polen', 'Necessita retorno em 15 dias', 83, 44.69),
+(33, 'Consulta de rotina realizada em 05/02/2024, paciente avaliado clinicamente.', 'Obesidade', 'Eletrocardiograma', 'Antirrabica', 'Curativo', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 81, 33.8),
+(34, 'Consulta de rotina realizada em 14/10/2025, paciente avaliado clinicamente.', 'Gastrite', 'Hemograma completo', 'V10', 'Limpeza dentaria', 'Nenhuma conhecida', 'Tutor orientado sobre cuidados pos-procedimento', 94, 17.59),
+(35, 'Consulta de rotina realizada em 14/06/2024, paciente avaliado clinicamente.', 'Gastrite', 'Ultrassom abdominal', 'Gripe canina', 'Vermifugacao', 'Alergia a proteina', 'Tutor orientado sobre cuidados pos-procedimento', 77, 27.2),
+(36, 'Consulta de rotina realizada em 20/05/2024, paciente avaliado clinicamente.', 'Verminose', 'Raio-X', 'Leishmaniose', 'Aplicacao de vacina', 'Alergia a medicamento', 'Necessita retorno em 15 dias', 96, 17.93),
+(37, 'Consulta de rotina realizada em 21/01/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Exame de urina', 'V10', 'Limpeza dentaria', 'Alergia a polen', 'Tutor orientado sobre cuidados pos-procedimento', 10, 24.01),
+(38, 'Consulta de rotina realizada em 01/06/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Exame de urina', 'Leishmaniose', 'Curativo', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 88, 8.19),
+(39, 'Consulta de rotina realizada em 16/02/2024, paciente avaliado clinicamente.', 'Obesidade', 'Hemograma completo', 'V10', 'Castracao', 'Alergia a proteina', 'Animal calmo durante consulta', 8, 42.72),
+(40, 'Consulta de rotina realizada em 13/09/2025, paciente avaliado clinicamente.', 'Doenca periodontal', 'Exame de urina', 'V4 Felina', 'Cirurgia ortopedica', 'Alergia a polen', 'Animal calmo durante consulta', 82, 24.38),
+(41, 'Consulta de rotina realizada em 20/03/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Ultrassom abdominal', 'V10', 'Aplicacao de vacina', 'Alergia a proteina', 'Necessita retorno em 15 dias', 69, 15.04),
+(42, 'Consulta de rotina realizada em 19/11/2024, paciente avaliado clinicamente.', 'Verminose', 'Eletrocardiograma', 'V4 Felina', 'Cirurgia ortopedica', 'Alergia a proteina', 'Animal calmo durante consulta', 32, 4.34),
+(43, 'Consulta de rotina realizada em 14/02/2025, paciente avaliado clinicamente.', 'Obesidade', 'Exame de fezes', 'V10', 'Castracao', 'Alergia a proteina', 'Animal calmo durante consulta', 2, 32.0),
+(44, 'Consulta de rotina realizada em 23/01/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Ultrassom abdominal', 'Leishmaniose', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 48, 6.15),
+(45, 'Consulta de rotina realizada em 25/05/2024, paciente avaliado clinicamente.', 'Otite', 'Ultrassom abdominal', 'V4 Felina', 'Castracao', 'Alergia a medicamento', 'Animal calmo durante consulta', 34, 32.2),
+(46, 'Consulta de rotina realizada em 19/11/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Exame de urina', 'Leishmaniose', 'Castracao', 'Nenhuma conhecida', 'Recomendado acompanhamento nutricional', 73, 7.93),
+(47, 'Consulta de rotina realizada em 06/05/2024, paciente avaliado clinicamente.', 'Obesidade', 'Eletrocardiograma', 'Gripe canina', 'Vermifugacao', 'Alergia a proteina', 'Tutor orientado sobre cuidados pos-procedimento', 1, 2.46),
+(48, 'Consulta de rotina realizada em 28/01/2024, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'Giardia', 'Curativo', 'Alergia a proteina', 'Necessita retorno em 15 dias', 5, 25.1),
+(49, 'Consulta de rotina realizada em 23/12/2025, paciente avaliado clinicamente.', 'Gastrite', 'Ultrassom abdominal', 'Antirrabica', 'Curativo', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 10, 25.93),
+(50, 'Consulta de rotina realizada em 04/09/2024, paciente avaliado clinicamente.', 'Fratura leve', 'Raio-X', 'Leishmaniose', 'Vermifugacao', 'Alergia a polen', 'Animal calmo durante consulta', 60, 39.04),
+(51, 'Consulta de rotina realizada em 25/05/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Exame de fezes', 'V4 Felina', 'Vermifugacao', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 38, 25.59),
+(52, 'Consulta de rotina realizada em 10/12/2024, paciente avaliado clinicamente.', 'Conjuntivite', 'Ultrassom abdominal', 'Leishmaniose', 'Curativo', 'Alergia a proteina', 'Tutor orientado sobre cuidados pos-procedimento', 98, 35.92),
+(53, 'Consulta de rotina realizada em 05/01/2025, paciente avaliado clinicamente.', 'Otite', 'Raio-X', 'Leishmaniose', 'Castracao', 'Nenhuma conhecida', 'Boa resposta ao tratamento', 1, 34.27),
+(54, 'Consulta de rotina realizada em 13/12/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Raio-X', 'Leishmaniose', 'Limpeza dentaria', 'Alergia a polen', 'Recomendado acompanhamento nutricional', 8, 43.78),
+(55, 'Consulta de rotina realizada em 05/12/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Hemograma completo', 'Antirrabica', 'Aplicacao de vacina', 'Alergia a polen', 'Boa resposta ao tratamento', 59, 43.87),
+(56, 'Consulta de rotina realizada em 03/10/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Raio-X', 'Gripe canina', 'Curativo', 'Nenhuma conhecida', 'Tutor orientado sobre cuidados pos-procedimento', 73, 3.27),
+(57, 'Consulta de rotina realizada em 22/03/2024, paciente avaliado clinicamente.', 'Verminose', 'Ultrassom abdominal', 'Giardia', 'Curativo', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 58, 12.6),
+(58, 'Consulta de rotina realizada em 03/04/2024, paciente avaliado clinicamente.', 'Obesidade', 'Hemograma completo', 'Antirrabica', 'Vermifugacao', 'Alergia a proteina', 'Recomendado acompanhamento nutricional', 60, 14.47),
+(59, 'Consulta de rotina realizada em 04/09/2025, paciente avaliado clinicamente.', 'Gastrite', 'Exame de urina', 'Giardia', 'Curativo', 'Alergia a picada de pulga', 'Animal calmo durante consulta', 12, 7.51),
+(60, 'Consulta de rotina realizada em 22/05/2024, paciente avaliado clinicamente.', 'Gastrite', 'Ultrassom abdominal', 'Antirrabica', 'Vermifugacao', 'Alergia a proteina', 'Boa resposta ao tratamento', 51, 23.35),
+(61, 'Consulta de rotina realizada em 22/05/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Hemograma completo', 'V4 Felina', 'Curativo', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 32, 4.72),
+(62, 'Consulta de rotina realizada em 04/03/2024, paciente avaliado clinicamente.', 'Otite', 'Hemograma completo', 'Antirrabica', 'Limpeza dentaria', 'Alergia a proteina', 'Recomendado acompanhamento nutricional', 48, 31.04),
+(63, 'Consulta de rotina realizada em 21/02/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Hemograma completo', 'V10', 'Limpeza dentaria', 'Alergia a polen', 'Necessita retorno em 15 dias', 12, 40.78),
+(64, 'Consulta de rotina realizada em 27/06/2024, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'V10', 'Limpeza dentaria', 'Alergia a medicamento', 'Recomendado acompanhamento nutricional', 93, 18.08),
+(65, 'Consulta de rotina realizada em 01/07/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Ultrassom abdominal', 'Antirrabica', 'Limpeza dentaria', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 58, 39.81),
+(66, 'Consulta de rotina realizada em 02/10/2024, paciente avaliado clinicamente.', 'Verminose', 'Exame de urina', 'V4 Felina', 'Aplicacao de vacina', 'Alergia a polen', 'Animal calmo durante consulta', 12, 12.95),
+(67, 'Consulta de rotina realizada em 05/07/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Raio-X', 'Gripe canina', 'Aplicacao de vacina', 'Nenhuma conhecida', 'Recomendado acompanhamento nutricional', 92, 16.48),
+(68, 'Consulta de rotina realizada em 18/08/2025, paciente avaliado clinicamente.', 'Obesidade', 'Exame de fezes', 'Giardia', 'Curativo', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 4, 14.69),
+(69, 'Consulta de rotina realizada em 08/01/2025, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'Leishmaniose', 'Castracao', 'Alergia a medicamento', 'Necessita retorno em 15 dias', 21, 4.96),
+(70, 'Consulta de rotina realizada em 22/04/2025, paciente avaliado clinicamente.', 'Doenca periodontal', 'Eletrocardiograma', 'V10', 'Limpeza dentaria', 'Alergia a medicamento', 'Recomendado acompanhamento nutricional', 46, 42.12),
+(71, 'Consulta de rotina realizada em 28/03/2024, paciente avaliado clinicamente.', 'Gastrite', 'Exame de fezes', 'Giardia', 'Cirurgia ortopedica', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 4, 31.8),
+(72, 'Consulta de rotina realizada em 12/10/2024, paciente avaliado clinicamente.', 'Obesidade', 'Raio-X', 'V4 Felina', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Necessita retorno em 15 dias', 63, 2.19),
+(73, 'Consulta de rotina realizada em 02/04/2024, paciente avaliado clinicamente.', 'Otite', 'Exame de fezes', 'V4 Felina', 'Vermifugacao', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 26, 36.39),
+(74, 'Consulta de rotina realizada em 11/12/2024, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Hemograma completo', 'V10', 'Limpeza dentaria', 'Alergia a medicamento', 'Necessita retorno em 15 dias', 100, 5.44),
+(75, 'Consulta de rotina realizada em 17/06/2024, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Eletrocardiograma', 'Gripe canina', 'Curativo', 'Alergia a medicamento', 'Animal calmo durante consulta', 44, 13.93),
+(76, 'Consulta de rotina realizada em 05/03/2025, paciente avaliado clinicamente.', 'Conjuntivite', 'Eletrocardiograma', 'Giardia', 'Limpeza dentaria', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 46, 10.43),
+(77, 'Consulta de rotina realizada em 19/03/2025, paciente avaliado clinicamente.', 'Verminose', 'Eletrocardiograma', 'Gripe canina', 'Castracao', 'Alergia a proteina', 'Necessita retorno em 15 dias', 94, 0.58),
+(78, 'Consulta de rotina realizada em 23/10/2025, paciente avaliado clinicamente.', 'Obesidade', 'Hemograma completo', 'Antirrabica', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 29, 28.96),
+(79, 'Consulta de rotina realizada em 04/08/2024, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Eletrocardiograma', 'V10', 'Limpeza dentaria', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 22, 28.81),
+(80, 'Consulta de rotina realizada em 03/12/2025, paciente avaliado clinicamente.', 'Conjuntivite', 'Hemograma completo', 'Giardia', 'Limpeza dentaria', 'Alergia a proteina', 'Animal calmo durante consulta', 45, 11.92),
+(81, 'Consulta de rotina realizada em 04/12/2024, paciente avaliado clinicamente.', 'Otite', 'Exame de urina', 'V4 Felina', 'Cirurgia ortopedica', 'Alergia a polen', 'Necessita retorno em 15 dias', 53, 22.44),
+(82, 'Consulta de rotina realizada em 13/06/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Exame de urina', 'Leishmaniose', 'Cirurgia ortopedica', 'Alergia a proteina', 'Necessita retorno em 15 dias', 58, 3.78),
+(83, 'Consulta de rotina realizada em 28/01/2025, paciente avaliado clinicamente.', 'Otite', 'Ultrassom abdominal', 'Giardia', 'Vermifugacao', 'Nenhuma conhecida', 'Boa resposta ao tratamento', 22, 40.01),
+(84, 'Consulta de rotina realizada em 06/12/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Hemograma completo', 'Giardia', 'Aplicacao de vacina', 'Alergia a medicamento', 'Recomendado acompanhamento nutricional', 91, 1.88),
+(85, 'Consulta de rotina realizada em 21/03/2025, paciente avaliado clinicamente.', 'Fratura leve', 'Hemograma completo', 'V10', 'Castracao', 'Alergia a proteina', 'Necessita retorno em 15 dias', 53, 31.53),
+(86, 'Consulta de rotina realizada em 24/12/2025, paciente avaliado clinicamente.', 'Verminose', 'Ultrassom abdominal', 'Antirrabica', 'Vermifugacao', 'Nenhuma conhecida', 'Recomendado acompanhamento nutricional', 74, 24.96),
+(87, 'Consulta de rotina realizada em 16/03/2024, paciente avaliado clinicamente.', 'Saudavel - check-up de rotina', 'Hemograma completo', 'V4 Felina', 'Vermifugacao', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 62, 9.39),
+(88, 'Consulta de rotina realizada em 01/04/2024, paciente avaliado clinicamente.', 'Verminose', 'Hemograma completo', 'V4 Felina', 'Vermifugacao', 'Alergia a picada de pulga', 'Recomendado acompanhamento nutricional', 61, 22.26),
+(89, 'Consulta de rotina realizada em 22/05/2024, paciente avaliado clinicamente.', 'Doenca periodontal', 'Exame de urina', 'Antirrabica', 'Castracao', 'Alergia a polen', 'Boa resposta ao tratamento', 24, 20.34),
+(90, 'Consulta de rotina realizada em 09/08/2025, paciente avaliado clinicamente.', 'Verminose', 'Raio-X', 'Giardia', 'Aplicacao de vacina', 'Nenhuma conhecida', 'Necessita retorno em 15 dias', 97, 31.49),
+(91, 'Consulta de rotina realizada em 04/02/2025, paciente avaliado clinicamente.', 'Doenca periodontal', 'Exame de urina', 'Leishmaniose', 'Limpeza dentaria', 'Alergia a medicamento', 'Animal calmo durante consulta', 50, 36.92),
+(92, 'Consulta de rotina realizada em 14/09/2025, paciente avaliado clinicamente.', 'Obesidade', 'Raio-X', 'V4 Felina', 'Castracao', 'Nenhuma conhecida', 'Recomendado acompanhamento nutricional', 92, 2.05),
+(93, 'Consulta de rotina realizada em 19/09/2024, paciente avaliado clinicamente.', 'Dermatite alergica', 'Exame de urina', 'Antirrabica', 'Limpeza dentaria', 'Alergia a proteina', 'Necessita retorno em 15 dias', 17, 2.4),
+(94, 'Consulta de rotina realizada em 03/11/2025, paciente avaliado clinicamente.', 'Gastrite', 'Eletrocardiograma', 'Antirrabica', 'Aplicacao de vacina', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 94, 41.18),
+(95, 'Consulta de rotina realizada em 03/02/2025, paciente avaliado clinicamente.', 'Doenca periodontal', 'Exame de urina', 'Leishmaniose', 'Castracao', 'Alergia a picada de pulga', 'Tutor orientado sobre cuidados pos-procedimento', 59, 41.31),
+(96, 'Consulta de rotina realizada em 01/12/2025, paciente avaliado clinicamente.', 'Dermatite alergica', 'Exame de urina', 'Antirrabica', 'Limpeza dentaria', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 75, 34.25),
+(97, 'Consulta de rotina realizada em 04/02/2024, paciente avaliado clinicamente.', 'Verminose', 'Exame de fezes', 'Giardia', 'Curativo', 'Alergia a picada de pulga', 'Recomendado acompanhamento nutricional', 84, 22.11),
+(98, 'Consulta de rotina realizada em 20/08/2024, paciente avaliado clinicamente.', 'Fratura leve', 'Ultrassom abdominal', 'V4 Felina', 'Limpeza dentaria', 'Alergia a medicamento', 'Tutor orientado sobre cuidados pos-procedimento', 88, 31.37),
+(99, 'Consulta de rotina realizada em 02/07/2025, paciente avaliado clinicamente.', 'Gastrite', 'Hemograma completo', 'Gripe canina', 'Curativo', 'Alergia a picada de pulga', 'Boa resposta ao tratamento', 3, 15.54),
+(100, 'Consulta de rotina realizada em 26/05/2025, paciente avaliado clinicamente.', 'Verminose', 'Exame de urina', 'Gripe canina', 'Cirurgia ortopedica', 'Nenhuma conhecida', 'Necessita retorno em 15 dias', 18, 13.87);
+ 
+-- ===== HOSPITALIZED PATIENTS =====
+INSERT INTO HospitalizedPatients (HospitalizedPatientsID, Date_Of_Entry, Check_in_time, DischargeDate, DischargeTime, ReasonForAdmission, Diagnosis, Tests, MedicalHistoryID, AttendingVeterinarian) VALUES
+(1, '2026-06-09', '23:45:00', '2026-06-14', '20:00:00', 'Desidratacao severa', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 53, 'Dra. Beatriz Moraes'),
+(2, '2025-09-06', '02:30:00', '2025-09-12', '16:45:00', 'Intoxicacao alimentar', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 23, 'Dra. Patricia Lopes'),
+(3, '2025-04-02', '14:00:00', '2025-04-05', '22:15:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Gasometria', 65, 'Dr. Rodrigo Ferreira'),
+(4, '2025-04-12', '15:45:00', '2025-04-14', '15:30:00', 'Insuficiencia renal', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 96, 'Dra. Fernanda Teixeira'),
+(5, '2025-07-02', '05:15:00', '2025-07-09', '07:15:00', 'Desidratacao severa', 'Insuficiencia renal em tratamento', 'Gasometria', 66, 'Dr. Marcos Almeida'),
+(6, '2026-03-21', '05:00:00', '2026-03-23', '08:30:00', 'Fratura complexa', 'Recuperacao pos-traumatica', 'Gasometria', 45, 'Dra. Beatriz Teixeira'),
+(7, '2025-08-10', '21:45:00', '2025-08-15', '03:00:00', 'Insuficiencia renal', 'Infeccao respiratoria em tratamento', 'Exame de sangue completo', 39, 'Dra. Fernanda Freitas'),
+(8, '2025-06-09', '20:30:00', '2025-06-16', '08:30:00', 'Fratura complexa', 'Quadro de desidratacao controlado', 'Raio-X e ultrassom', 67, 'Dra. Patricia Almeida'),
+(9, '2026-11-11', '21:15:00', '2026-11-17', '00:45:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Gasometria', 52, 'Dr. Rodrigo Almeida'),
+(10, '2025-06-24', '22:15:00', '2025-06-28', '17:45:00', 'Insuficiencia renal', 'Infeccao respiratoria em tratamento', 'Exame de sangue completo', 22, 'Dr. Sergio Cardoso'),
+(11, '2026-02-16', '04:30:00', '2026-02-22', '17:15:00', 'Insuficiencia renal', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 46, 'Dra. Patricia Teixeira'),
+(12, '2026-06-12', '08:30:00', '2026-06-16', '03:45:00', 'Cirurgia de emergencia', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 61, 'Dra. Patricia Ferreira'),
+(13, '2026-09-10', '13:00:00', '2026-09-17', '04:15:00', 'Desidratacao severa', 'Insuficiencia renal em tratamento', 'Gasometria', 73, 'Dra. Beatriz Cardoso'),
+(14, '2026-12-06', '02:45:00', '2026-12-09', '20:15:00', 'Insuficiencia renal', 'Estabilizado apos cirurgia', 'Hemograma e bioquimico', 58, 'Dr. Andre Lopes'),
+(15, '2025-10-25', '05:45:00', '2025-10-28', '02:15:00', 'Complicacoes respiratorias', 'Recuperacao pos-traumatica', 'Gasometria', 55, 'Dra. Beatriz Cavalcanti'),
+(16, '2025-01-18', '06:30:00', '2025-01-19', '10:15:00', 'Cirurgia de emergencia', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 29, 'Dra. Camila Teixeira'),
+(17, '2025-02-13', '16:30:00', '2025-02-15', '02:00:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Gasometria', 94, 'Dr. Sergio Moraes'),
+(18, '2026-11-05', '10:45:00', '2026-11-08', '06:15:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 29, 'Dr. Ricardo Lopes'),
+(19, '2025-10-17', '05:00:00', '2025-10-20', '22:00:00', 'Complicacoes respiratorias', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 77, 'Dr. Marcos Ferreira'),
+(20, '2025-01-23', '03:45:00', '2025-01-27', '12:00:00', 'Fratura complexa', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 27, 'Dr. Marcos Teixeira'),
+(21, '2026-11-04', '21:30:00', '2026-11-09', '19:15:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Hemograma e bioquimico', 37, 'Dra. Fernanda Ferreira'),
+(22, '2026-04-20', '06:30:00', '2026-04-27', '16:15:00', 'Insuficiencia renal', 'Recuperacao pos-traumatica', 'Exame de sangue completo', 21, 'Dr. Marcos Freitas'),
+(23, '2025-12-16', '10:15:00', '2025-12-17', '00:00:00', 'Observacao pos-cirurgica', 'Infeccao respiratoria em tratamento', 'Gasometria', 20, 'Dra. Fernanda Ferreira'),
+(24, '2025-05-21', '07:45:00', '2025-05-24', '08:45:00', 'Cirurgia de emergencia', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 6, 'Dr. Andre Moraes'),
+(25, '2026-07-24', '03:00:00', '2026-07-28', '01:00:00', 'Intoxicacao alimentar', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 46, 'Dra. Beatriz Teixeira'),
+(26, '2025-06-11', '05:00:00', '2025-06-15', '12:45:00', 'Fratura complexa', 'Recuperacao pos-traumatica', 'Gasometria', 54, 'Dr. Ricardo Ferreira'),
+(27, '2025-12-24', '01:15:00', '2025-12-25', '13:45:00', 'Parto assistido', 'Quadro de desidratacao controlado', 'Gasometria', 100, 'Dra. Camila Almeida'),
+(28, '2025-08-16', '03:45:00', '2025-08-20', '01:00:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 91, 'Dr. Sergio Lopes'),
+(29, '2026-09-17', '22:00:00', '2026-09-21', '21:15:00', 'Parto assistido', 'Insuficiencia renal em tratamento', 'Gasometria', 20, 'Dr. Sergio Almeida'),
+(30, '2025-11-06', '16:45:00', '2025-11-13', '15:15:00', 'Observacao pos-cirurgica', 'Recuperacao pos-traumatica', 'Exame de sangue completo', 31, 'Dra. Camila Teixeira'),
+(31, '2025-09-08', '17:45:00', '2025-09-12', '07:00:00', 'Parto assistido', 'Recuperacao pos-traumatica', 'Gasometria', 12, 'Dra. Beatriz Freitas'),
+(32, '2026-02-16', '23:00:00', '2026-02-17', '12:45:00', 'Cirurgia de emergencia', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 12, 'Dra. Vanessa Teixeira'),
+(33, '2025-11-22', '14:30:00', '2025-11-25', '01:15:00', 'Parto assistido', 'Insuficiencia renal em tratamento', 'Gasometria', 92, 'Dra. Camila Freitas'),
+(34, '2025-02-25', '21:15:00', '2025-02-26', '10:30:00', 'Fratura complexa', 'Infeccao respiratoria em tratamento', 'Exame de sangue completo', 90, 'Dra. Fernanda Almeida'),
+(35, '2025-08-05', '22:45:00', '2025-08-06', '08:15:00', 'Desidratacao severa', 'Estabilizado apos cirurgia', 'Gasometria', 28, 'Dra. Beatriz Lopes'),
+(36, '2026-02-25', '13:00:00', '2026-02-28', '21:00:00', 'Parto assistido', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 64, 'Dr. Marcos Almeida'),
+(37, '2026-10-16', '16:15:00', '2026-10-22', '18:15:00', 'Intoxicacao alimentar', 'Estabilizado apos cirurgia', 'Gasometria', 85, 'Dra. Vanessa Moraes'),
+(38, '2026-07-20', '22:15:00', '2026-07-23', '12:30:00', 'Fratura complexa', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 18, 'Dr. Rodrigo Teixeira'),
+(39, '2026-12-24', '17:15:00', '2026-12-26', '06:30:00', 'Insuficiencia renal', 'Quadro de desidratacao controlado', 'Raio-X e ultrassom', 65, 'Dr. Sergio Moraes'),
+(40, '2025-06-18', '15:45:00', '2025-06-24', '23:30:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Hemograma e bioquimico', 4, 'Dr. Rodrigo Cardoso'),
+(41, '2025-11-02', '06:30:00', '2025-11-09', '05:30:00', 'Fratura complexa', 'Quadro de desidratacao controlado', 'Hemograma e bioquimico', 89, 'Dr. Andre Lopes'),
+(42, '2025-06-15', '03:15:00', '2025-06-21', '20:45:00', 'Desidratacao severa', 'Infeccao respiratoria em tratamento', 'Exame de sangue completo', 89, 'Dr. Marcos Cavalcanti'),
+(43, '2026-07-22', '10:00:00', '2026-07-23', '23:30:00', 'Desidratacao severa', 'Infeccao respiratoria em tratamento', 'Gasometria', 29, 'Dra. Camila Lopes'),
+(44, '2025-05-15', '05:00:00', '2025-05-17', '05:00:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Gasometria', 36, 'Dr. Sergio Teixeira'),
+(45, '2025-03-19', '08:00:00', '2025-03-22', '14:15:00', 'Cirurgia de emergencia', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 77, 'Dr. Marcos Teixeira'),
+(46, '2026-10-18', '11:00:00', '2026-10-25', '22:30:00', 'Desidratacao severa', 'Quadro de desidratacao controlado', 'Hemograma e bioquimico', 65, 'Dr. Ricardo Cavalcanti'),
+(47, '2026-02-12', '07:15:00', '2026-02-18', '10:30:00', 'Insuficiencia renal', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 97, 'Dra. Vanessa Freitas'),
+(48, '2025-02-22', '11:45:00', '2025-02-24', '20:15:00', 'Cirurgia de emergencia', 'Insuficiencia renal em tratamento', 'Gasometria', 15, 'Dr. Rodrigo Teixeira'),
+(49, '2026-01-17', '11:45:00', '2026-01-21', '01:30:00', 'Desidratacao severa', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 13, 'Dr. Ricardo Almeida'),
+(50, '2025-04-22', '20:15:00', '2025-04-28', '21:45:00', 'Observacao pos-cirurgica', 'Quadro de desidratacao controlado', 'Gasometria', 83, 'Dra. Fernanda Cardoso'),
+(51, '2025-08-23', '10:00:00', '2025-08-24', '02:00:00', 'Intoxicacao alimentar', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 74, 'Dra. Patricia Teixeira'),
+(52, '2026-07-15', '20:45:00', '2026-07-19', '10:00:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Hemograma e bioquimico', 83, 'Dra. Vanessa Ferreira'),
+(53, '2025-12-03', '11:00:00', '2025-12-06', '21:30:00', 'Observacao pos-cirurgica', 'Insuficiencia renal em tratamento', 'Gasometria', 49, 'Dr. Rodrigo Almeida'),
+(54, '2026-03-18', '07:15:00', '2026-03-24', '12:30:00', 'Intoxicacao alimentar', 'Insuficiencia renal em tratamento', 'Exame de sangue completo', 2, 'Dr. Sergio Cardoso'),
+(55, '2025-01-01', '18:45:00', '2025-01-06', '17:00:00', 'Fratura complexa', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 28, 'Dr. Rodrigo Cardoso'),
+(56, '2025-03-08', '19:30:00', '2025-03-10', '03:15:00', 'Cirurgia de emergencia', 'Infeccao respiratoria em tratamento', 'Gasometria', 83, 'Dr. Sergio Ferreira'),
+(57, '2026-11-03', '08:00:00', '2026-11-05', '23:45:00', 'Insuficiencia renal', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 86, 'Dra. Patricia Ferreira'),
+(58, '2026-10-03', '06:30:00', '2026-10-07', '14:30:00', 'Fratura complexa', 'Infeccao respiratoria em tratamento', 'Raio-X e ultrassom', 73, 'Dra. Vanessa Moraes'),
+(59, '2026-07-06', '00:30:00', '2026-07-08', '07:45:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 87, 'Dra. Camila Freitas'),
+(60, '2026-08-12', '09:45:00', '2026-08-17', '03:15:00', 'Observacao pos-cirurgica', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 69, 'Dra. Patricia Teixeira'),
+(61, '2025-12-03', '00:00:00', '2025-12-10', '18:45:00', 'Desidratacao severa', 'Estabilizado apos cirurgia', 'Exame de sangue completo', 70, 'Dr. Sergio Freitas'),
+(62, '2025-06-13', '07:30:00', '2025-06-15', '14:00:00', 'Complicacoes respiratorias', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 85, 'Dra. Patricia Cardoso'),
+(63, '2025-08-06', '05:15:00', '2025-08-12', '23:45:00', 'Insuficiencia renal', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 98, 'Dra. Beatriz Lopes'),
+(64, '2025-05-12', '07:00:00', '2025-05-18', '06:30:00', 'Complicacoes respiratorias', 'Recuperacao pos-traumatica', 'Gasometria', 6, 'Dr. Marcos Moraes'),
+(65, '2025-12-17', '20:30:00', '2025-12-24', '23:30:00', 'Intoxicacao alimentar', 'Recuperacao pos-traumatica', 'Gasometria', 47, 'Dra. Vanessa Ferreira'),
+(66, '2026-07-08', '16:45:00', '2026-07-11', '11:45:00', 'Parto assistido', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 65, 'Dr. Ricardo Freitas'),
+(67, '2025-04-03', '16:30:00', '2025-04-05', '04:15:00', 'Intoxicacao alimentar', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 85, 'Dra. Patricia Cavalcanti'),
+(68, '2026-12-04', '15:45:00', '2026-12-08', '06:15:00', 'Complicacoes respiratorias', 'Estabilizado apos cirurgia', 'Raio-X e ultrassom', 6, 'Dr. Ricardo Cardoso'),
+(69, '2025-11-17', '01:15:00', '2025-11-18', '05:30:00', 'Intoxicacao alimentar', 'Infeccao respiratoria em tratamento', 'Gasometria', 77, 'Dra. Vanessa Almeida'),
+(70, '2026-02-07', '14:45:00', '2026-02-14', '15:15:00', 'Desidratacao severa', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 75, 'Dr. Ricardo Teixeira'),
+(71, '2025-12-22', '10:45:00', '2025-12-27', '18:00:00', 'Desidratacao severa', 'Recuperacao pos-traumatica', 'Gasometria', 17, 'Dra. Fernanda Almeida'),
+(72, '2025-09-17', '21:45:00', '2025-09-24', '04:00:00', 'Intoxicacao alimentar', 'Recuperacao pos-traumatica', 'Hemograma e bioquimico', 69, 'Dr. Sergio Ferreira'),
+(73, '2025-08-22', '04:00:00', '2025-08-28', '21:45:00', 'Complicacoes respiratorias', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 90, 'Dr. Sergio Cavalcanti'),
+(74, '2025-08-25', '12:30:00', '2025-08-28', '23:00:00', 'Complicacoes respiratorias', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 62, 'Dra. Patricia Ferreira'),
+(75, '2026-10-18', '13:30:00', '2026-10-20', '00:00:00', 'Observacao pos-cirurgica', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 49, 'Dra. Patricia Moraes'),
+(76, '2026-06-04', '04:45:00', '2026-06-10', '18:30:00', 'Fratura complexa', 'Infeccao respiratoria em tratamento', 'Gasometria', 73, 'Dra. Camila Teixeira'),
+(77, '2026-04-14', '17:45:00', '2026-04-16', '11:45:00', 'Fratura complexa', 'Insuficiencia renal em tratamento', 'Exame de sangue completo', 100, 'Dr. Rodrigo Cardoso'),
+(78, '2025-12-08', '14:15:00', '2025-12-09', '06:45:00', 'Insuficiencia renal', 'Infeccao respiratoria em tratamento', 'Hemograma e bioquimico', 21, 'Dr. Rodrigo Almeida'),
+(79, '2025-03-16', '19:45:00', '2025-03-17', '02:30:00', 'Desidratacao severa', 'Insuficiencia renal em tratamento', 'Hemograma e bioquimico', 78, 'Dr. Marcos Cavalcanti'),
+(80, '2026-10-21', '16:30:00', '2026-10-27', '19:00:00', 'Intoxicacao alimentar', 'Recuperacao pos-traumatica', 'Gasometria', 2, 'Dra. Patricia Teixeira'),
+(81, '2025-01-20', '16:15:00', '2025-01-25', '05:00:00', 'Insuficiencia renal', 'Quadro de desidratacao controlado', 'Hemograma e bioquimico', 21, 'Dra. Fernanda Teixeira'),
+(82, '2026-06-22', '12:45:00', '2026-06-27', '06:00:00', 'Observacao pos-cirurgica', 'Estabilizado apos cirurgia', 'Exame de sangue completo', 93, 'Dr. Sergio Moraes'),
+(83, '2026-05-08', '19:15:00', '2026-05-12', '12:00:00', 'Fratura complexa', 'Quadro de desidratacao controlado', 'Gasometria', 65, 'Dra. Fernanda Ferreira'),
+(84, '2026-06-04', '16:30:00', '2026-06-09', '18:30:00', 'Parto assistido', 'Recuperacao pos-traumatica', 'Gasometria', 99, 'Dra. Patricia Moraes'),
+(85, '2026-11-15', '18:00:00', '2026-11-19', '03:30:00', 'Observacao pos-cirurgica', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 87, 'Dra. Patricia Moraes'),
+(86, '2026-06-17', '17:00:00', '2026-06-23', '08:15:00', 'Fratura complexa', 'Estabilizado apos cirurgia', 'Gasometria', 87, 'Dra. Camila Ferreira'),
+(87, '2025-08-11', '11:15:00', '2025-08-16', '08:15:00', 'Desidratacao severa', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 31, 'Dra. Patricia Teixeira'),
+(88, '2025-04-07', '07:30:00', '2025-04-09', '03:00:00', 'Observacao pos-cirurgica', 'Recuperacao pos-traumatica', 'Hemograma e bioquimico', 98, 'Dr. Sergio Almeida'),
+(89, '2026-06-20', '10:45:00', '2026-06-25', '08:45:00', 'Intoxicacao alimentar', 'Infeccao respiratoria em tratamento', 'Exame de sangue completo', 51, 'Dra. Patricia Cardoso'),
+(90, '2025-09-14', '15:00:00', '2025-09-19', '11:45:00', 'Intoxicacao alimentar', 'Recuperacao pos-traumatica', 'Hemograma e bioquimico', 90, 'Dr. Sergio Freitas'),
+(91, '2026-12-01', '00:15:00', '2026-12-05', '18:00:00', 'Insuficiencia renal', 'Insuficiencia renal em tratamento', 'Exame de sangue completo', 24, 'Dr. Sergio Teixeira'),
+(92, '2025-05-16', '19:30:00', '2025-05-19', '05:45:00', 'Complicacoes respiratorias', 'Quadro de desidratacao controlado', 'Gasometria', 90, 'Dra. Camila Moraes'),
+(93, '2026-05-15', '05:15:00', '2026-05-20', '21:15:00', 'Observacao pos-cirurgica', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 72, 'Dr. Rodrigo Cavalcanti'),
+(94, '2025-03-24', '04:45:00', '2025-03-28', '00:15:00', 'Complicacoes respiratorias', 'Recuperacao pos-traumatica', 'Raio-X e ultrassom', 81, 'Dr. Sergio Moraes'),
+(95, '2026-05-09', '17:00:00', '2026-05-13', '03:15:00', 'Cirurgia de emergencia', 'Quadro de desidratacao controlado', 'Exame de sangue completo', 61, 'Dra. Fernanda Freitas'),
+(96, '2026-05-12', '11:30:00', '2026-05-15', '00:45:00', 'Observacao pos-cirurgica', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 74, 'Dra. Vanessa Cardoso'),
+(97, '2026-06-11', '21:45:00', '2026-06-18', '23:45:00', 'Observacao pos-cirurgica', 'Recuperacao pos-traumatica', 'Exame de sangue completo', 60, 'Dr. Ricardo Cardoso'),
+(98, '2026-07-21', '19:45:00', '2026-07-28', '02:00:00', 'Intoxicacao alimentar', 'Insuficiencia renal em tratamento', 'Raio-X e ultrassom', 41, 'Dra. Camila Teixeira'),
+(99, '2026-10-21', '12:30:00', '2026-10-25', '11:45:00', 'Complicacoes respiratorias', 'Quadro de desidratacao controlado', 'Raio-X e ultrassom', 3, 'Dr. Ricardo Lopes'),
+(100, '2026-12-23', '23:00:00', '2026-12-25', '05:45:00', 'Observacao pos-cirurgica', 'Estabilizado apos cirurgia', 'Hemograma e bioquimico', 61, 'Dr. Sergio Almeida');
+
+-- ==========================================================================
+-- MedPet - Fase 4: Stored Procedures de Nivel Medio (uma por tabela principal)
+-- ==========================================================================
+USE MedPet;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_CadastrarCliente (
+    IN p_CustomerName   VARCHAR(50),
+    IN p_Email          VARCHAR(150),
+    IN p_Phone          VARCHAR(15),
+    IN p_Password       VARCHAR(150)
+)
+
+BEGIN
+    DECLARE v_existentes INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    -- Subquery para verificar duplicidade de email ou telefone
+    SELECT COUNT(*) INTO v_existentes
+    FROM Customer
+    WHERE Email = p_Email OR Phone = p_Phone;
+
+    START TRANSACTION;
+
+    IF v_existentes > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Ja existe um cliente cadastrado com este email ou telefone.';
+    ELSE
+        INSERT INTO Customer (CustomerName, Email, Phone, PasswordCustomer, RegistrationDate)
+        VALUES (p_CustomerName, p_Email, p_Phone, p_Password, CURDATE());
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_CadastrarPet (
+    IN p_PetName    VARCHAR(100),
+    IN p_Age        VARCHAR(4),
+    IN p_Gender     VARCHAR(15),
+    IN p_Animal     VARCHAR(50),
+    IN p_Race       VARCHAR(150),
+    IN p_CustomerID INT,
+    IN p_Weight     DECIMAL(5,2)
+)
+
+BEGIN
+    DECLARE v_cliente_existe INT DEFAULT 0;
+    DECLARE v_size VARCHAR(20);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT COUNT(*) INTO v_cliente_existe
+    FROM Customer
+    WHERE CustomerID = p_CustomerID;
+
+    START TRANSACTION;
+
+    IF v_cliente_existe = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cliente informado nao existe no cadastro.';
+    ELSE
+        -- Classificacao automatica de porte com base no peso
+        IF p_Weight <= 10 THEN
+            SET v_size = 'Pequeno';
+        ELSEIF p_Weight <= 25 THEN
+            SET v_size = 'Medio';
+        ELSE
+            SET v_size = 'Grande';
+        END IF;
+
+        INSERT INTO Pet (PetName, Age, Gender, Animal, Race, Size, CustomerID, Weight)
+        VALUES (p_PetName, p_Age, p_Gender, p_Animal, p_Race, v_size, p_CustomerID, p_Weight);
+
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_AgendarConsulta (
+    IN p_PetID          INT,
+    IN p_SchedulingDate DATE,
+    IN p_SchedulingHour TIME
+)
+
+BEGIN
+    DECLARE v_pet_existe   INT DEFAULT 0;
+    DECLARE v_conflito     INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT COUNT(*) INTO v_pet_existe
+    FROM Pet
+    WHERE PetID = p_PetID;
+
+    -- Subquery: verifica se ja existe agendamento ativo no mesmo dia/hora
+    SELECT COUNT(*) INTO v_conflito
+    FROM Scheduling
+    WHERE SchedulingDate = p_SchedulingDate
+      AND SchedulingHour = p_SchedulingHour
+      AND StatusPet IN ('Agendado', 'Confirmado');
+
+    START TRANSACTION;
+
+    IF v_pet_existe = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Pet informado nao existe no cadastro.';
+    ELSEIF v_conflito > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Ja existe um agendamento neste mesmo dia e horario.';
+    ELSE
+        INSERT INTO Scheduling (SchedulingDate, SchedulingHour, PetID, StatusPet)
+        VALUES (p_SchedulingDate, p_SchedulingHour, p_PetID, 'Agendado');
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_RegistrarConsulta (
+    IN p_SchedulingID   INT,
+    IN p_AppointmentValue DECIMAL(10,2),
+    IN p_VeterinarianName VARCHAR(150)
+)
+
+BEGIN
+    DECLARE v_status_atual VARCHAR(30);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT StatusPet INTO v_status_atual
+    FROM Scheduling
+    WHERE SchedulingID = p_SchedulingID;
+
+    START TRANSACTION;
+
+    IF v_status_atual IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Agendamento informado nao existe.';
+    ELSEIF v_status_atual = 'Cancelado' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Nao e possivel registrar consulta de um agendamento cancelado.';
+    ELSE
+        INSERT INTO Appointment (AppointmentValue, SchedulingID, VeterinarianName)
+        VALUES (p_AppointmentValue, p_SchedulingID, p_VeterinarianName);
+
+        UPDATE Scheduling
+        SET StatusPet = 'Concluido'
+        WHERE SchedulingID = p_SchedulingID;
+
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_GerarFatura (
+    IN p_AppointmentID INT,
+    IN p_PaymentMethod VARCHAR(50)
+)
+
+BEGIN
+    DECLARE v_valor_consulta   DECIMAL(10,2);
+    DECLARE v_qtd_faturas_ant  INT DEFAULT 0;
+    DECLARE v_valor_final      DECIMAL(10,2);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT AppointmentValue INTO v_valor_consulta
+    FROM Appointment
+    WHERE AppointmentID = p_AppointmentID;
+
+    -- Conta quantas faturas o cliente (dono do pet desta consulta) ja pagou,
+    -- percorrendo o relacionamento Billing -> Appointment -> Scheduling -> Pet -> Customer
+    SELECT COUNT(*) INTO v_qtd_faturas_ant
+    FROM Billing b
+    JOIN Appointment a ON b.AppointmentID = a.AppointmentID
+    JOIN Scheduling s  ON a.SchedulingID  = s.SchedulingID
+    JOIN Pet p         ON s.PetID         = p.PetID
+    WHERE p.CustomerID = (
+        SELECT p2.CustomerID
+        FROM Appointment a2
+        JOIN Scheduling s2 ON a2.SchedulingID = s2.SchedulingID
+        JOIN Pet p2        ON s2.PetID        = p2.PetID
+        WHERE a2.AppointmentID = p_AppointmentID
+    );
+
+    START TRANSACTION;
+
+    IF v_valor_consulta IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Consulta (Appointment) informada nao existe.';
+    ELSE
+        IF v_qtd_faturas_ant >= 5 THEN
+            SET v_valor_final = v_valor_consulta * 0.90; -- 10% de desconto fidelidade
+        ELSE
+            SET v_valor_final = v_valor_consulta;
+        END IF;
+
+        INSERT INTO Billing (AmountRaised, SalesMade, AppointmentID, PaymentMethod)
+        VALUES (v_valor_final, v_qtd_faturas_ant + 1, p_AppointmentID, p_PaymentMethod);
+
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_RegistrarHistoricoMedico (
+    IN p_PetID          INT,
+    IN p_Consultations  TEXT,
+    IN p_Diagnosis      VARCHAR(200),
+    IN p_Tests          VARCHAR(200),
+    IN p_Vaccines       VARCHAR(100),
+    IN p_Procedures     VARCHAR(150),
+    IN p_Allergies      VARCHAR(100),
+    IN p_Observations   VARCHAR(300),
+    IN p_Weight         DECIMAL(5,2)
+)
+
+BEGIN
+    DECLARE v_pet_existe        INT DEFAULT 0;
+    DECLARE v_observacao_final  VARCHAR(300);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT COUNT(*) INTO v_pet_existe
+    FROM Pet
+    WHERE PetID = p_PetID;
+
+    START TRANSACTION;
+
+    IF v_pet_existe = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Pet informado nao existe no cadastro.';
+    ELSE
+        -- Se o pet tem alergia a medicamento registrada, adiciona alerta automatico
+        IF p_Allergies LIKE '%medicamento%' THEN
+            SET v_observacao_final = CONCAT(p_Observations,
+                ' | ALERTA: paciente possui alergia a medicamento, revisar antes de aplicar vacinas/procedimentos.');
+        ELSE
+            SET v_observacao_final = p_Observations;
+        END IF;
+
+        INSERT INTO MedicalHistory (
+            Consultations, Diagnosis, Tests, Vaccines, Procedures,
+            Allergies, ClinicalObservations, PetID, Weight
+        )
+        VALUES (
+            p_Consultations, p_Diagnosis, p_Tests, p_Vaccines, p_Procedures,
+            p_Allergies, v_observacao_final, p_PetID, p_Weight
+        );
+
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_InternarPaciente (
+    IN p_MedicalHistoryID   INT,
+    IN p_Date_Of_Entry      DATE,
+    IN p_Check_in_time      TIME,
+    IN p_DischargeDate      DATE,
+    IN p_DischargeTime      TIME,
+    IN p_ReasonForAdmission VARCHAR(250),
+    IN p_Diagnosis          TEXT,
+    IN p_Tests              VARCHAR(200),
+    IN p_AttendingVet       VARCHAR(150)
+)
+
+BEGIN
+    DECLARE v_hist_existe   INT DEFAULT 0;
+    DECLARE v_dias_internado INT;
+    DECLARE v_diagnostico_final TEXT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    SELECT COUNT(*) INTO v_hist_existe
+    FROM MedicalHistory
+    WHERE MedicalHistoryID = p_MedicalHistoryID;
+
+    SET v_dias_internado = DATEDIFF(p_DischargeDate, p_Date_Of_Entry);
+
+    START TRANSACTION;
+
+    IF v_hist_existe = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Historico medico informado nao existe.';
+    ELSEIF v_dias_internado < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A data de alta nao pode ser anterior a data de entrada.';
+    ELSE
+        IF v_dias_internado > 5 THEN
+            SET v_diagnostico_final = CONCAT(p_Diagnosis, ' | Internacao prolongada (', v_dias_internado, ' dias).');
+        ELSE
+            SET v_diagnostico_final = p_Diagnosis;
+        END IF;
+
+        INSERT INTO HospitalizedPatients (
+            Date_Of_Entry, Check_in_time, DischargeDate, DischargeTime,
+            ReasonForAdmission, Diagnosis, Tests, MedicalHistoryID, AttendingVeterinarian
+        )
+        VALUES (
+            p_Date_Of_Entry, p_Check_in_time, p_DischargeDate, p_DischargeTime,
+            p_ReasonForAdmission, v_diagnostico_final, p_Tests, p_MedicalHistoryID, p_AttendingVet
+        );
+
+        COMMIT;
+    END IF;
+END$$
+DELIMITER ;
