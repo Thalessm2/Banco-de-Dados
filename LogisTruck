@@ -1,0 +1,249 @@
+CREATE DATABASE LogisTruck;
+USE LogisTruck;
+
+CREATE TABLE Caminhoes (
+    CaminhaoID INT PRIMARY KEY AUTO_INCREMENT,
+    Placa VARCHAR(10) UNIQUE NOT NULL,
+    Modelo VARCHAR(50) NOT NULL,
+    Marca VARCHAR(40) NOT NULL,
+    AnoFabricacao INT NOT NULL,
+    CapacidadeCarga DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Motoristas (
+    MotoristaID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(50) NOT NULL,
+    DataNascimento DATE NOT NULL,
+    Telefone VARCHAR(20),
+    Email VARCHAR(50),
+    CNH VARCHAR(20) UNIQUE NOT NULL
+);
+
+CREATE TABLE Clientes (
+    ClienteID INT PRIMARY KEY AUTO_INCREMENT,
+    RazaoSocial VARCHAR(60) NOT NULL,
+    CNPJ VARCHAR(14) UNIQUE NOT NULL,
+    Telefone VARCHAR(20),
+    Cidade VARCHAR(40),
+    Email VARCHAR(50)
+);
+
+CREATE TABLE Rotas (
+    RotaID INT PRIMARY KEY AUTO_INCREMENT,
+    Origem VARCHAR(50) NOT NULL,
+    Destino VARCHAR(50) NOT NULL,
+    DistanciaKM DECIMAL(8,2) NOT NULL
+);
+
+CREATE TABLE Entregas (
+    EntregaID INT PRIMARY KEY AUTO_INCREMENT,
+    CaminhaoID INT NOT NULL,
+    MotoristaID INT NOT NULL,
+    ClienteID INT NOT NULL,
+    RotaID INT NOT NULL,
+    DataEntrega DATE NOT NULL,
+    Status VARCHAR(30),
+    FOREIGN KEY (CaminhaoID) REFERENCES Caminhoes(CaminhaoID),
+    FOREIGN KEY (MotoristaID) REFERENCES Motoristas(MotoristaID),
+    FOREIGN KEY (ClienteID) REFERENCES Clientes(ClienteID),
+    FOREIGN KEY (RotaID) REFERENCES Rotas(RotaID)
+);
+
+CREATE TABLE Manutencoes (
+    ManutencaoID INT PRIMARY KEY AUTO_INCREMENT,
+    CaminhaoID INT NOT NULL,
+    DataManutencao DATE NOT NULL,
+    TipoManutencao VARCHAR(50),
+    Custo DECIMAL(10,2),
+    FOREIGN KEY (CaminhaoID) REFERENCES Caminhoes(CaminhaoID)
+);
+
+CREATE TABLE ConsumoCombustivel (
+    ConsumoID INT PRIMARY KEY AUTO_INCREMENT,
+    CaminhaoID INT NOT NULL,
+    DataAbastecimento DATE NOT NULL,
+    Litros DECIMAL(8,2) NOT NULL,
+    ValorTotal DECIMAL(10,2) NOT NULL,
+    Quilometragem INT NOT NULL,
+    FOREIGN KEY (CaminhaoID) REFERENCES Caminhoes(CaminhaoID)
+);
+ALTER TABLE Caminhoes
+ADD Cor VARCHAR(30);
+
+ALTER TABLE Motoristas
+ADD Salario DECIMAL(10,2);
+
+ALTER TABLE Clientes
+ADD Endereco VARCHAR(100);
+
+ALTER TABLE Rotas
+ADD TempoEstimado TIME;
+
+ALTER TABLE Entregas
+ADD PesoCarga DECIMAL(10,2);
+
+ALTER TABLE Manutencoes
+ADD Oficina VARCHAR(50);
+
+ALTER TABLE ConsumoCombustivel
+ADD TipoCombustivel VARCHAR(20);
+
+INSERT INTO Caminhoes
+(Placa, Modelo, Marca, AnoFabricacao, CapacidadeCarga, Cor)
+VALUES
+('ABC1D23','FH 540','Volvo',2022,30000.00,'Branco'),
+('DEF4E56','Actros 2651','Mercedes-Benz',2021,28000.00,'Prata'),
+('GHI7J89','R450','Scania',2023,32000.00,'Azul'),
+('JKL1M23','XF 480','DAF',2020,27000.00,'Vermelho'),
+('NOP4Q56','Constellation','Volkswagen',2022,26000.00,'Cinza');
+
+INSERT INTO Motoristas
+(Nome, DataNascimento, Telefone, Email, CNH, Salario)
+VALUES
+('João Silva','1985-03-15','31999990001','joao@logis.com','12345678901',4200.00),
+('Maria Oliveira','1990-08-20','31999990002','maria@logis.com','23456789012',4500.00),
+('Carlos Santos','1988-12-10','31999990003','carlos@logis.com','34567890123',4300.00),
+('Fernanda Costa','1992-05-25','31999990004','fernanda@logis.com','45678901234',4400.00),
+('Lucas Pereira','1987-09-18','31999990005','lucas@logis.com','56789012345',4600.00);
+
+INSERT INTO Clientes
+(RazaoSocial, CNPJ, Telefone, Cidade, Email, Endereco)
+VALUES
+('Mercado Alfa Ltda','12345678000101','3133331111','São Paulo','contato@alfa.com','Av. Paulista, 100'),
+('Construtora Beta','22345678000102','3133332222','Belo Horizonte','contato@beta.com','Rua Minas, 250'),
+('Indústria Gama','32345678000103','3133333333','Curitiba','gama@empresa.com','Av. Brasil, 450'),
+('Atacado Delta','42345678000104','3133334444','Rio de Janeiro','delta@empresa.com','Rua das Flores, 120'),
+('Supermercado Ômega','52345678000105','3133335555','Fortaleza','omega@empresa.com','Av. Central, 800');
+
+INSERT INTO Rotas
+(Origem, Destino, DistanciaKM, TempoEstimado)
+VALUES
+('São Paulo','Campinas',95.50,'01:30:00'),
+('Belo Horizonte','Uberlândia',540.00,'07:00:00'),
+('Curitiba','Londrina',385.70,'05:00:00'),
+('Rio de Janeiro','Vitória',521.30,'06:40:00'),
+('Fortaleza','Sobral',235.80,'03:20:00');
+
+INSERT INTO Entregas
+(CaminhaoID, MotoristaID, ClienteID, RotaID, DataEntrega, Status, PesoCarga)
+VALUES
+(1,1,1,1,'2026-07-10','Entregue',12500.00),
+(2,2,2,2,'2026-07-11','Em trânsito',15000.00),
+(3,3,3,3,'2026-07-12','Entregue',18000.00),
+(4,4,4,4,'2026-07-13','Pendente',9800.00),
+(5,5,5,5,'2026-07-14','Entregue',20000.00);
+
+INSERT INTO Manutencoes
+(CaminhaoID, DataManutencao, TipoManutencao, Custo, Oficina)
+VALUES
+(1,'2026-06-10','Troca de óleo',850.00,'Oficina Central'),
+(2,'2026-06-15','Revisão Geral',2500.00,'Auto Diesel'),
+(3,'2026-06-20','Troca de Pneus',4200.00,'Pneus Brasil'),
+(4,'2026-06-25','Alinhamento',600.00,'Centro Automotivo'),
+(5,'2026-06-30','Troca de Freios',1800.00,'Mecânica União');
+
+INSERT INTO ConsumoCombustivel
+(CaminhaoID, DataAbastecimento, Litros, ValorTotal, Quilometragem, TipoCombustivel)
+VALUES
+(1,'2026-07-01',300.00,1980.00,120000,'Diesel S10'),
+(2,'2026-07-02',280.00,1848.00,98000,'Diesel S10'),
+(3,'2026-07-03',320.00,2112.00,135000,'Diesel S500'),
+(4,'2026-07-04',290.00,1914.00,110500,'Diesel S10'),
+(5,'2026-07-05',310.00,2046.00,125800,'Diesel S500');
+
+-- 1. Listar todas as entregas com informações completas
+-- Regra: Mostrar dados integrados (caminhão, motorista, cliente e rota)
+DELIMITER $$
+
+CREATE PROCEDURE ListarEntregasCompletas()
+BEGIN
+    SELECT e.EntregaID, c.Placa, m.Nome AS Motorista, cl.RazaoSocial, 
+           r.Origem, r.Destino, e.DataEntrega, e.Status
+    FROM Entregas e
+    INNER JOIN Caminhoes c ON e.CaminhaoID = c.CaminhaoID
+    INNER JOIN Motoristas m ON e.MotoristaID = m.MotoristaID
+    INNER JOIN Clientes cl ON e.ClienteID = cl.ClienteID
+    INNER JOIN Rotas r ON e.RotaID = r.RotaID;
+END $$
+
+DELIMITER ;
+
+-- 2. Buscar entregas por cliente
+-- Regra: Permitir consultar histórico de entregas de um cliente específico
+DELIMITER $$
+
+CREATE PROCEDURE EntregasPorCliente(IN idCliente INT)
+BEGIN
+    SELECT e.EntregaID, e.DataEntrega, e.Status
+    FROM Entregas e
+    WHERE e.ClienteID = idCliente;
+END $$
+
+DELIMITER ;
+
+-- 3. Listar entregas por motorista
+-- Regra: Acompanhar desempenho dos motoristas
+DELIMITER $$
+
+CREATE PROCEDURE EntregasPorMotorista(IN idMotorista INT)
+BEGIN
+    SELECT e.EntregaID, e.DataEntrega, e.Status
+    FROM Entregas e
+    WHERE e.MotoristaID = idMotorista;
+END $$
+
+DELIMITER ;
+
+-- 4. Calcular total gasto com combustível por caminhão
+-- Regra: Controle de custos operacionais
+DELIMITER $$
+
+CREATE PROCEDURE GastoCombustivelPorCaminhao()
+BEGIN
+    SELECT c.Placa, SUM(cc.ValorTotal) AS TotalGasto
+    FROM Caminhoes c
+    INNER JOIN ConsumoCombustivel cc ON c.CaminhaoID = cc.CaminhaoID
+    GROUP BY c.CaminhaoID;
+END $$
+
+DELIMITER ;
+
+-- 5. Calcular total gasto com manutenção por caminhão
+-- Regra: Monitorar custos de manutenção da frota
+DELIMITER $$
+
+CREATE PROCEDURE GastoManutencaoPorCaminhao()
+BEGIN
+    SELECT c.Placa, SUM(m.Custo) AS TotalManutencao
+    FROM Caminhoes c
+    INNER JOIN Manutencoes m ON c.CaminhaoID = m.CaminhaoID
+    GROUP BY c.CaminhaoID;
+END $$
+
+DELIMITER ;
+
+-- 6. Listar rotas mais longas (acima de um valor informado)
+-- Regra: Identificar rotas de maior distância
+DELIMITER $$
+
+CREATE PROCEDURE RotasLongas(IN distanciaMin DECIMAL(8,2))
+BEGIN
+    SELECT Origem, Destino, DistanciaKM
+    FROM Rotas
+    WHERE DistanciaKM > distanciaMin;
+END $$
+
+DELIMITER ;
+
+-- 7. Verificar quantidade de entregas por status
+-- Regra: Controle operacional (pendente, entregue, etc.)
+DELIMITER $$
+
+CREATE PROCEDURE EntregasPorStatus()
+BEGIN
+    SELECT Status, COUNT(*) AS Quantidade
+    FROM Entregas
+    GROUP BY Status;
+END $$
+
+DELIMITER ;
