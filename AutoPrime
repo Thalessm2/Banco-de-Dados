@@ -1,0 +1,244 @@
+CREATE DATABASE AutoPrime;
+USE AutoPrime;
+
+CREATE TABLE Fornecedores (
+    FornecedoresID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Endereco VARCHAR(40) NOT NULL,
+    Cidade VARCHAR(40) NOT NULL,
+    Email VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Funcionarios (
+    FuncionariosID INT PRIMARY KEY AUTO_INCREMENT,
+    SegundoNome VARCHAR(40) NOT NULL,
+    DataNascimento DATE NOT NULL,
+    Foto VARCHAR(150),
+    Nota VARCHAR(200)
+);
+
+CREATE TABLE Clientes (
+    ClientesID INT PRIMARY KEY AUTO_INCREMENT,
+    Telefone VARCHAR(20) NOT NULL,
+    Endereco VARCHAR(40) NOT NULL,
+    Cidade VARCHAR(40) NOT NULL,
+    Pais VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Carros (
+    CarrosID INT PRIMARY KEY AUTO_INCREMENT,
+    Modelo VARCHAR(40) NOT NULL,
+    EstadoDoCarro VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Vendas (
+    VendasID INT PRIMARY KEY AUTO_INCREMENT,
+    FuncionariosID INT NOT NULL,
+    ClientesID INT NOT NULL,
+    CarrosID INT NOT NULL,
+    FOREIGN KEY (FuncionariosID) REFERENCES Funcionarios(FuncionariosID),
+    FOREIGN KEY (ClientesID) REFERENCES Clientes(ClientesID),
+    FOREIGN KEY (CarrosID) REFERENCES Carros(CarrosID)
+);
+
+CREATE TABLE Pecas (
+    PecasID INT PRIMARY KEY AUTO_INCREMENT,
+    FornecedoresID INT,
+    FOREIGN KEY (FornecedoresID) REFERENCES Fornecedores(FornecedoresID)
+);
+
+CREATE TABLE TestDrive (
+    TestDriveID INT PRIMARY KEY AUTO_INCREMENT,
+    DataAgendamento DATE,
+    ClientesID INT,
+    CarrosID INT,
+    FOREIGN KEY (ClientesID) REFERENCES Clientes(ClientesID),
+    FOREIGN KEY (CarrosID) REFERENCES Carros(CarrosID)
+);
+
+ALTER TABLE carros
+ADD Documentacao VARCHAR(40) NOT NULL;
+
+ALTER TABLE carros
+ADD Marca VARCHAR(40) NOT NULL;
+
+ALTER TABLE fornecedores
+ADD CNPJ VARCHAR(14) UNIQUE NOT NULL;
+
+ALTER TABLE fornecedores
+ADD Telefone VARCHAR(20) NOT NULL;
+
+ALTER TABLE pecas
+ADD PecasDeSubstituicao VARCHAR(40);
+
+ALTER TABLE funcionarios
+ADD PrimeiroNome VARCHAR(40) NOT NULL;
+
+ALTER TABLE clientes
+ADD Nome VARCHAR(40) NOT NULL;
+
+INSERT INTO Fornecedores (Nome, Telefone, Endereco, Cidade, Email, CNPJ)
+VALUES
+('Distribuidora Alfa', '(11)98765-4321', 'Rua das Indústrias, 450', 'São Paulo', 'contato@alfa.com.br', '12345678000190'),
+('Logística Sul', '(41)3322-1100', 'Av. das Araucárias, 12', 'Curitiba', 'comercial@logsul.com', '98765432000110'),
+('Metais & Cia', '(31)99123-8877', 'Via Expressa, Km 5', 'Contagem', 'vendas@metaiscia.com.br', '55666777000188'),
+('Norte Peças', '(91)3214-5555', 'Rodovia Augusto Montenegro', 'Belém', 'norte@pecas.com.br', '22333444000122'),
+('Auto Parts', '(21)97000-1234', 'Rua da Alfândega, 89', 'Rio de Janeiro', 'contato@autoparts.com', '44555666000133');
+
+INSERT INTO Funcionarios (PrimeiroNome, SegundoNome, DataNascimento, Foto, Nota)
+VALUES
+('Ana', 'Silva', '1992-05-14', 'ana.jpg', 'Excelente vendedora'),
+('Bruno', 'Souza', '1988-10-22', 'bruno.jpg', 'Especialista em SUVs'),
+('Carla', 'Mendes', '1995-03-05', 'carla.jpg', 'Ótimo atendimento'),
+('Diego', 'Oliveira', '1990-12-12', 'diego.jpg', 'Vendedor destaque'),
+('Elena', 'Santos', '1994-07-19', 'elena.jpg', 'Excelente pós-venda');
+
+INSERT INTO Clientes (Nome, Telefone, Endereco, Cidade, Pais)
+VALUES
+('João Medeiros', '(11)97766-5544', 'Av. Paulista, 1500', 'São Paulo', 'Brasil'),
+('Maria Oliveira', '(31)98888-1111', 'Rua Bahia, 450', 'Belo Horizonte', 'Brasil'),
+('Carlos Pereira', '(41)99999-2222', 'Av. Paraná, 800', 'Curitiba', 'Brasil'),
+('Fernanda Costa', '(21)97777-3333', 'Rua das Flores, 90', 'Rio de Janeiro', 'Brasil'),
+('Lucas Martins', '(85)96666-4444', 'Av. Beira Mar, 100', 'Fortaleza', 'Brasil');
+
+INSERT INTO Carros (Modelo, Marca, EstadoDoCarro, Documentacao)
+VALUES
+('Onix', 'Chevrolet', 'Seminovo', 'Regular'),
+('Corolla', 'Toyota', 'Novo', 'Regular'),
+('HB20', 'Hyundai', 'Usado', 'Regular'),
+('Compass', 'Jeep', 'Seminovo', 'IPVA Pago'),
+('Gol', 'Volkswagen', 'Usado', 'Pendente');
+
+INSERT INTO Vendas (FuncionariosID, ClientesID, CarrosID)
+VALUES
+(1,1,1),
+(2,2,2),
+(3,3,3),
+(4,4,4),
+(5,5,5);
+
+INSERT INTO Pecas (PecasDeSubstituicao, FornecedoresID)
+VALUES
+('Filtro de Óleo',1),
+('Pastilha de Freio',2),
+('Vela de Ignição',3),
+('Correia Dentada',4),
+('Amortecedor',5);
+
+INSERT INTO TestDrive (DataAgendamento, ClientesID, CarrosID)
+VALUES
+('2026-07-02',1,1),
+('2026-07-03',2,2),
+('2026-07-04',3,3),
+('2026-07-05',4,4),
+('2026-07-06',5,5);
+
+-- 1. Listar vendas completas
+-- Regra: integrar cliente, funcionário e carro na mesma consulta
+
+DELIMITER $$
+
+CREATE PROCEDURE VendasCompletas()
+BEGIN
+    SELECT v.VendasID,
+           f.PrimeiroNome, f.SegundoNome AS Funcionario,
+           c.Nome AS Cliente,
+           ca.Modelo, ca.Marca
+    FROM Vendas v
+    INNER JOIN Funcionarios f ON v.FuncionariosID = f.FuncionariosID
+    INNER JOIN Clientes c ON v.ClientesID = c.ClientesID
+    INNER JOIN Carros ca ON v.CarrosID = ca.CarrosID;
+END $$
+
+DELIMITER ;
+
+-- 2. Buscar vendas por cliente
+-- Regra: histórico de compras do cliente
+
+DELIMITER $$
+
+CREATE PROCEDURE VendasPorCliente(IN idCliente INT)
+BEGIN
+    SELECT v.VendasID, ca.Modelo, ca.Marca
+    FROM Vendas v
+    INNER JOIN Carros ca ON v.CarrosID = ca.CarrosID
+    WHERE v.ClientesID = idCliente;
+END $$
+
+DELIMITER ;
+
+-- 3. Funcionários e suas vendas
+-- Regra: acompanhar desempenho dos vendedores
+
+DELIMITER $$
+
+CREATE PROCEDURE FuncionariosVendas()
+BEGIN
+    SELECT f.PrimeiroNome, f.SegundoNome, COUNT(v.VendasID) AS TotalVendas
+    FROM Funcionarios f
+    INNER JOIN Vendas v ON f.FuncionariosID = v.FuncionariosID
+    GROUP BY f.FuncionariosID;
+END $$
+
+DELIMITER ;
+
+-- 4. Test drives agendados com cliente e carro
+-- Regra: controle de agendamentos
+
+DELIMITER $$
+
+CREATE PROCEDURE TestDrives()
+BEGIN
+    SELECT t.TestDriveID, t.DataAgendamento,
+           c.Nome AS Cliente,
+           ca.Modelo
+    FROM TestDrive t
+    INNER JOIN Clientes c ON t.ClientesID = c.ClientesID
+    INNER JOIN Carros ca ON t.CarrosID = ca.CarrosID;
+END $$
+
+DELIMITER ;
+
+-- 5. Peças e fornecedores
+-- Regra: rastrear origem das peças
+
+DELIMITER $$
+
+CREATE PROCEDURE PecasFornecedores()
+BEGIN
+    SELECT p.PecasID, f.Nome AS Fornecedor, f.CNPJ
+    FROM Pecas p
+    INNER JOIN Fornecedores f ON p.FornecedoresID = f.FornecedoresID;
+END $$
+
+DELIMITER ;
+
+-- 6. Listar carros vendidos
+-- Regra: identificar veículos já comercializados
+
+DELIMITER $$
+
+CREATE PROCEDURE CarrosVendidos()
+BEGIN
+    SELECT DISTINCT ca.Modelo, ca.Marca
+    FROM Vendas v
+    INNER JOIN Carros ca ON v.CarrosID = ca.CarrosID;
+END $$
+
+DELIMITER ;
+
+-- 7. Quantidade de test drives por carro
+-- Regra: identificar carros mais procurados
+
+DELIMITER $$
+
+CREATE PROCEDURE PopularidadeCarros()
+BEGIN
+    SELECT ca.Modelo, COUNT(t.TestDriveID) AS TotalTestDrive
+    FROM TestDrive t
+    INNER JOIN Carros ca ON t.CarrosID = ca.CarrosID
+    GROUP BY ca.CarrosID;
+END $$
+
+DELIMITER ;
+
