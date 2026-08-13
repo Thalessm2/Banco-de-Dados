@@ -1,0 +1,232 @@
+CREATE DATABASE EcoStyle;
+USE EcoStyle;
+
+CREATE TABLE Fornecedores (
+    FornecedoresID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Telefone VARCHAR(20) NOT NULL,
+    Endereco VARCHAR(40) NOT NULL,
+    Cidade VARCHAR(40) NOT NULL,
+    CNPJ VARCHAR(14) UNIQUE NOT NULL,
+    Email VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Clientes (
+    ClientesID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Telefone VARCHAR(20) NOT NULL,
+    Endereco VARCHAR(40) NOT NULL,
+    Cidade VARCHAR(40) NOT NULL,
+    Pais VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE Transportadora (
+    TransportadoraID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Telefone VARCHAR(20) NOT NULL,
+    Devolucao VARCHAR(500)
+);
+
+CREATE TABLE Produtos (
+    ProdutosID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Quantidade INT NOT NULL,
+    Preco DECIMAL(10,2) NOT NULL,
+    FornecedoresID INT,
+    TransportadoraID INT,
+    FOREIGN KEY (FornecedoresID) REFERENCES Fornecedores(FornecedoresID),
+    FOREIGN KEY (TransportadoraID) REFERENCES Transportadora(TransportadoraID)
+);
+
+CREATE TABLE Vendas (
+    VendasID INT PRIMARY KEY AUTO_INCREMENT,
+    ProdutosID INT NOT NULL,
+    ClientesID INT NOT NULL,
+    FOREIGN KEY (ProdutosID) REFERENCES Produtos(ProdutosID),
+    FOREIGN KEY (ClientesID) REFERENCES Clientes(ClientesID)
+);
+
+CREATE TABLE Funcionarios (
+    FuncionariosID INT PRIMARY KEY AUTO_INCREMENT,
+    PrimeiroNome VARCHAR(40) NOT NULL,
+    SegundoNome VARCHAR(40) NOT NULL,
+    DataDeNascimento DATE NOT NULL,
+    Foto VARCHAR(150),
+    Nota VARCHAR(200),
+    VendasID INT,
+    FOREIGN KEY (VendasID) REFERENCES Vendas(VendasID)
+);
+
+CREATE TABLE Materiais (
+    MateriaisID INT PRIMARY KEY AUTO_INCREMENT,
+    NomeMaterial VARCHAR(40) NOT NULL,
+    FornecedoresID INT,
+    FOREIGN KEY (FornecedoresID) REFERENCES Fornecedores(FornecedoresID)
+);
+
+-- 1
+ALTER TABLE Clientes ADD Email VARCHAR(50);
+
+-- 2
+ALTER TABLE Produtos ADD Categoria VARCHAR(40);
+
+-- 3
+ALTER TABLE Produtos ADD DataCadastro DATE;
+
+-- 4
+ALTER TABLE Vendas ADD DataVenda DATE;
+
+-- 5
+ALTER TABLE Funcionarios ADD Salario DECIMAL(10,2);
+
+-- 6
+ALTER TABLE Transportadora ADD Endereco VARCHAR(60);
+
+-- 7
+ALTER TABLE Materiais ADD Quantidade INT;
+
+INSERT INTO Fornecedores (Nome, Telefone, Endereco, Cidade, CNPJ, Email)
+VALUES
+('EcoTec', '(11)98765-1111', 'Rua Verde, 100', 'São Paulo', '12345678000101', 'contato@ecotec.com'),
+('BioFashion', '(21)99888-2222', 'Av. Central, 250', 'Rio de Janeiro', '22345678000102', 'vendas@biofashion.com'),
+('Green Supply', '(31)97777-3333', 'Rua das Flores, 80', 'Belo Horizonte', '32345678000103', 'suporte@greensupply.com'),
+('NatureTex', '(41)96666-4444', 'Av. Paraná, 400', 'Curitiba', '42345678000104', 'contato@naturetex.com'),
+('EcoBrasil', '(85)95555-5555', 'Rua do Sol, 50', 'Fortaleza', '52345678000105', 'atendimento@ecobrasil.com');
+
+INSERT INTO Clientes (Nome, Telefone, Endereco, Cidade, Pais)
+VALUES
+('João Silva', '(11)98888-1111', 'Rua A, 120', 'São Paulo', 'Brasil'),
+('Maria Souza', '(31)97777-2222', 'Rua B, 250', 'Belo Horizonte', 'Brasil'),
+('Carlos Lima', '(41)96666-3333', 'Rua C, 300', 'Curitiba', 'Brasil'),
+('Fernanda Costa', '(21)95555-4444', 'Rua D, 410', 'Rio de Janeiro', 'Brasil'),
+('Lucas Oliveira', '(85)94444-5555', 'Rua E, 520', 'Fortaleza', 'Brasil');
+
+INSERT INTO Transportadora (Nome, Telefone, Devolucao)
+VALUES
+('TransEco', '(11)3000-1111', 'Prazo de devolução de 30 dias'),
+('EcoExpress', '(31)3000-2222', 'Devolução gratuita'),
+('VerdeLog', '(41)3000-3333', 'Troca em até 15 dias'),
+('BioTrans', '(21)3000-4444', 'Coleta no endereço'),
+('NatureEntrega', '(85)3000-5555', 'Troca mediante nota fiscal');
+
+INSERT INTO Produtos (Nome, Quantidade, Preco, FornecedoresID, TransportadoraID)
+VALUES
+('Camiseta Ecológica', 100, 59.90, 1, 1),
+('Calça Jeans Sustentável', 50, 129.90, 2, 2),
+('Tênis Reciclado', 30, 249.90, 3, 3),
+('Mochila de Algodão', 40, 89.90, 4, 4),
+('Boné Orgânico', 80, 39.90, 5, 5);
+
+INSERT INTO Vendas (ProdutosID, ClientesID)
+VALUES
+(1,1),
+(2,2),
+(3,3),
+(4,4),
+(5,5);
+
+INSERT INTO Funcionarios (PrimeiroNome, SegundoNome, DataDeNascimento, Foto, Nota, VendasID)
+VALUES
+('Ana', 'Silva', '1995-03-15', 'ana.jpg', 'Excelente atendimento', 1),
+('Bruno', 'Souza', '1992-06-20', 'bruno.jpg', 'Especialista em vendas', 2),
+('Carla', 'Oliveira', '1998-01-12', 'carla.jpg', 'Ótimo desempenho', 3),
+('Diego', 'Santos', '1990-09-25', 'diego.jpg', 'Vendedor destaque', 4),
+('Elena', 'Costa', '1996-12-08', 'elena.jpg', 'Boa comunicação', 5);
+
+INSERT INTO Materiais (NomeMaterial, FornecedoresID)
+VALUES
+('Algodão Orgânico', 1),
+('Tecido Reciclado', 2),
+('Borracha Reciclada', 3),
+('Fibra de Bambu', 4),
+('Poliéster Reciclado', 5);
+
+-- 1. Vendas com cliente e produto
+DELIMITER $$
+
+CREATE PROCEDURE VendasCompletas()
+BEGIN
+    SELECT v.VendasID, c.Nome AS Cliente, p.Nome AS Produto, p.Preco
+    FROM Vendas v
+    INNER JOIN Clientes c ON v.ClientesID = c.ClientesID
+    INNER JOIN Produtos p ON v.ProdutosID = p.ProdutosID;
+END $$
+
+DELIMITER ;
+
+-- 2. Produtos com fornecedores
+DELIMITER $$
+
+CREATE PROCEDURE ProdutosFornecedores()
+BEGIN
+    SELECT p.Nome AS Produto, f.Nome AS Fornecedor
+    FROM Produtos p
+    INNER JOIN Fornecedores f ON p.FornecedoresID = f.FornecedoresID;
+END $$
+
+DELIMITER ;
+
+-- 3. Produtos com transportadora
+DELIMITER $$
+
+CREATE PROCEDURE ProdutosTransportadora()
+BEGIN
+    SELECT p.Nome, t.Nome AS Transportadora
+    FROM Produtos p
+    INNER JOIN Transportadora t ON p.TransportadoraID = t.TransportadoraID;
+END $$
+
+DELIMITER ;
+
+-- 4. Funcionários e vendas
+DELIMITER $$
+
+CREATE PROCEDURE FuncionariosVendas()
+BEGIN
+    SELECT f.PrimeiroNome, f.SegundoNome, v.VendasID
+    FROM Funcionarios f
+    INNER JOIN Vendas v ON f.VendasID = v.VendasID;
+END $$
+
+DELIMITER ;
+
+-- 5. Materiais com fornecedores
+DELIMITER $$
+
+CREATE PROCEDURE MateriaisFornecedores()
+BEGIN
+    SELECT m.NomeMaterial, f.Nome AS Fornecedor
+    FROM Materiais m
+    INNER JOIN Fornecedores f ON m.FornecedoresID = f.FornecedoresID;
+END $$
+
+DELIMITER ;
+
+-- 6. Vendas completas com tudo
+DELIMITER $$
+
+CREATE PROCEDURE VendasDetalhadas()
+BEGIN
+    SELECT v.VendasID, c.Nome AS Cliente, p.Nome AS Produto,
+           f.Nome AS Fornecedor
+    FROM Vendas v
+    INNER JOIN Clientes c ON v.ClientesID = c.ClientesID
+    INNER JOIN Produtos p ON v.ProdutosID = p.ProdutosID
+    INNER JOIN Fornecedores f ON p.FornecedoresID = f.FornecedoresID;
+END $$
+
+DELIMITER ;
+
+-- 7. Média de preço por fornecedor
+DELIMITER $$
+
+CREATE PROCEDURE MediaPrecoFornecedor()
+BEGIN
+    SELECT f.Nome, AVG(p.Preco) AS MediaPreco
+    FROM Produtos p
+    INNER JOIN Fornecedores f ON p.FornecedoresID = f.FornecedoresID
+    GROUP BY f.FornecedoresID;
+END $$
+
+DELIMITER ;
+
