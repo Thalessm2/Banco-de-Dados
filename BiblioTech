@@ -1,0 +1,1466 @@
+CREATE DATABASE BiblioTech;
+USE BiblioTech;
+
+CREATE TABLE Supplier (
+SupplierID INT PRIMARY KEY AUTO_INCREMENT,
+SupplierName VARCHAR (100) NOT NULL,
+ContactName VARCHAR (100) NOT NULL,
+Email VARCHAR (100) NOT NULL,
+CONSTRAINT uc_email UNIQUE (Email),
+Phone VARCHAR (20) NOT NULL,
+CONSTRAINT uc_phone UNIQUE (Phone),
+Country VARCHAR (50) NOT NULL,
+State VARCHAR (50) NOT NULL,
+City VARCHAR (50) NOT NULL,
+Address VARCHAR (150) NOT NULL,
+PostalCode VARCHAR (10) NOT NULL
+);
+
+CREATE TABLE Shippers (
+ShippersID INT PRIMARY KEY AUTO_INCREMENT,
+CarrierName VARCHAR (100) NOT NULL,
+ContactName VARCHAR (100) NOT NULL,
+Email VARCHAR (100) NOT NULL,
+CONSTRAINT uc_email UNIQUE (Email),
+Phone VARCHAR (20) NOT NULL,
+CONSTRAINT uc_phone UNIQUE (Phone),
+Country VARCHAR (50) NOT NULL,
+State VARCHAR (50) NOT NULL,
+City VARCHAR (50) NOT NULL,
+Address VARCHAR (150) NOT NULL,
+PostalCode VARCHAR (10) NOT NULL
+);
+
+CREATE TABLE Inventory (
+InventoryID  INT PRIMARY KEY AUTO_INCREMENT,
+Categories VARCHAR (77) NOT NULL,
+Book VARCHAR (120) NOT NULL,
+Authors VARCHAR (150) NOT NULL,
+Publisher VARCHAR (200) NOT NULL,
+Quantity INT NOT NULL,
+SupplierID INT,
+ShippersID INT,
+    FOREIGN KEY (SupplierID)
+    REFERENCES Supplier(SupplierID),
+    FOREIGN KEY (ShippersID)
+    REFERENCES Shippers(ShippersID)
+);
+
+
+CREATE TABLE Customer (
+CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+CPF VARCHAR (20) UNIQUE NOT NULL,
+Phone VARCHAR (20) UNIQUE NOT NULL,
+Email VARCHAR (200) UNIQUE NOT NULL,
+NameCustomer VARCHAR (200) NOT NULL,
+DateOfBirth DATE NOT NULL
+);
+
+CREATE TABLE Employee (
+EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+EmployeeName VARCHAR (200) NOT NULL,
+CPF VARCHAR (20) UNIQUE NOT NULL,
+Phone VARCHAR (20) UNIQUE NOT NULL,
+Email VARCHAR (200) UNIQUE NOT NULL,
+DateOfBirth DATE NOT NULL,
+ResumeEmployee VARCHAR (300) NOT NULL,
+InventoryID INT,
+CustomerID INT,
+    FOREIGN KEY (InventoryID) 
+    REFERENCES Inventory (InventoryID),
+        FOREIGN KEY (CustomerID) 
+    REFERENCES Customer (CustomerID)
+
+);
+
+CREATE TABLE BookCopyCondition (
+BookCopyConditionID INT PRIMARY KEY AUTO_INCREMENT,
+InspectionDate DATE NOT NULL,
+ConservationStatus VARCHAR (30) NOT NULL,
+DamageDescription VARCHAR (250),
+ActionTaken VARCHAR (150),
+AvailabilityStatus VARCHAR (40) NOT NULL,
+EmployeeID INT,
+    FOREIGN KEY (EmployeeID) 
+    REFERENCES Employee(EmployeeID)
+);
+
+CREATE TABLE PhysicalLoan (
+PhysicalLoanID INT PRIMARY KEY AUTO_INCREMENT,
+LoanDate DATE NOT NULL,
+DueDate DATE NOT NULL,
+ReturnDate DATE,
+LoanStatus VARCHAR (50) NOT NULL,
+EmployeeID INT,
+    FOREIGN KEY (EmployeeID) 
+    REFERENCES Employee(EmployeeID)
+);
+
+CREATE TABLE DigitalLoan (
+DigitalLoanID INT PRIMARY KEY AUTO_INCREMENT,
+LoanDate DATE NOT NULL,
+ExpirationDate DATE NOT NULL,
+AccessStatus VARCHAR (50) NOT NULL,
+EmployeeID INT,
+    FOREIGN KEY (EmployeeID) 
+    REFERENCES Employee(EmployeeID)
+);
+
+CREATE TABLE LateFee (
+LateFeeID INT PRIMARY KEY AUTO_INCREMENT,
+DaysLate INT NOT NULL,
+FineAmount DECIMAL (10,2) NOT NULL,
+PaymentStatus VARCHAR (20) NOT NULL,
+PaymentDate DATE,
+PhysicalLoanID INT,
+    FOREIGN KEY (PhysicalLoanID)
+    REFERENCES PhysicalLoan(PhysicalLoanID)
+);
+
+ALTER TABLE Supplier
+ADD RegistrationDate DATE NOT NULL;
+
+ALTER TABLE Shippers
+ADD DeliveryType VARCHAR(50) NOT NULL;
+
+ALTER TABLE Inventory
+ADD ShelfLocation VARCHAR(50) NOT NULL;
+
+ALTER TABLE Customer
+ADD RegistrationDate DATE NOT NULL, ADD PasswordCustomer VARCHAR(150) NOT NULL ;
+
+ALTER TABLE Employee
+ADD HireDate DATE NOT NULL, ADD Position VARCHAR (100) NOT NULL, ADD PasswordCustomer VARCHAR(150) NOT NULL ;
+
+ALTER TABLE BookCopyCondition
+ADD InspectionNotes VARCHAR(300);
+
+ALTER TABLE PhysicalLoan
+ADD RenewalCount INT NOT NULL DEFAULT 0;
+
+ALTER TABLE DigitalLoan
+ADD DownloadLimit INT NOT NULL DEFAULT 3;
+
+ALTER TABLE LateFee
+ADD PaymentMethod VARCHAR(50);
+
+-- ===== SUPPLIER =====
+INSERT INTO Supplier (SupplierID, SupplierName, ContactName, Email, Phone, Country, State, City, Address, PostalCode, RegistrationDate) VALUES
+(1, 'Importadora Sul', 'Mariana Silva', 'importadora.sul1@empresa.com', '11909722233', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Minas Gerais, 1203', '17602-619', '2021-01-03'),
+(2, 'Atacado Literario Premium', 'Carla Santos', 'atacado.literario.premium2@empresa.com', '11912175294', 'Brasil', 'Pernambuco', 'Recife', 'Rua das Flores, 1703', '84115-226', '2021-11-21'),
+(3, 'Papelaria Distribuicao Nacional', 'Sofia Lima', 'papelaria.distribuicao.nacional3@empresa.com', '11953241552', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Sete de Setembro, 105', '82963-979', '2020-05-14'),
+(4, 'Livros & Cia Master', 'Daniel Lima', 'livros.&.cia.master4@empresa.com', '11941403729', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua das Flores, 1201', '84868-754', '2021-06-04'),
+(5, 'Central de Livros Brasil', 'Sofia Silva', 'central.de.livros.brasil5@empresa.com', '11983082061', 'Brasil', 'Bahia', 'Salvador', 'Rua Bahia, 1403', '79693-537', '2023-08-19'),
+(6, 'Grafica Express', 'Joao Santos', 'grafica.express6@empresa.com', '11924127884', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 1186', '49354-637', '2025-06-24'),
+(7, 'Grafica Cultural', 'Tiago Souza', 'grafica.cultural7@empresa.com', '11915846520', 'Brasil', 'Pernambuco', 'Recife', 'Rua Sete de Setembro, 1560', '54833-255', '2025-07-02'),
+(8, 'Editora Parceira Master', 'Sofia Costa', 'editora.parceira.master8@empresa.com', '11945650450', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua Rio Branco, 1027', '86008-916', '2025-02-27'),
+(9, 'Editora Parceira Cultural', 'Pedro Souza', 'editora.parceira.cultural9@empresa.com', '11908142912', 'Brasil', 'Parana', 'Curitiba', 'Rua Rio Branco, 1405', '68411-391', '2024-11-12'),
+(10, 'Distribuidora Alfa', 'Lucas Oliveira', 'distribuidora.alfa10@empresa.com', '11981996233', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Bahia, 130', '38600-886', '2022-03-24'),
+(11, 'Grupo Editorial Premium', 'Mariana Almeida', 'grupo.editorial.premium11@empresa.com', '11910815439', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 832', '82016-384', '2020-07-28'),
+(12, 'Central de Livros Cultural', 'Nuno Costa', 'central.de.livros.cultural12@empresa.com', '11991633537', 'Brasil', 'Pernambuco', 'Recife', 'Rua Sete de Setembro, 319', '20876-280', '2020-04-22'),
+(13, 'Grupo Editorial Nacional', 'Pedro Lima', 'grupo.editorial.nacional13@empresa.com', '11924473646', 'Brasil', 'Parana', 'Curitiba', 'Rua Minas Gerais, 18', '29094-529', '2023-10-19'),
+(14, 'Importadora Sul', 'Queila Lima', 'importadora.sul14@empresa.com', '11987908110', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Bahia, 1852', '99204-917', '2024-07-13'),
+(15, 'Atacado Literario Brasil', 'Pedro Rodrigues', 'atacado.literario.brasil15@empresa.com', '11908354761', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 437', '67753-266', '2019-06-20'),
+(16, 'Distribuidora Brasil', 'Ana Lima', 'distribuidora.brasil16@empresa.com', '11920302435', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Minas Gerais, 1266', '13342-172', '2021-10-13'),
+(17, 'Livros & Cia Cultural', 'Lucas Lima', 'livros.&.cia.cultural17@empresa.com', '11948877189', 'Brasil', 'Ceara', 'Fortaleza', 'Rua das Flores, 246', '73972-577', '2025-08-10'),
+(18, 'Editora Parceira Sul', 'Daniel Costa', 'editora.parceira.sul18@empresa.com', '11999368259', 'Brasil', 'Parana', 'Curitiba', 'Rua Bahia, 1707', '31160-628', '2018-04-17'),
+(19, 'Importadora Sul', 'Rafael Silva', 'importadora.sul19@empresa.com', '11970881649', 'Brasil', 'Parana', 'Curitiba', 'Rua das Flores, 1435', '44224-630', '2023-03-12'),
+(20, 'Grupo Editorial Master', 'Rafael Nascimento', 'grupo.editorial.master20@empresa.com', '11944246886', 'Brasil', 'Bahia', 'Salvador', 'Rua Rio Branco, 1671', '35578-925', '2021-07-24'),
+(21, 'Grupo Editorial Norte Livros', 'Queila Almeida', 'grupo.editorial.norte.livros21@empresa.com', '11947722796', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua das Flores, 1628', '46623-583', '2022-04-23'),
+(22, 'Papelaria Distribuicao Express', 'Olivia Costa', 'papelaria.distribuicao.express22@empresa.com', '11948940600', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Sete de Setembro, 219', '39733-581', '2021-06-07'),
+(23, 'Grafica Global', 'Tiago Silva', 'grafica.global23@empresa.com', '11964353833', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua das Flores, 1719', '96584-222', '2024-12-25'),
+(24, 'Grupo Editorial Alfa', 'Felipe Rodrigues', 'grupo.editorial.alfa24@empresa.com', '11985341298', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua das Flores, 1650', '61883-574', '2024-12-03'),
+(25, 'Livros & Cia Sul', 'Eduarda Silva', 'livros.&.cia.sul25@empresa.com', '11920287103', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Sete de Setembro, 1262', '88101-585', '2023-03-18'),
+(26, 'Central de Livros Sul', 'Ana Silva', 'central.de.livros.sul26@empresa.com', '11997491738', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Rio Branco, 1544', '28251-544', '2021-04-01'),
+(27, 'Comercial Norte Livros', 'Joao Nascimento', 'comercial.norte.livros27@empresa.com', '11932284650', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua Minas Gerais, 1124', '64920-954', '2020-01-24'),
+(28, 'Importadora Alfa', 'Sofia Nascimento', 'importadora.alfa28@empresa.com', '11956455770', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Rio Branco, 320', '78617-622', '2018-08-25'),
+(29, 'Livros & Cia Global', 'Ana Oliveira', 'livros.&.cia.global29@empresa.com', '11923131984', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 1277', '25772-669', '2018-06-22'),
+(30, 'Central de Livros Master', 'Rafael Almeida', 'central.de.livros.master30@empresa.com', '11914241764', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Sete de Setembro, 401', '46296-143', '2019-09-15'),
+(31, 'Central de Livros Nacional', 'Carla Almeida', 'central.de.livros.nacional31@empresa.com', '11943703122', 'Brasil', 'Bahia', 'Salvador', 'Rua Minas Gerais, 936', '76605-646', '2025-09-08'),
+(32, 'Central de Livros Cultural', 'Rafael Santos', 'central.de.livros.cultural32@empresa.com', '11960066221', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 259', '61427-552', '2023-02-22'),
+(33, 'Grupo Editorial Premium', 'Carla Santos', 'grupo.editorial.premium33@empresa.com', '11989855030', 'Brasil', 'Parana', 'Curitiba', 'Rua das Flores, 1847', '30243-833', '2023-03-09'),
+(34, 'Livros & Cia Alfa', 'Henrique Souza', 'livros.&.cia.alfa34@empresa.com', '11953453132', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Sete de Setembro, 1377', '39322-265', '2024-09-13'),
+(35, 'Importadora Premium', 'Gabriela Costa', 'importadora.premium35@empresa.com', '11942751778', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Minas Gerais, 49', '54299-667', '2025-08-23'),
+(36, 'Distribuidora Premium', 'Karina Nascimento', 'distribuidora.premium36@empresa.com', '11983742074', 'Brasil', 'Parana', 'Curitiba', 'Rua Rio Branco, 1977', '18426-215', '2021-02-03'),
+(37, 'Comercial Cultural', 'Bruno Oliveira', 'comercial.cultural37@empresa.com', '11936298660', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 1749', '98601-938', '2022-07-05'),
+(38, 'Central de Livros Master', 'Sofia Almeida', 'central.de.livros.master38@empresa.com', '11994008438', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua das Flores, 581', '17540-918', '2020-07-03'),
+(39, 'Comercial Nacional', 'Carla Pereira', 'comercial.nacional39@empresa.com', '11911239731', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 551', '25948-564', '2018-06-18'),
+(40, 'Atacado Literario Cultural', 'Tiago Oliveira', 'atacado.literario.cultural40@empresa.com', '11905798969', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 1994', '31161-368', '2018-03-07'),
+(41, 'Comercial Cultural', 'Queila Santos', 'comercial.cultural41@empresa.com', '11938917884', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Rio Branco, 1386', '33317-377', '2023-01-09'),
+(42, 'Distribuidora Nacional', 'Ana Nascimento', 'distribuidora.nacional42@empresa.com', '11973960561', 'Brasil', 'Bahia', 'Salvador', 'Rua Rio Branco, 982', '42201-557', '2019-11-27'),
+(43, 'Atacado Literario Alfa', 'Rafael Rodrigues', 'atacado.literario.alfa43@empresa.com', '11968006237', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 480', '54918-303', '2020-07-12'),
+(44, 'Distribuidora Sul', 'Ana Souza', 'distribuidora.sul44@empresa.com', '11983946251', 'Brasil', 'Parana', 'Curitiba', 'Rua Bahia, 344', '17261-186', '2024-09-22'),
+(45, 'Comercial Global', 'Henrique Pereira', 'comercial.global45@empresa.com', '11906071673', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Sete de Setembro, 332', '45263-556', '2018-05-12'),
+(46, 'Importadora Master', 'Karina Santos', 'importadora.master46@empresa.com', '11904623360', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 740', '33980-101', '2023-07-03'),
+(47, 'Grafica Cultural', 'Queila Santos', 'grafica.cultural47@empresa.com', '11933310074', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua das Flores, 551', '21764-247', '2024-10-02'),
+(48, 'Atacado Literario Nacional', 'Joao Pereira', 'atacado.literario.nacional48@empresa.com', '11984512860', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 1209', '79361-973', '2020-11-23'),
+(49, 'Papelaria Distribuicao Premium', 'Karina Almeida', 'papelaria.distribuicao.premium49@empresa.com', '11920060604', 'Brasil', 'Parana', 'Curitiba', 'Rua Rio Branco, 1327', '28972-144', '2024-12-23'),
+(50, 'Central de Livros Sul', 'Queila Nascimento', 'central.de.livros.sul50@empresa.com', '11976300026', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Rio Branco, 1644', '99508-809', '2021-02-01'),
+(51, 'Distribuidora Sul', 'Lucas Souza', 'distribuidora.sul51@empresa.com', '11950548847', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Rio Branco, 113', '92282-119', '2021-08-09'),
+(52, 'Distribuidora Alfa', 'Carla Nascimento', 'distribuidora.alfa52@empresa.com', '11971833303', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Rio Branco, 145', '72109-358', '2019-05-08'),
+(53, 'Grupo Editorial Norte Livros', 'Olivia Almeida', 'grupo.editorial.norte.livros53@empresa.com', '11951346398', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Bahia, 1874', '99613-394', '2018-10-21'),
+(54, 'Grupo Editorial Brasil', 'Tiago Oliveira', 'grupo.editorial.brasil54@empresa.com', '11944529810', 'Brasil', 'Parana', 'Curitiba', 'Rua Minas Gerais, 1282', '84417-236', '2018-08-02'),
+(55, 'Grafica Cultural', 'Daniel Santos', 'grafica.cultural55@empresa.com', '11990691946', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Minas Gerais, 1461', '77703-392', '2025-08-15'),
+(56, 'Editora Parceira Master', 'Gabriela Pereira', 'editora.parceira.master56@empresa.com', '11911523163', 'Brasil', 'Ceara', 'Fortaleza', 'Rua das Flores, 603', '70158-178', '2025-05-13'),
+(57, 'Grupo Editorial Norte Livros', 'Carla Lima', 'grupo.editorial.norte.livros57@empresa.com', '11912120276', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Rio Branco, 546', '57127-235', '2022-02-23'),
+(58, 'Importadora Norte Livros', 'Pedro Almeida', 'importadora.norte.livros58@empresa.com', '11952892592', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Sete de Setembro, 17', '74447-797', '2025-07-10'),
+(59, 'Livros & Cia Premium', 'Lucas Rodrigues', 'livros.&.cia.premium59@empresa.com', '11942423277', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Minas Gerais, 13', '52539-868', '2023-07-04'),
+(60, 'Grupo Editorial Nacional', 'Joao Pereira', 'grupo.editorial.nacional60@empresa.com', '11949958791', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Bahia, 809', '87224-178', '2023-07-25'),
+(61, 'Comercial Nacional', 'Isabela Souza', 'comercial.nacional61@empresa.com', '11906927985', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 520', '44829-546', '2023-04-25'),
+(62, 'Importadora Premium', 'Ana Rodrigues', 'importadora.premium62@empresa.com', '11974377153', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 111', '63855-561', '2020-11-28'),
+(63, 'Comercial Alfa', 'Bruno Nascimento', 'comercial.alfa63@empresa.com', '11917087436', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 859', '55044-388', '2022-05-24'),
+(64, 'Comercial Premium', 'Henrique Pereira', 'comercial.premium64@empresa.com', '11964851593', 'Brasil', 'Pernambuco', 'Recife', 'Rua das Flores, 352', '94306-265', '2019-04-17'),
+(65, 'Grafica Master', 'Henrique Almeida', 'grafica.master65@empresa.com', '11944672257', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Bahia, 295', '81799-297', '2021-02-06'),
+(66, 'Importadora Master', 'Carla Costa', 'importadora.master66@empresa.com', '11932095026', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua Minas Gerais, 1667', '84660-306', '2018-12-28'),
+(67, 'Atacado Literario Premium', 'Nuno Nascimento', 'atacado.literario.premium67@empresa.com', '11928186385', 'Brasil', 'Pernambuco', 'Recife', 'Rua Minas Gerais, 702', '18134-610', '2022-10-12'),
+(68, 'Livros & Cia Master', 'Queila Santos', 'livros.&.cia.master68@empresa.com', '11912428314', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 797', '62396-761', '2025-07-10'),
+(69, 'Distribuidora Sul', 'Bruno Rodrigues', 'distribuidora.sul69@empresa.com', '11995229059', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Rio Branco, 1013', '10023-174', '2024-09-28'),
+(70, 'Grafica Alfa', 'Henrique Souza', 'grafica.alfa70@empresa.com', '11930037983', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Sete de Setembro, 1079', '99400-211', '2025-02-18'),
+(71, 'Distribuidora Nacional', 'Eduarda Santos', 'distribuidora.nacional71@empresa.com', '11976421196', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Minas Gerais, 1981', '26772-741', '2022-09-21'),
+(72, 'Atacado Literario Brasil', 'Daniel Souza', 'atacado.literario.brasil72@empresa.com', '11940312198', 'Brasil', 'Bahia', 'Salvador', 'Rua Bahia, 544', '39305-909', '2018-01-18'),
+(73, 'Comercial Alfa', 'Isabela Costa', 'comercial.alfa73@empresa.com', '11986513477', 'Brasil', 'Bahia', 'Salvador', 'Rua Bahia, 1087', '40771-660', '2021-01-14'),
+(74, 'Comercial Nacional', 'Ana Santos', 'comercial.nacional74@empresa.com', '11966882068', 'Brasil', 'Pernambuco', 'Recife', 'Rua das Flores, 536', '39863-783', '2024-06-08'),
+(75, 'Grafica Nacional', 'Karina Rodrigues', 'grafica.nacional75@empresa.com', '11948629752', 'Brasil', 'Pernambuco', 'Recife', 'Rua Sete de Setembro, 23', '48287-856', '2019-04-16'),
+(76, 'Grupo Editorial Cultural', 'Gabriela Santos', 'grupo.editorial.cultural76@empresa.com', '11962426554', 'Brasil', 'Bahia', 'Salvador', 'Rua Minas Gerais, 1567', '48657-211', '2025-10-06'),
+(77, 'Grupo Editorial Alfa', 'Nuno Silva', 'grupo.editorial.alfa77@empresa.com', '11979832995', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Bahia, 121', '37911-124', '2020-07-02'),
+(78, 'Distribuidora Sul', 'Mariana Almeida', 'distribuidora.sul78@empresa.com', '11995567685', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua das Flores, 172', '31709-437', '2021-03-21'),
+(79, 'Central de Livros Alfa', 'Bruno Pereira', 'central.de.livros.alfa79@empresa.com', '11989178266', 'Brasil', 'Pernambuco', 'Recife', 'Rua Minas Gerais, 689', '67990-273', '2019-01-03'),
+(80, 'Comercial Brasil', 'Lucas Rodrigues', 'comercial.brasil80@empresa.com', '11916603844', 'Brasil', 'Bahia', 'Salvador', 'Rua Bahia, 740', '50461-941', '2024-02-02'),
+(81, 'Grafica Norte Livros', 'Lucas Nascimento', 'grafica.norte.livros81@empresa.com', '11959907747', 'Brasil', 'Bahia', 'Salvador', 'Rua Minas Gerais, 755', '72198-131', '2024-04-26'),
+(82, 'Atacado Literario Nacional', 'Mariana Silva', 'atacado.literario.nacional82@empresa.com', '11962283819', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua das Flores, 536', '35551-865', '2019-10-11'),
+(83, 'Importadora Cultural', 'Karina Lima', 'importadora.cultural83@empresa.com', '11905849955', 'Brasil', 'Parana', 'Curitiba', 'Rua Minas Gerais, 1902', '46127-404', '2018-12-25'),
+(84, 'Papelaria Distribuicao Brasil', 'Ana Santos', 'papelaria.distribuicao.brasil84@empresa.com', '11914396377', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Bahia, 1963', '60661-908', '2022-07-27'),
+(85, 'Grafica Sul', 'Pedro Oliveira', 'grafica.sul85@empresa.com', '11901168389', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 1253', '40951-435', '2023-08-12'),
+(86, 'Papelaria Distribuicao Brasil', 'Queila Santos', 'papelaria.distribuicao.brasil86@empresa.com', '11952571125', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Sete de Setembro, 845', '18484-765', '2018-08-18'),
+(87, 'Central de Livros Express', 'Felipe Rodrigues', 'central.de.livros.express87@empresa.com', '11914122579', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Rua Minas Gerais, 1289', '21020-313', '2019-07-16'),
+(88, 'Grafica Sul', 'Henrique Oliveira', 'grafica.sul88@empresa.com', '11955947402', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Rio Branco, 1835', '98356-340', '2019-05-10'),
+(89, 'Comercial Global', 'Isabela Costa', 'comercial.global89@empresa.com', '11934098886', 'Brasil', 'Parana', 'Curitiba', 'Rua Sete de Setembro, 909', '42431-290', '2021-04-05'),
+(90, 'Comercial Global', 'Gabriela Costa', 'comercial.global90@empresa.com', '11908697858', 'Brasil', 'Pernambuco', 'Recife', 'Rua Minas Gerais, 513', '76496-638', '2021-11-26'),
+(91, 'Editora Parceira Alfa', 'Bruno Souza', 'editora.parceira.alfa91@empresa.com', '11900602919', 'Brasil', 'Ceara', 'Fortaleza', 'Rua Sete de Setembro, 1731', '68759-482', '2018-05-08'),
+(92, 'Editora Parceira Nacional', 'Gabriela Lima', 'editora.parceira.nacional92@empresa.com', '11978274942', 'Brasil', 'Bahia', 'Salvador', 'Rua das Flores, 772', '77196-986', '2020-08-20'),
+(93, 'Comercial Nacional', 'Daniel Lima', 'comercial.nacional93@empresa.com', '11995255140', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua Sete de Setembro, 86', '58327-448', '2020-01-07'),
+(94, 'Comercial Nacional', 'Tiago Santos', 'comercial.nacional94@empresa.com', '11901527375', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Rua Bahia, 1399', '58733-289', '2022-02-07'),
+(95, 'Distribuidora Alfa', 'Rafael Almeida', 'distribuidora.alfa95@empresa.com', '11908492100', 'Brasil', 'Pernambuco', 'Recife', 'Rua das Flores, 1639', '61812-779', '2020-11-18'),
+(96, 'Editora Parceira Sul', 'Mariana Pereira', 'editora.parceira.sul96@empresa.com', '11955000937', 'Brasil', 'Parana', 'Curitiba', 'Rua Minas Gerais, 865', '16731-419', '2023-07-14'),
+(97, 'Distribuidora Express', 'Gabriela Rodrigues', 'distribuidora.express97@empresa.com', '11997714760', 'Brasil', 'Pernambuco', 'Recife', 'Rua Sete de Setembro, 1939', '10770-544', '2020-07-04'),
+(98, 'Editora Parceira Premium', 'Sofia Costa', 'editora.parceira.premium98@empresa.com', '11961861787', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Sete de Setembro, 40', '16775-664', '2020-11-26'),
+(99, 'Atacado Literario Brasil', 'Sofia Lima', 'atacado.literario.brasil99@empresa.com', '11949773788', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Rua Sete de Setembro, 722', '47132-265', '2020-02-04'),
+(100, 'Atacado Literario Alfa', 'Gabriela Pereira', 'atacado.literario.alfa100@empresa.com', '11916998722', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Rua Bahia, 654', '16995-722', '2024-02-23');
+ 
+-- ===== SHIPPERS =====
+INSERT INTO Shippers (ShippersID, CarrierName, ContactName, Email, Phone, Country, State, City, Address, PostalCode, DeliveryType) VALUES
+(1, 'LogPonto S.A.', 'Henrique Lima', 'logponto.s.a.1001@empresa.com', '11954288997', 'Brasil', 'Bahia', 'Salvador', 'Av. Industrial, 759', '84111-323', 'Rodoviario'),
+(2, 'VelozTrans S.A.', 'Mariana Costa', 'veloztrans.s.a.1002@empresa.com', '11916516391', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Amazonas, 2979', '35243-142', 'Mesmo Dia'),
+(3, 'TransLog Transportes', 'Daniel Rodrigues', 'translog.transportes1003@empresa.com', '11980466181', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Central, 2578', '50136-764', 'Economico'),
+(4, 'CorreioExpresso S.A.', 'Nuno Rodrigues', 'correioexpresso.s.a.1004@empresa.com', '11988428371', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Industrial, 2072', '67455-283', 'Rodoviario'),
+(5, 'TransLog Logistica', 'Olivia Santos', 'translog.logistica1005@empresa.com', '11959971013', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Amazonas, 1948', '62473-209', 'Rodoviario'),
+(6, 'EntregaFast Transportes', 'Nuno Costa', 'entregafast.transportes1006@empresa.com', '11912309529', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Central, 2099', '96126-141', 'Rodoviario'),
+(7, 'EntregaFast Ltda', 'Karina Nascimento', 'entregafast.ltda1007@empresa.com', '11910733117', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Central, 1557', '95556-903', 'Aereo'),
+(8, 'TransLog Ltda', 'Tiago Souza', 'translog.ltda1008@empresa.com', '11925998954', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Industrial, 1189', '31641-802', 'Aereo'),
+(9, 'Rapid Express Transportes', 'Tiago Pereira', 'rapid.express.transportes1009@empresa.com', '11921309406', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Central, 1136', '69821-247', 'Expresso'),
+(10, 'EntregaCerta Logistica', 'Gabriela Lima', 'entregacerta.logistica1010@empresa.com', '11935281500', 'Brasil', 'Bahia', 'Salvador', 'Av. Brasil, 1534', '14827-303', 'Aereo'),
+(11, 'VelozTrans S.A.', 'Isabela Costa', 'veloztrans.s.a.1011@empresa.com', '11950578720', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 481', '79562-149', 'Expresso'),
+(12, 'BrasilCarga Ltda', 'Isabela Nascimento', 'brasilcarga.ltda1012@empresa.com', '11984527132', 'Brasil', 'Pernambuco', 'Recife', 'Av. Brasil, 1094', '59248-477', 'Mesmo Dia'),
+(13, 'EntregaFast Transportes', 'Karina Souza', 'entregafast.transportes1013@empresa.com', '11959362035', 'Brasil', 'Bahia', 'Salvador', 'Av. Amazonas, 2530', '16329-403', 'Mesmo Dia'),
+(14, 'CorreioExpresso Transportes', 'Sofia Costa', 'correioexpresso.transportes1014@empresa.com', '11998386799', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 917', '29577-397', 'Mesmo Dia'),
+(15, 'VelozTrans Logistica', 'Queila Costa', 'veloztrans.logistica1015@empresa.com', '11906412435', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Industrial, 940', '90284-768', 'Rodoviario'),
+(16, 'TransLog Ltda', 'Ana Lima', 'translog.ltda1016@empresa.com', '11947642270', 'Brasil', 'Parana', 'Curitiba', 'Av. Contorno, 2152', '56812-646', 'Aereo'),
+(17, 'VelozTrans Transportes', 'Sofia Oliveira', 'veloztrans.transportes1017@empresa.com', '11927405162', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Central, 1955', '30791-237', 'Rodoviario'),
+(18, 'LogCargo S.A.', 'Olivia Souza', 'logcargo.s.a.1018@empresa.com', '11908545460', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 1656', '44634-111', 'Rodoviario'),
+(19, 'EntregaCerta Transportes', 'Tiago Lima', 'entregacerta.transportes1019@empresa.com', '11959559685', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Amazonas, 686', '10052-145', 'Rodoviario'),
+(20, 'EntregaCerta Ltda', 'Mariana Oliveira', 'entregacerta.ltda1020@empresa.com', '11931899367', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Contorno, 439', '11618-727', 'Mesmo Dia'),
+(21, 'LogCargo S.A.', 'Nuno Santos', 'logcargo.s.a.1021@empresa.com', '11969559423', 'Brasil', 'Pernambuco', 'Recife', 'Av. Central, 725', '76660-416', 'Rodoviario'),
+(22, 'CorreioExpresso Ltda', 'Pedro Nascimento', 'correioexpresso.ltda1022@empresa.com', '11900852202', 'Brasil', 'Pernambuco', 'Recife', 'Av. Industrial, 1915', '20548-859', 'Economico'),
+(23, 'EntregaFast S.A.', 'Daniel Pereira', 'entregafast.s.a.1023@empresa.com', '11931178333', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 1384', '44511-828', 'Rodoviario'),
+(24, 'CorreioExpresso Logistica', 'Queila Pereira', 'correioexpresso.logistica1024@empresa.com', '11939677040', 'Brasil', 'Bahia', 'Salvador', 'Av. Contorno, 2088', '11995-273', 'Expresso'),
+(25, 'LogCargo S.A.', 'Felipe Costa', 'logcargo.s.a.1025@empresa.com', '11925761344', 'Brasil', 'Pernambuco', 'Recife', 'Av. Brasil, 2472', '41348-488', 'Mesmo Dia'),
+(26, 'BrasilCarga Logistica', 'Queila Silva', 'brasilcarga.logistica1026@empresa.com', '11903559020', 'Brasil', 'Pernambuco', 'Recife', 'Av. Amazonas, 2346', '50337-908', 'Aereo'),
+(27, 'VelozTrans Ltda', 'Sofia Oliveira', 'veloztrans.ltda1027@empresa.com', '11919407201', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 468', '23982-736', 'Aereo'),
+(28, 'MoveMais S.A.', 'Ana Silva', 'movemais.s.a.1028@empresa.com', '11905590093', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Contorno, 2864', '18890-854', 'Rodoviario'),
+(29, 'Rapid Express Transportes', 'Gabriela Nascimento', 'rapid.express.transportes1029@empresa.com', '11989142510', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Av. Industrial, 448', '42319-310', 'Aereo'),
+(30, 'Rapid Express Ltda', 'Bruno Souza', 'rapid.express.ltda1030@empresa.com', '11984763393', 'Brasil', 'Parana', 'Curitiba', 'Av. Industrial, 419', '27387-200', 'Aereo'),
+(31, 'CorreioExpresso Transportes', 'Karina Rodrigues', 'correioexpresso.transportes1031@empresa.com', '11935052250', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Brasil, 1061', '47040-149', 'Expresso'),
+(32, 'MoveMais Logistica', 'Joao Lima', 'movemais.logistica1032@empresa.com', '11904158247', 'Brasil', 'Pernambuco', 'Recife', 'Av. Contorno, 1797', '77976-891', 'Rodoviario'),
+(33, 'MoveMais Logistica', 'Bruno Nascimento', 'movemais.logistica1033@empresa.com', '11975980310', 'Brasil', 'Bahia', 'Salvador', 'Av. Contorno, 2363', '47632-274', 'Economico'),
+(34, 'TransLog S.A.', 'Joao Silva', 'translog.s.a.1034@empresa.com', '11900585413', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Industrial, 401', '74419-811', 'Aereo'),
+(35, 'BrasilCarga Transportes', 'Queila Pereira', 'brasilcarga.transportes1035@empresa.com', '11977578838', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 889', '40346-610', 'Aereo'),
+(36, 'Rapid Express Ltda', 'Pedro Nascimento', 'rapid.express.ltda1036@empresa.com', '11914033524', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Brasil, 399', '62595-504', 'Rodoviario'),
+(37, 'VelozTrans Ltda', 'Lucas Santos', 'veloztrans.ltda1037@empresa.com', '11940686900', 'Brasil', 'Parana', 'Curitiba', 'Av. Industrial, 2242', '75691-275', 'Economico'),
+(38, 'LogCargo Logistica', 'Eduarda Nascimento', 'logcargo.logistica1038@empresa.com', '11979737187', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Brasil, 2392', '52816-634', 'Aereo'),
+(39, 'BrasilCarga Transportes', 'Felipe Almeida', 'brasilcarga.transportes1039@empresa.com', '11958894474', 'Brasil', 'Parana', 'Curitiba', 'Av. Central, 956', '26522-442', 'Economico'),
+(40, 'LogCargo S.A.', 'Isabela Pereira', 'logcargo.s.a.1040@empresa.com', '11994377364', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Amazonas, 1024', '52803-717', 'Mesmo Dia'),
+(41, 'MoveMais S.A.', 'Henrique Costa', 'movemais.s.a.1041@empresa.com', '11925403847', 'Brasil', 'Parana', 'Curitiba', 'Av. Contorno, 684', '96232-204', 'Aereo'),
+(42, 'VelozTrans S.A.', 'Eduarda Pereira', 'veloztrans.s.a.1042@empresa.com', '11998420866', 'Brasil', 'Parana', 'Curitiba', 'Av. Industrial, 1131', '35715-211', 'Rodoviario'),
+(43, 'CorreioExpresso S.A.', 'Mariana Almeida', 'correioexpresso.s.a.1043@empresa.com', '11904554223', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Industrial, 1798', '39157-612', 'Expresso'),
+(44, 'BrasilCarga Ltda', 'Eduarda Pereira', 'brasilcarga.ltda1044@empresa.com', '11981028420', 'Brasil', 'Pernambuco', 'Recife', 'Av. Contorno, 1002', '66364-817', 'Mesmo Dia'),
+(45, 'LogPonto Logistica', 'Henrique Lima', 'logponto.logistica1045@empresa.com', '11930682998', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Contorno, 1869', '66692-420', 'Expresso'),
+(46, 'Rapid Express Logistica', 'Henrique Rodrigues', 'rapid.express.logistica1046@empresa.com', '11995717436', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 1744', '73274-566', 'Rodoviario'),
+(47, 'LogPonto Logistica', 'Queila Oliveira', 'logponto.logistica1047@empresa.com', '11987844120', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Contorno, 1602', '74204-208', 'Rodoviario'),
+(48, 'CorreioExpresso S.A.', 'Felipe Santos', 'correioexpresso.s.a.1048@empresa.com', '11969688525', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Contorno, 2363', '69871-654', 'Aereo'),
+(49, 'BrasilCarga Ltda', 'Lucas Nascimento', 'brasilcarga.ltda1049@empresa.com', '11946016792', 'Brasil', 'Pernambuco', 'Recife', 'Av. Industrial, 870', '99700-288', 'Economico'),
+(50, 'EntregaCerta Ltda', 'Tiago Costa', 'entregacerta.ltda1050@empresa.com', '11985573037', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Brasil, 1133', '60048-509', 'Rodoviario'),
+(51, 'TransLog Ltda', 'Nuno Rodrigues', 'translog.ltda1051@empresa.com', '11984364535', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Central, 1096', '24320-329', 'Expresso'),
+(52, 'VelozTrans S.A.', 'Mariana Almeida', 'veloztrans.s.a.1052@empresa.com', '11928455873', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Amazonas, 292', '93138-297', 'Economico'),
+(53, 'EntregaCerta S.A.', 'Eduarda Costa', 'entregacerta.s.a.1053@empresa.com', '11989394078', 'Brasil', 'Pernambuco', 'Recife', 'Av. Industrial, 1215', '81862-765', 'Aereo'),
+(54, 'BrasilCarga Transportes', 'Henrique Pereira', 'brasilcarga.transportes1054@empresa.com', '11994516167', 'Brasil', 'Pernambuco', 'Recife', 'Av. Brasil, 1755', '98974-290', 'Economico'),
+(55, 'TransLog Transportes', 'Lucas Santos', 'translog.transportes1055@empresa.com', '11987832447', 'Brasil', 'Parana', 'Curitiba', 'Av. Brasil, 1974', '73559-538', 'Mesmo Dia'),
+(56, 'Rapid Express Transportes', 'Eduarda Pereira', 'rapid.express.transportes1056@empresa.com', '11951688682', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 2322', '52559-902', 'Aereo'),
+(57, 'EntregaCerta Transportes', 'Sofia Silva', 'entregacerta.transportes1057@empresa.com', '11988221745', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Amazonas, 304', '95977-400', 'Expresso'),
+(58, 'LogPonto Ltda', 'Sofia Oliveira', 'logponto.ltda1058@empresa.com', '11931358823', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Industrial, 1429', '30011-313', 'Economico'),
+(59, 'EntregaCerta S.A.', 'Tiago Lima', 'entregacerta.s.a.1059@empresa.com', '11912134061', 'Brasil', 'Parana', 'Curitiba', 'Av. Amazonas, 2035', '37931-643', 'Rodoviario'),
+(60, 'BrasilCarga Ltda', 'Rafael Souza', 'brasilcarga.ltda1060@empresa.com', '11935499827', 'Brasil', 'Pernambuco', 'Recife', 'Av. Amazonas, 580', '72028-604', 'Mesmo Dia'),
+(61, 'TransLog Logistica', 'Olivia Oliveira', 'translog.logistica1061@empresa.com', '11994008999', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Amazonas, 2050', '31576-652', 'Mesmo Dia'),
+(62, 'TransLog S.A.', 'Karina Almeida', 'translog.s.a.1062@empresa.com', '11993400178', 'Brasil', 'Ceara', 'Fortaleza', 'Av. Brasil, 1917', '59146-536', 'Economico'),
+(63, 'Rapid Express S.A.', 'Lucas Silva', 'rapid.express.s.a.1063@empresa.com', '11902759485', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Brasil, 394', '76928-595', 'Economico'),
+(64, 'EntregaFast Ltda', 'Gabriela Rodrigues', 'entregafast.ltda1064@empresa.com', '11983923373', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 396', '96379-474', 'Expresso'),
+(65, 'BrasilCarga S.A.', 'Joao Rodrigues', 'brasilcarga.s.a.1065@empresa.com', '11945896468', 'Brasil', 'Pernambuco', 'Recife', 'Av. Brasil, 2279', '16910-946', 'Expresso'),
+(66, 'CorreioExpresso Transportes', 'Pedro Rodrigues', 'correioexpresso.transportes1066@empresa.com', '11944791387', 'Brasil', 'Parana', 'Curitiba', 'Av. Central, 1422', '36677-770', 'Economico'),
+(67, 'Rapid Express Transportes', 'Gabriela Costa', 'rapid.express.transportes1067@empresa.com', '11995721535', 'Brasil', 'Parana', 'Curitiba', 'Av. Amazonas, 2412', '93207-189', 'Rodoviario'),
+(68, 'VelozTrans Logistica', 'Rafael Lima', 'veloztrans.logistica1068@empresa.com', '11906670565', 'Brasil', 'Pernambuco', 'Recife', 'Av. Brasil, 454', '10814-147', 'Aereo'),
+(69, 'BrasilCarga Ltda', 'Queila Nascimento', 'brasilcarga.ltda1069@empresa.com', '11982106366', 'Brasil', 'Pernambuco', 'Recife', 'Av. Central, 612', '92157-789', 'Mesmo Dia'),
+(70, 'Rapid Express S.A.', 'Bruno Almeida', 'rapid.express.s.a.1070@empresa.com', '11983923346', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Contorno, 2728', '33763-990', 'Rodoviario'),
+(71, 'VelozTrans Ltda', 'Ana Costa', 'veloztrans.ltda1071@empresa.com', '11918615439', 'Brasil', 'Parana', 'Curitiba', 'Av. Central, 2918', '43816-983', 'Expresso'),
+(72, 'EntregaFast Logistica', 'Bruno Costa', 'entregafast.logistica1072@empresa.com', '11902736975', 'Brasil', 'Pernambuco', 'Recife', 'Av. Central, 2638', '85796-155', 'Economico'),
+(73, 'LogPonto Ltda', 'Daniel Rodrigues', 'logponto.ltda1073@empresa.com', '11977218321', 'Brasil', 'Pernambuco', 'Recife', 'Av. Industrial, 285', '11852-796', 'Economico'),
+(74, 'LogPonto S.A.', 'Pedro Rodrigues', 'logponto.s.a.1074@empresa.com', '11973659398', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Av. Contorno, 2649', '71891-317', 'Aereo'),
+(75, 'TransLog Logistica', 'Ana Silva', 'translog.logistica1075@empresa.com', '11991772858', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Av. Contorno, 903', '25905-232', 'Economico'),
+(76, 'TransLog Transportes', 'Sofia Santos', 'translog.transportes1076@empresa.com', '11960502221', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Contorno, 1508', '28979-847', 'Rodoviario'),
+(77, 'CorreioExpresso Logistica', 'Olivia Pereira', 'correioexpresso.logistica1077@empresa.com', '11907068021', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 258', '11930-766', 'Mesmo Dia'),
+(78, 'Rapid Express Logistica', 'Joao Pereira', 'rapid.express.logistica1078@empresa.com', '11997904037', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Industrial, 2504', '17835-423', 'Expresso'),
+(79, 'LogPonto Logistica', 'Pedro Oliveira', 'logponto.logistica1079@empresa.com', '11919449024', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Av. Brasil, 2651', '31499-744', 'Economico'),
+(80, 'BrasilCarga Logistica', 'Olivia Pereira', 'brasilcarga.logistica1080@empresa.com', '11976076828', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Brasil, 1156', '17947-736', 'Mesmo Dia'),
+(81, 'MoveMais Ltda', 'Eduarda Lima', 'movemais.ltda1081@empresa.com', '11941419287', 'Brasil', 'Pernambuco', 'Recife', 'Av. Amazonas, 1552', '60771-801', 'Economico'),
+(82, 'LogPonto S.A.', 'Olivia Pereira', 'logponto.s.a.1082@empresa.com', '11992416181', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Brasil, 1087', '45130-532', 'Aereo'),
+(83, 'LogPonto Ltda', 'Joao Oliveira', 'logponto.ltda1083@empresa.com', '11976760223', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 2253', '99736-895', 'Economico'),
+(84, 'MoveMais Ltda', 'Rafael Nascimento', 'movemais.ltda1084@empresa.com', '11965063717', 'Brasil', 'Pernambuco', 'Recife', 'Av. Amazonas, 2968', '40675-416', 'Mesmo Dia'),
+(85, 'TransLog Logistica', 'Olivia Santos', 'translog.logistica1085@empresa.com', '11934189901', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Industrial, 1893', '80852-189', 'Mesmo Dia'),
+(86, 'MoveMais Ltda', 'Henrique Rodrigues', 'movemais.ltda1086@empresa.com', '11977791310', 'Brasil', 'Parana', 'Curitiba', 'Av. Central, 1324', '72467-618', 'Mesmo Dia'),
+(87, 'LogCargo S.A.', 'Gabriela Santos', 'logcargo.s.a.1087@empresa.com', '11912373310', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Brasil, 1496', '85742-677', 'Expresso'),
+(88, 'VelozTrans S.A.', 'Henrique Silva', 'veloztrans.s.a.1088@empresa.com', '11966205392', 'Brasil', 'Rio Grande do Sul', 'Porto Alegre', 'Av. Contorno, 1532', '92934-574', 'Rodoviario'),
+(89, 'EntregaFast Transportes', 'Tiago Silva', 'entregafast.transportes1089@empresa.com', '11946294601', 'Brasil', 'Parana', 'Curitiba', 'Av. Central, 2496', '12696-196', 'Rodoviario'),
+(90, 'LogCargo Logistica', 'Sofia Lima', 'logcargo.logistica1090@empresa.com', '11928666638', 'Brasil', 'Parana', 'Curitiba', 'Av. Brasil, 1754', '22728-557', 'Mesmo Dia'),
+(91, 'LogPonto S.A.', 'Isabela Silva', 'logponto.s.a.1091@empresa.com', '11945478761', 'Brasil', 'Bahia', 'Salvador', 'Av. Amazonas, 1559', '20965-128', 'Rodoviario'),
+(92, 'TransLog Transportes', 'Olivia Almeida', 'translog.transportes1092@empresa.com', '11908614876', 'Brasil', 'Pernambuco', 'Recife', 'Av. Contorno, 2903', '21790-363', 'Expresso'),
+(93, 'LogPonto S.A.', 'Carla Nascimento', 'logponto.s.a.1093@empresa.com', '11952763443', 'Brasil', 'Rio de Janeiro', 'Rio de Janeiro', 'Av. Industrial, 664', '58616-340', 'Aereo'),
+(94, 'EntregaFast Ltda', 'Isabela Costa', 'entregafast.ltda1094@empresa.com', '11907955994', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 1066', '77283-826', 'Economico'),
+(95, 'TransLog Ltda', 'Eduarda Costa', 'translog.ltda1095@empresa.com', '11900775444', 'Brasil', 'Bahia', 'Salvador', 'Av. Brasil, 2425', '87524-551', 'Rodoviario'),
+(96, 'BrasilCarga Transportes', 'Lucas Pereira', 'brasilcarga.transportes1096@empresa.com', '11952351371', 'Brasil', 'Sao Paulo', 'Sao Paulo', 'Av. Brasil, 1981', '59760-272', 'Economico'),
+(97, 'LogCargo S.A.', 'Ana Almeida', 'logcargo.s.a.1097@empresa.com', '11996264539', 'Brasil', 'Bahia', 'Salvador', 'Av. Contorno, 652', '38908-179', 'Mesmo Dia'),
+(98, 'MoveMais S.A.', 'Olivia Souza', 'movemais.s.a.1098@empresa.com', '11951684447', 'Brasil', 'Minas Gerais', 'Belo Horizonte', 'Av. Contorno, 1862', '54535-430', 'Aereo'),
+(99, 'BrasilCarga Ltda', 'Lucas Oliveira', 'brasilcarga.ltda1099@empresa.com', '11944557477', 'Brasil', 'Bahia', 'Salvador', 'Av. Contorno, 748', '69162-666', 'Aereo'),
+(100, 'BrasilCarga S.A.', 'Isabela Rodrigues', 'brasilcarga.s.a.1100@empresa.com', '11955268400', 'Brasil', 'Bahia', 'Salvador', 'Av. Amazonas, 114', '45534-684', 'Expresso');
+ 
+-- ===== INVENTORY =====
+INSERT INTO Inventory (InventoryID, Categories, Book, Authors, Publisher, Quantity, SupplierID, ShippersID, ShelfLocation) VALUES
+(1, 'Historia', 'A Voz do Silencio', 'Beatriz Lemos', 'Casa das Palavras', 7, 41, 59, 'D04-3'),
+(2, 'Programacao', 'Alem do Horizonte', 'Ricardo Nogueira', 'Casa das Palavras', 19, 16, 33, 'B12-7'),
+(3, 'Biografia', 'O Codigo Perdido', 'Ricardo Nogueira', 'Grupo Letras', 25, 38, 54, 'B02-5'),
+(4, 'Fantasia', 'O Guardiao das Sombras', 'Paulo Ramires', 'Selo Literario', 33, 18, 57, 'A17-5'),
+(5, 'Fantasia', 'Rastros na Neve', 'Isabel Duarte', 'Editora Horizonte', 27, 28, 36, 'E06-3'),
+(6, 'Negocios', 'A Voz do Silencio', 'Luciana Prado', 'Companhia do Saber', 46, 23, 26, 'E03-2'),
+(7, 'Filosofia', 'A Chave Dourada', 'Paulo Ramires', 'Editora Nova Era', 12, 27, 18, 'E07-5'),
+(8, 'Ficcao Cientifica', 'O Guardiao das Sombras', 'Joao Batista', 'Editora Atlantica', 47, 8, 67, 'C11-5'),
+(9, 'Negocios', 'O Elo Quebrado', 'Joao Batista', 'Editora Horizonte', 27, 98, 62, 'B09-4'),
+(10, 'Fantasia', 'Ecos da Memoria', 'Fernando Castro', 'Editora Horizonte', 11, 90, 48, 'E20-1'),
+(11, 'Historia', 'Vozes do Deserto', 'Paulo Ramires', 'Grupo Letras', 8, 46, 92, 'B11-7'),
+(12, 'Poesia', 'Alem do Horizonte', 'Beatriz Lemos', 'Grupo Letras', 47, 64, 58, 'E01-9'),
+(13, 'Terror', 'O Ultimo Capitulo', 'Clarice Andrade', 'Editora Horizonte', 16, 12, 29, 'E06-3'),
+(14, 'Romance', 'A Cidade Invisivel', 'Beatriz Lemos', 'Editora Horizonte', 2, 13, 90, 'B09-1'),
+(15, 'Negocios', 'A Chave Dourada', 'Gustavo Teles', 'Casa das Palavras', 34, 31, 90, 'D04-6'),
+(16, 'Negocios', 'O Ultimo Suspiro', 'Clarice Andrade', 'Editora Horizonte', 18, 16, 60, 'D19-9'),
+(17, 'Terror', 'Mares Profundos', 'Joao Batista', 'Grupo Letras', 8, 52, 18, 'E19-4'),
+(18, 'Negocios', 'O Codigo Perdido', 'Clarice Andrade', 'Casa das Palavras', 48, 51, 22, 'A13-7'),
+(19, 'Poesia', 'A Chave Dourada', 'Luciana Prado', 'Editora Horizonte', 26, 7, 100, 'C11-7'),
+(20, 'Ficcao Cientifica', 'O Legado de Ontem', 'Isabel Duarte', 'Selo Literario', 26, 72, 7, 'C17-3'),
+(21, 'Infantil', 'Rastros na Neve', 'Ricardo Nogueira', 'Editora Atlantica', 43, 81, 2, 'C04-9'),
+(22, 'Fantasia', 'Cronicas de um Reino', 'Fernando Castro', 'Editora Atlantica', 13, 65, 86, 'A08-3'),
+(23, 'Autoajuda', 'O Som das Estrelas', 'Paulo Ramires', 'Editora Horizonte', 3, 5, 83, 'E09-5'),
+(24, 'Infantil', 'O Ultimo Capitulo', 'Maria Fernandes', 'Grupo Letras', 17, 16, 67, 'A14-4'),
+(25, 'Ficcao', 'A Cidade Invisivel', 'Joao Batista', 'Editora Nova Era', 23, 83, 22, 'A02-9'),
+(26, 'Filosofia', 'Mares Profundos', 'Joao Batista', 'Casa das Palavras', 38, 69, 19, 'D04-9'),
+(27, 'Fantasia', 'A Cidade Invisivel', 'Isabel Duarte', 'Editora Nova Era', 18, 32, 95, 'A18-5'),
+(28, 'Negocios', 'A Sombra do Passado', 'Gustavo Teles', 'Companhia do Saber', 42, 50, 26, 'E12-8'),
+(29, 'Filosofia', 'O Ultimo Capitulo', 'Beatriz Lemos', 'Casa das Palavras', 31, 40, 4, 'B11-4'),
+(30, 'Ficcao Cientifica', 'Vozes do Deserto', 'Luciana Prado', 'Editora Atlantica', 38, 51, 2, 'C06-4'),
+(31, 'Historia', 'O Ultimo Capitulo', 'Fernando Castro', 'Casa das Palavras', 18, 37, 28, 'C02-1'),
+(32, 'Fantasia', 'O Ultimo Capitulo', 'Joao Batista', 'Selo Literario', 29, 85, 8, 'E13-8'),
+(33, 'Historia', 'O Ultimo Suspiro', 'Luciana Prado', 'Companhia do Saber', 44, 95, 20, 'D11-6'),
+(34, 'Fantasia', 'Jardins de Ferro', 'Gustavo Teles', 'Editora Nova Era', 34, 13, 95, 'D09-3'),
+(35, 'Autoajuda', 'O Ultimo Suspiro', 'Maria Fernandes', 'Editora Atlantica', 50, 71, 75, 'A16-7'),
+(36, 'Poesia', 'Segredos do Tempo', 'Isabel Duarte', 'Editora Nova Era', 40, 78, 15, 'D15-8'),
+(37, 'Biografia', 'Rastros na Neve', 'Beatriz Lemos', 'Selo Literario', 26, 68, 72, 'E13-6'),
+(38, 'Ficcao', 'O Elo Quebrado', 'Isabel Duarte', 'Casa das Palavras', 20, 24, 69, 'C05-7'),
+(39, 'Poesia', 'O Som das Estrelas', 'Gustavo Teles', 'Companhia do Saber', 6, 43, 42, 'E08-6'),
+(40, 'Ficcao Cientifica', 'Entre Linhas', 'Maria Fernandes', 'Editora Horizonte', 4, 33, 73, 'D10-9'),
+(41, 'Terror', 'A Cidade Invisivel', 'Luciana Prado', 'Editora Atlantica', 34, 67, 94, 'D13-8'),
+(42, 'Historia', 'Alem do Horizonte', 'Gustavo Teles', 'Selo Literario', 29, 2, 87, 'A17-4'),
+(43, 'Romance', 'Entre Linhas', 'Fernando Castro', 'Editora Atlantica', 42, 72, 74, 'B07-7'),
+(44, 'Tecnologia', 'O Som das Estrelas', 'Paulo Ramires', 'Selo Literario', 45, 68, 96, 'A06-6'),
+(45, 'Historia', 'Rastros na Neve', 'Joao Batista', 'Editora Nova Era', 33, 23, 15, 'C11-9'),
+(46, 'Filosofia', 'Entre Linhas', 'Clarice Andrade', 'Editora Nova Era', 33, 27, 65, 'B14-3'),
+(47, 'Ficcao', 'Ecos da Memoria', 'Gustavo Teles', 'Grupo Letras', 23, 73, 81, 'A14-1'),
+(48, 'Terror', 'O Guardiao das Sombras', 'Beatriz Lemos', 'Editora Horizonte', 20, 51, 13, 'E01-1'),
+(49, 'Ficcao Cientifica', 'A Voz do Silencio', 'Paulo Ramires', 'Editora Nova Era', 42, 69, 66, 'B19-4'),
+(50, 'Autoajuda', 'A Chave Dourada', 'Joao Batista', 'Editora Bravos', 11, 67, 98, 'E04-1'),
+(51, 'Romance', 'Cronicas de um Reino', 'Clarice Andrade', 'Casa das Palavras', 30, 79, 56, 'A01-6'),
+(52, 'Fantasia', 'O Codigo Perdido', 'Fernando Castro', 'Editora Nova Era', 11, 5, 35, 'A19-2'),
+(53, 'Historia', 'Jardins de Ferro', 'Paulo Ramires', 'Editora Atlantica', 2, 7, 29, 'D19-1'),
+(54, 'Tecnologia', 'Alem do Horizonte', 'Gustavo Teles', 'Companhia do Saber', 16, 29, 6, 'B19-3'),
+(55, 'Historia', 'O Guardiao das Sombras', 'Paulo Ramires', 'Editora Nova Era', 27, 78, 33, 'D03-4'),
+(56, 'Infantil', 'O Som das Estrelas', 'Gustavo Teles', 'Companhia do Saber', 27, 40, 52, 'D01-4'),
+(57, 'Romance', 'A Voz do Silencio', 'Clarice Andrade', 'Selo Literario', 25, 24, 1, 'C13-9'),
+(58, 'Historia', 'O Ultimo Suspiro', 'Fernando Castro', 'Editora Atlantica', 22, 52, 84, 'A04-7'),
+(59, 'Negocios', 'Rastros na Neve', 'Luciana Prado', 'Companhia do Saber', 25, 25, 60, 'C12-4'),
+(60, 'Autoajuda', 'Alem do Horizonte', 'Beatriz Lemos', 'Editora Horizonte', 22, 20, 31, 'B03-4'),
+(61, 'Biografia', 'O Ultimo Capitulo', 'Clarice Andrade', 'Casa das Palavras', 30, 31, 21, 'C12-4'),
+(62, 'Suspense', 'O Som das Estrelas', 'Isabel Duarte', 'Companhia do Saber', 20, 61, 65, 'B08-8'),
+(63, 'Infantil', 'Segredos do Tempo', 'Beatriz Lemos', 'Casa das Palavras', 38, 48, 69, 'B13-9'),
+(64, 'Ficcao Cientifica', 'Segredos do Tempo', 'Joao Batista', 'Grupo Letras', 35, 35, 95, 'D01-3'),
+(65, 'Biografia', 'O Guardiao das Sombras', 'Isabel Duarte', 'Grupo Letras', 45, 23, 100, 'B11-4'),
+(66, 'Infantil', 'O Ultimo Suspiro', 'Joao Batista', 'Selo Literario', 33, 98, 39, 'B03-5'),
+(67, 'Romance', 'O Codigo Perdido', 'Beatriz Lemos', 'Editora Bravos', 46, 52, 37, 'C13-8'),
+(68, 'Terror', 'Segredos do Tempo', 'Beatriz Lemos', 'Editora Bravos', 2, 47, 87, 'C14-1'),
+(69, 'Infantil', 'A Sombra do Passado', 'Ricardo Nogueira', 'Editora Atlantica', 23, 81, 13, 'B10-2'),
+(70, 'Biografia', 'A Chave Dourada', 'Ricardo Nogueira', 'Editora Horizonte', 26, 6, 78, 'B14-4'),
+(71, 'Terror', 'A Cidade Invisivel', 'Clarice Andrade', 'Editora Atlantica', 48, 6, 71, 'C06-4'),
+(72, 'Poesia', 'O Elo Quebrado', 'Luciana Prado', 'Editora Nova Era', 28, 86, 88, 'E12-1'),
+(73, 'Romance', 'A Cidade Invisivel', 'Maria Fernandes', 'Editora Horizonte', 16, 88, 15, 'A11-4'),
+(74, 'Terror', 'Rastros na Neve', 'Joao Batista', 'Editora Atlantica', 45, 96, 51, 'E08-5'),
+(75, 'Programacao', 'Cronicas de um Reino', 'Fernando Castro', 'Editora Atlantica', 29, 44, 89, 'E15-9'),
+(76, 'Ficcao', 'Jardins de Ferro', 'Isabel Duarte', 'Editora Bravos', 32, 98, 25, 'A18-5'),
+(77, 'Fantasia', 'O Ultimo Capitulo', 'Clarice Andrade', 'Companhia do Saber', 35, 34, 32, 'A06-6'),
+(78, 'Historia', 'Entre Linhas', 'Joao Batista', 'Companhia do Saber', 41, 40, 18, 'B16-8'),
+(79, 'Ficcao Cientifica', 'O Codigo Perdido', 'Maria Fernandes', 'Casa das Palavras', 9, 83, 45, 'C05-3'),
+(80, 'Poesia', 'Ecos da Memoria', 'Ricardo Nogueira', 'Selo Literario', 41, 16, 71, 'D06-3'),
+(81, 'Poesia', 'A Sombra do Passado', 'Isabel Duarte', 'Companhia do Saber', 8, 89, 38, 'A12-8'),
+(82, 'Ficcao Cientifica', 'Alem do Horizonte', 'Maria Fernandes', 'Editora Nova Era', 20, 26, 15, 'C15-2'),
+(83, 'Fantasia', 'O Legado de Ontem', 'Paulo Ramires', 'Casa das Palavras', 37, 47, 38, 'B18-2'),
+(84, 'Ficcao', 'O Guardiao das Sombras', 'Paulo Ramires', 'Casa das Palavras', 6, 96, 92, 'C19-5'),
+(85, 'Romance', 'O Elo Quebrado', 'Isabel Duarte', 'Casa das Palavras', 13, 70, 42, 'A12-2'),
+(86, 'Infantil', 'A Cidade Invisivel', 'Gustavo Teles', 'Editora Nova Era', 42, 32, 11, 'B01-1'),
+(87, 'Terror', 'O Som das Estrelas', 'Clarice Andrade', 'Editora Nova Era', 24, 24, 82, 'E06-2'),
+(88, 'Terror', 'A Cidade Invisivel', 'Gustavo Teles', 'Selo Literario', 25, 24, 83, 'C11-4'),
+(89, 'Historia', 'Segredos do Tempo', 'Luciana Prado', 'Selo Literario', 17, 31, 8, 'A04-7'),
+(90, 'Filosofia', 'Alem do Horizonte', 'Ricardo Nogueira', 'Casa das Palavras', 28, 64, 94, 'B10-2'),
+(91, 'Fantasia', 'O Codigo Perdido', 'Clarice Andrade', 'Editora Bravos', 29, 82, 52, 'A02-8'),
+(92, 'Tecnologia', 'Jardins de Ferro', 'Ricardo Nogueira', 'Selo Literario', 1, 5, 79, 'E14-3'),
+(93, 'Biografia', 'Cronicas de um Reino', 'Maria Fernandes', 'Editora Atlantica', 22, 9, 57, 'A06-3'),
+(94, 'Autoajuda', 'A Cidade Invisivel', 'Maria Fernandes', 'Casa das Palavras', 37, 87, 45, 'E07-8'),
+(95, 'Romance', 'O Ultimo Capitulo', 'Fernando Castro', 'Casa das Palavras', 28, 69, 81, 'B13-2'),
+(96, 'Terror', 'Alem do Horizonte', 'Fernando Castro', 'Editora Nova Era', 37, 74, 54, 'C16-3'),
+(97, 'Biografia', 'O Legado de Ontem', 'Luciana Prado', 'Editora Horizonte', 13, 29, 87, 'D03-3'),
+(98, 'Infantil', 'Ecos da Memoria', 'Fernando Castro', 'Editora Atlantica', 24, 68, 31, 'E15-7'),
+(99, 'Biografia', 'O Ultimo Suspiro', 'Ricardo Nogueira', 'Editora Bravos', 13, 71, 96, 'A08-5'),
+(100, 'Infantil', 'O Ultimo Suspiro', 'Ricardo Nogueira', 'Editora Nova Era', 46, 63, 30, 'E15-4');
+ 
+-- ===== CUSTOMER (senha criptografada com SHA2-256) =====
+INSERT INTO Customer (CustomerID, CPF, Phone, Email, NameCustomer, DateOfBirth, RegistrationDate, PasswordCustomer) VALUES
+(1, '813.215.853-75', '11978981211', 'rafael.lima2001@empresa.com', 'Rafael Lima', '1996-02-28', '2023-11-03', SHA2('Senha@8201', 256)),
+(2, '663.619.831-24', '11984100117', 'eduarda.nascimento2002@empresa.com', 'Eduarda Nascimento', '2006-09-04', '2023-11-13', SHA2('Senha@9917', 256)),
+(3, '676.586.893-21', '11918361302', 'felipe.santos2003@empresa.com', 'Felipe Santos', '1983-10-02', '2023-04-02', SHA2('Senha@7100', 256)),
+(4, '818.708.318-68', '11940255922', 'bruno.silva2004@empresa.com', 'Bruno Silva', '1967-12-05', '2023-02-20', SHA2('Senha@4303', 256)),
+(5, '845.991.463-31', '11949255543', 'sofia.souza2005@empresa.com', 'Sofia Souza', '2007-06-26', '2025-11-01', SHA2('Senha@5188', 256)),
+(6, '481.625.854-77', '11947910333', 'daniel.santos2006@empresa.com', 'Daniel Santos', '2006-08-02', '2024-06-04', SHA2('Senha@6828', 256)),
+(7, '922.717.215-14', '11990626204', 'rafael.costa2007@empresa.com', 'Rafael Costa', '1975-05-12', '2021-12-15', SHA2('Senha@1348', 256)),
+(8, '216.910.121-72', '11914819945', 'sofia.almeida2008@empresa.com', 'Sofia Almeida', '1964-05-06', '2021-09-10', SHA2('Senha@7239', 256)),
+(9, '996.356.651-98', '11936066199', 'eduarda.lima2009@empresa.com', 'Eduarda Lima', '1988-01-01', '2022-03-16', SHA2('Senha@9221', 256)),
+(10, '919.957.136-19', '11924465903', 'pedro.silva2010@empresa.com', 'Pedro Silva', '1999-11-22', '2024-07-27', SHA2('Senha@8794', 256)),
+(11, '502.334.993-88', '11969390211', 'felipe.almeida2011@empresa.com', 'Felipe Almeida', '1964-06-11', '2024-04-10', SHA2('Senha@3145', 256)),
+(12, '144.316.273-56', '11997609261', 'sofia.lima2012@empresa.com', 'Sofia Lima', '1989-06-19', '2023-07-12', SHA2('Senha@6150', 256)),
+(13, '693.595.441-39', '11902753101', 'ana.costa2013@empresa.com', 'Ana Costa', '1975-08-20', '2020-11-05', SHA2('Senha@3353', 256)),
+(14, '379.165.612-43', '11947893413', 'isabela.rodrigues2014@empresa.com', 'Isabela Rodrigues', '1996-10-17', '2024-03-23', SHA2('Senha@1558', 256)),
+(15, '993.304.892-64', '11984973487', 'rafael.souza2015@empresa.com', 'Rafael Souza', '1996-11-04', '2022-05-26', SHA2('Senha@4900', 256)),
+(16, '411.881.449-56', '11968304346', 'eduarda.souza2016@empresa.com', 'Eduarda Souza', '2000-04-12', '2024-12-13', SHA2('Senha@6479', 256)),
+(17, '787.430.901-71', '11967609935', 'bruno.costa2017@empresa.com', 'Bruno Costa', '1983-04-26', '2021-06-05', SHA2('Senha@3221', 256)),
+(18, '991.787.564-61', '11959796452', 'gabriela.silva2018@empresa.com', 'Gabriela Silva', '1985-10-25', '2022-03-19', SHA2('Senha@2086', 256)),
+(19, '837.415.358-83', '11973990267', 'eduarda.pereira2019@empresa.com', 'Eduarda Pereira', '2002-06-03', '2021-10-03', SHA2('Senha@3928', 256)),
+(20, '461.579.465-98', '11957481388', 'joao.lima2020@empresa.com', 'Joao Lima', '2006-02-27', '2023-06-06', SHA2('Senha@5519', 256)),
+(21, '123.876.268-90', '11935977201', 'isabela.nascimento2021@empresa.com', 'Isabela Nascimento', '1975-12-01', '2021-01-13', SHA2('Senha@8338', 256)),
+(22, '389.984.613-92', '11913364045', 'gabriela.lima2022@empresa.com', 'Gabriela Lima', '1972-04-24', '2020-03-20', SHA2('Senha@1796', 256)),
+(23, '928.935.996-83', '11945789766', 'carla.souza2023@empresa.com', 'Carla Souza', '2006-03-01', '2021-05-18', SHA2('Senha@1245', 256)),
+(24, '317.429.434-13', '11987098329', 'karina.silva2024@empresa.com', 'Karina Silva', '1991-07-20', '2025-06-06', SHA2('Senha@1941', 256)),
+(25, '189.741.727-52', '11966351864', 'nuno.silva2025@empresa.com', 'Nuno Silva', '1998-07-09', '2023-01-01', SHA2('Senha@6191', 256)),
+(26, '157.525.728-52', '11921029055', 'sofia.costa2026@empresa.com', 'Sofia Costa', '1965-01-05', '2021-03-17', SHA2('Senha@2472', 256)),
+(27, '533.452.651-97', '11978985658', 'lucas.costa2027@empresa.com', 'Lucas Costa', '1995-03-22', '2024-10-11', SHA2('Senha@4768', 256)),
+(28, '932.828.589-14', '11986879991', 'tiago.pereira2028@empresa.com', 'Tiago Pereira', '1979-11-25', '2024-12-15', SHA2('Senha@5559', 256)),
+(29, '642.380.235-42', '11901213369', 'lucas.nascimento2029@empresa.com', 'Lucas Nascimento', '1995-08-04', '2025-06-05', SHA2('Senha@4738', 256)),
+(30, '128.739.237-25', '11908075382', 'mariana.souza2030@empresa.com', 'Mariana Souza', '1994-09-07', '2024-03-09', SHA2('Senha@6990', 256)),
+(31, '991.855.976-30', '11970933802', 'eduarda.oliveira2031@empresa.com', 'Eduarda Oliveira', '1961-06-25', '2025-04-15', SHA2('Senha@9174', 256)),
+(32, '919.498.571-37', '11943463962', 'gabriela.costa2032@empresa.com', 'Gabriela Costa', '1961-02-22', '2025-01-03', SHA2('Senha@7583', 256)),
+(33, '333.677.485-62', '11950407717', 'lucas.silva2033@empresa.com', 'Lucas Silva', '2002-11-28', '2021-01-09', SHA2('Senha@1340', 256)),
+(34, '347.336.462-36', '11943761075', 'isabela.rodrigues2034@empresa.com', 'Isabela Rodrigues', '1987-11-09', '2022-08-07', SHA2('Senha@3567', 256)),
+(35, '869.239.942-48', '11937925359', 'pedro.pereira2035@empresa.com', 'Pedro Pereira', '1965-06-01', '2023-04-06', SHA2('Senha@6239', 256)),
+(36, '563.317.693-16', '11928161321', 'tiago.lima2036@empresa.com', 'Tiago Lima', '2007-06-02', '2023-03-14', SHA2('Senha@3290', 256)),
+(37, '924.214.255-11', '11917902535', 'joao.silva2037@empresa.com', 'Joao Silva', '1979-03-17', '2025-06-04', SHA2('Senha@3764', 256)),
+(38, '192.524.447-92', '11989301908', 'olivia.rodrigues2038@empresa.com', 'Olivia Rodrigues', '2005-07-11', '2020-10-08', SHA2('Senha@4299', 256)),
+(39, '238.616.709-39', '11977155164', 'ana.silva2039@empresa.com', 'Ana Silva', '1987-12-04', '2025-01-02', SHA2('Senha@6185', 256)),
+(40, '223.599.239-77', '11957508912', 'carla.souza2040@empresa.com', 'Carla Souza', '1960-03-08', '2025-09-05', SHA2('Senha@9937', 256)),
+(41, '642.462.959-73', '11910378725', 'queila.souza2041@empresa.com', 'Queila Souza', '1982-04-28', '2021-12-03', SHA2('Senha@5472', 256)),
+(42, '370.375.170-15', '11926366619', 'felipe.silva2042@empresa.com', 'Felipe Silva', '1992-01-14', '2024-06-09', SHA2('Senha@1173', 256)),
+(43, '768.564.657-46', '11973660036', 'karina.silva2043@empresa.com', 'Karina Silva', '1981-12-14', '2025-12-09', SHA2('Senha@7541', 256)),
+(44, '652.529.492-29', '11951952679', 'nuno.costa2044@empresa.com', 'Nuno Costa', '1984-07-26', '2021-11-01', SHA2('Senha@4917', 256)),
+(45, '360.810.725-58', '11932314527', 'tiago.nascimento2045@empresa.com', 'Tiago Nascimento', '1972-11-04', '2020-10-26', SHA2('Senha@1551', 256)),
+(46, '810.671.432-97', '11986734653', 'bruno.rodrigues2046@empresa.com', 'Bruno Rodrigues', '1988-09-22', '2022-08-19', SHA2('Senha@1015', 256)),
+(47, '622.450.706-79', '11950988340', 'pedro.almeida2047@empresa.com', 'Pedro Almeida', '1975-11-26', '2025-07-12', SHA2('Senha@2050', 256)),
+(48, '372.727.775-96', '11943236455', 'mariana.nascimento2048@empresa.com', 'Mariana Nascimento', '1964-11-26', '2024-11-08', SHA2('Senha@5340', 256)),
+(49, '978.838.456-76', '11979120158', 'isabela.almeida2049@empresa.com', 'Isabela Almeida', '1990-10-08', '2021-02-25', SHA2('Senha@9663', 256)),
+(50, '309.640.273-56', '11932030014', 'lucas.nascimento2050@empresa.com', 'Lucas Nascimento', '2003-03-05', '2025-08-06', SHA2('Senha@1708', 256)),
+(51, '470.952.984-64', '11916513345', 'karina.rodrigues2051@empresa.com', 'Karina Rodrigues', '1986-03-23', '2022-07-04', SHA2('Senha@6976', 256)),
+(52, '633.409.563-94', '11911811196', 'lucas.nascimento2052@empresa.com', 'Lucas Nascimento', '1977-07-10', '2023-12-04', SHA2('Senha@8361', 256)),
+(53, '877.629.253-10', '11991292206', 'pedro.oliveira2053@empresa.com', 'Pedro Oliveira', '1968-06-16', '2024-11-08', SHA2('Senha@7074', 256)),
+(54, '920.490.358-12', '11974651957', 'queila.costa2054@empresa.com', 'Queila Costa', '1972-01-19', '2022-01-19', SHA2('Senha@3923', 256)),
+(55, '381.431.361-40', '11935621920', 'joao.nascimento2055@empresa.com', 'Joao Nascimento', '1988-02-17', '2025-08-28', SHA2('Senha@2455', 256)),
+(56, '533.911.397-89', '11949877848', 'gabriela.oliveira2056@empresa.com', 'Gabriela Oliveira', '1962-12-15', '2023-06-02', SHA2('Senha@5837', 256)),
+(57, '763.722.930-42', '11947291954', 'nuno.rodrigues2057@empresa.com', 'Nuno Rodrigues', '1975-07-28', '2024-03-20', SHA2('Senha@4139', 256)),
+(58, '164.781.308-52', '11909499911', 'sofia.costa2058@empresa.com', 'Sofia Costa', '1965-08-13', '2023-09-14', SHA2('Senha@9136', 256)),
+(59, '707.677.573-69', '11994079250', 'ana.souza2059@empresa.com', 'Ana Souza', '1987-07-16', '2021-02-15', SHA2('Senha@7514', 256)),
+(60, '624.870.944-11', '11989976950', 'pedro.oliveira2060@empresa.com', 'Pedro Oliveira', '1974-12-07', '2023-09-02', SHA2('Senha@5816', 256)),
+(61, '887.496.888-68', '11915853690', 'rafael.costa2061@empresa.com', 'Rafael Costa', '1965-04-28', '2020-10-27', SHA2('Senha@1253', 256)),
+(62, '190.968.871-37', '11975754335', 'daniel.almeida2062@empresa.com', 'Daniel Almeida', '1989-01-27', '2025-04-23', SHA2('Senha@6498', 256)),
+(63, '663.807.865-63', '11978375608', 'pedro.silva2063@empresa.com', 'Pedro Silva', '1968-07-27', '2020-11-05', SHA2('Senha@6250', 256)),
+(64, '630.106.290-78', '11936865233', 'karina.santos2064@empresa.com', 'Karina Santos', '1993-05-03', '2022-07-09', SHA2('Senha@5895', 256)),
+(65, '623.530.797-16', '11941184285', 'rafael.rodrigues2065@empresa.com', 'Rafael Rodrigues', '1979-04-28', '2023-07-28', SHA2('Senha@9840', 256)),
+(66, '306.234.153-36', '11972054647', 'isabela.pereira2066@empresa.com', 'Isabela Pereira', '2001-06-15', '2025-08-23', SHA2('Senha@3314', 256)),
+(67, '305.567.823-81', '11989106242', 'lucas.costa2067@empresa.com', 'Lucas Costa', '1963-12-11', '2020-09-03', SHA2('Senha@7699', 256)),
+(68, '136.380.324-66', '11939129070', 'sofia.costa2068@empresa.com', 'Sofia Costa', '1972-12-07', '2024-10-15', SHA2('Senha@7651', 256)),
+(69, '999.308.159-33', '11958213016', 'olivia.santos2069@empresa.com', 'Olivia Santos', '2000-02-02', '2021-02-27', SHA2('Senha@9145', 256)),
+(70, '838.674.854-31', '11966869551', 'felipe.silva2070@empresa.com', 'Felipe Silva', '1974-11-24', '2025-12-10', SHA2('Senha@4457', 256)),
+(71, '249.896.832-36', '11969287479', 'rafael.oliveira2071@empresa.com', 'Rafael Oliveira', '1966-08-04', '2021-02-02', SHA2('Senha@7794', 256)),
+(72, '823.553.802-64', '11920781855', 'henrique.pereira2072@empresa.com', 'Henrique Pereira', '1963-12-05', '2020-03-27', SHA2('Senha@8312', 256)),
+(73, '995.696.916-50', '11994884127', 'joao.santos2073@empresa.com', 'Joao Santos', '1995-12-05', '2022-05-11', SHA2('Senha@9990', 256)),
+(74, '918.781.336-60', '11904421446', 'gabriela.oliveira2074@empresa.com', 'Gabriela Oliveira', '1980-07-05', '2025-05-08', SHA2('Senha@9941', 256)),
+(75, '575.252.845-33', '11957694631', 'carla.santos2075@empresa.com', 'Carla Santos', '1981-11-13', '2020-01-27', SHA2('Senha@6764', 256)),
+(76, '771.636.638-19', '11939024966', 'daniel.santos2076@empresa.com', 'Daniel Santos', '1991-06-01', '2023-02-07', SHA2('Senha@8942', 256)),
+(77, '712.697.653-21', '11927021375', 'isabela.pereira2077@empresa.com', 'Isabela Pereira', '1968-08-09', '2021-10-10', SHA2('Senha@1530', 256)),
+(78, '203.101.452-34', '11920429925', 'sofia.lima2078@empresa.com', 'Sofia Lima', '2002-05-02', '2021-06-12', SHA2('Senha@8366', 256)),
+(79, '437.860.472-32', '11914716735', 'pedro.santos2079@empresa.com', 'Pedro Santos', '1979-02-24', '2024-08-04', SHA2('Senha@2850', 256)),
+(80, '502.572.136-14', '11905316574', 'felipe.lima2080@empresa.com', 'Felipe Lima', '1992-10-04', '2023-11-23', SHA2('Senha@3162', 256)),
+(81, '957.461.178-57', '11997660020', 'nuno.lima2081@empresa.com', 'Nuno Lima', '2002-12-06', '2022-03-22', SHA2('Senha@2475', 256)),
+(82, '962.760.994-71', '11940719445', 'karina.silva2082@empresa.com', 'Karina Silva', '1969-05-04', '2020-04-04', SHA2('Senha@3507', 256)),
+(83, '648.654.220-51', '11962788901', 'pedro.pereira2083@empresa.com', 'Pedro Pereira', '1975-03-19', '2024-01-17', SHA2('Senha@5198', 256)),
+(84, '390.513.668-36', '11917060865', 'lucas.santos2084@empresa.com', 'Lucas Santos', '1975-12-28', '2024-09-08', SHA2('Senha@2556', 256)),
+(85, '154.600.910-99', '11976559348', 'ana.souza2085@empresa.com', 'Ana Souza', '1973-12-24', '2021-02-25', SHA2('Senha@3806', 256)),
+(86, '131.534.502-89', '11969540385', 'eduarda.pereira2086@empresa.com', 'Eduarda Pereira', '1967-05-19', '2020-02-22', SHA2('Senha@4565', 256)),
+(87, '709.893.902-75', '11995400629', 'henrique.santos2087@empresa.com', 'Henrique Santos', '1963-04-03', '2024-06-04', SHA2('Senha@1675', 256)),
+(88, '891.808.278-48', '11945912117', 'gabriela.lima2088@empresa.com', 'Gabriela Lima', '1965-08-19', '2021-01-11', SHA2('Senha@7749', 256)),
+(89, '190.907.350-28', '11998482899', 'nuno.silva2089@empresa.com', 'Nuno Silva', '1992-11-06', '2021-06-25', SHA2('Senha@3299', 256)),
+(90, '324.802.439-18', '11900382163', 'gabriela.santos2090@empresa.com', 'Gabriela Santos', '1990-01-16', '2024-06-03', SHA2('Senha@2026', 256)),
+(91, '966.474.905-62', '11912399900', 'gabriela.silva2091@empresa.com', 'Gabriela Silva', '2001-12-12', '2024-03-26', SHA2('Senha@9070', 256)),
+(92, '365.948.810-48', '11907083574', 'pedro.oliveira2092@empresa.com', 'Pedro Oliveira', '2007-08-27', '2025-10-06', SHA2('Senha@8132', 256)),
+(93, '406.865.707-78', '11987939507', 'mariana.nascimento2093@empresa.com', 'Mariana Nascimento', '2000-02-03', '2022-04-08', SHA2('Senha@4244', 256)),
+(94, '675.342.998-73', '11977175707', 'sofia.almeida2094@empresa.com', 'Sofia Almeida', '2003-12-02', '2023-11-26', SHA2('Senha@7468', 256)),
+(95, '515.189.333-93', '11990185479', 'karina.rodrigues2095@empresa.com', 'Karina Rodrigues', '1981-11-20', '2023-05-01', SHA2('Senha@5922', 256)),
+(96, '116.213.999-70', '11956191218', 'pedro.lima2096@empresa.com', 'Pedro Lima', '1986-10-10', '2023-03-11', SHA2('Senha@9935', 256)),
+(97, '462.503.964-69', '11983117862', 'gabriela.souza2097@empresa.com', 'Gabriela Souza', '1962-05-11', '2020-05-06', SHA2('Senha@8242', 256)),
+(98, '926.347.223-37', '11991664148', 'nuno.nascimento2098@empresa.com', 'Nuno Nascimento', '2000-01-13', '2021-07-09', SHA2('Senha@6450', 256)),
+(99, '271.329.459-88', '11952929449', 'eduarda.costa2099@empresa.com', 'Eduarda Costa', '1979-08-11', '2024-10-07', SHA2('Senha@3657', 256)),
+(100, '109.100.973-32', '11913923959', 'mariana.nascimento2100@empresa.com', 'Mariana Nascimento', '1975-08-19', '2025-05-24', SHA2('Senha@6772', 256));
+ 
+-- ===== EMPLOYEE (senha criptografada com SHA2-256) =====
+INSERT INTO Employee (EmployeeID, EmployeeName, CPF, Phone, Email, DateOfBirth, ResumeEmployee, InventoryID, HireDate, Position, PasswordCustomer) VALUES
+(1, 'Daniel Nascimento', '852.982.871-75', '11989403653', 'daniel.nascimento3001@empresa.com', '1987-03-25', 'Especialista em gestao de estoque e logistica de distribuicao.', 86, '2021-02-17', 'Analista de Sistemas', SHA2('Func@8276', 256)),
+(2, 'Isabela Pereira', '470.412.777-90', '11992115503', 'isabela.pereira3002@empresa.com', '1987-09-26', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 84, '2022-08-12', 'Bibliotecario', SHA2('Func@1933', 256)),
+(3, 'Daniel Nascimento', '486.558.418-75', '11920440190', 'daniel.nascimento3003@empresa.com', '1998-10-24', 'Profissional com experiencia em atendimento ao cliente e vendas.', 5, '2020-08-05', 'Bibliotecario', SHA2('Func@5447', 256)),
+(4, 'Eduarda Santos', '701.690.620-15', '11952642764', 'eduarda.santos3004@empresa.com', '1980-12-19', 'Especialista em gestao de estoque e logistica de distribuicao.', 81, '2018-05-25', 'Bibliotecario', SHA2('Func@7892', 256)),
+(5, 'Rafael Rodrigues', '764.186.924-96', '11985823710', 'rafael.rodrigues3005@empresa.com', '1987-08-23', 'Especialista em gestao de estoque e logistica de distribuicao.', 89, '2019-06-06', 'Supervisor de Loja', SHA2('Func@1791', 256)),
+(6, 'Rafael Costa', '243.305.628-17', '11921763345', 'rafael.costa3006@empresa.com', '1984-12-17', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 88, '2019-01-19', 'Recepcionista', SHA2('Func@7274', 256)),
+(7, 'Lucas Oliveira', '378.416.586-35', '11983311058', 'lucas.oliveira3007@empresa.com', '1985-08-13', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 88, '2019-06-13', 'Analista de Sistemas', SHA2('Func@7316', 256)),
+(8, 'Pedro Pereira', '215.308.737-67', '11967277381', 'pedro.pereira3008@empresa.com', '2001-07-21', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 100, '2020-01-05', 'Recepcionista', SHA2('Func@9776', 256)),
+(9, 'Pedro Nascimento', '968.786.521-19', '11936962137', 'pedro.nascimento3009@empresa.com', '1987-06-23', 'Profissional com experiencia em atendimento ao cliente e vendas.', 68, '2019-11-04', 'Recepcionista', SHA2('Func@8367', 256)),
+(10, 'Ana Silva', '644.946.814-82', '11941015118', 'ana.silva3010@empresa.com', '1986-10-12', 'Especialista em gestao de estoque e logistica de distribuicao.', 32, '2016-09-04', 'Assistente Administrativo', SHA2('Func@2823', 256)),
+(11, 'Joao Oliveira', '760.280.840-91', '11999637643', 'joao.oliveira3011@empresa.com', '1997-02-25', 'Profissional com experiencia em atendimento ao cliente e vendas.', 51, '2020-07-13', 'Supervisor de Loja', SHA2('Func@6518', 256)),
+(12, 'Lucas Oliveira', '829.992.246-78', '11998738551', 'lucas.oliveira3012@empresa.com', '1991-07-22', 'Especialista em gestao de estoque e logistica de distribuicao.', 18, '2018-06-22', 'Atendente', SHA2('Func@7769', 256)),
+(13, 'Carla Nascimento', '103.972.687-95', '11931614059', 'carla.nascimento3013@empresa.com', '1993-07-13', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 74, '2019-11-26', 'Auxiliar de Estoque', SHA2('Func@3476', 256)),
+(14, 'Henrique Santos', '612.227.389-14', '11999724966', 'henrique.santos3014@empresa.com', '2001-11-13', 'Especialista em gestao de estoque e logistica de distribuicao.', 17, '2025-12-23', 'Assistente Administrativo', SHA2('Func@5506', 256)),
+(15, 'Carla Lima', '719.944.621-44', '11981561363', 'carla.lima3015@empresa.com', '1981-04-10', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 47, '2025-10-26', 'Atendente', SHA2('Func@6893', 256)),
+(16, 'Ana Nascimento', '173.224.958-51', '11929312123', 'ana.nascimento3016@empresa.com', '1975-08-21', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 58, '2019-09-02', 'Supervisor de Loja', SHA2('Func@1528', 256)),
+(17, 'Bruno Nascimento', '947.578.213-71', '11930127983', 'bruno.nascimento3017@empresa.com', '1984-11-11', 'Especialista em gestao de estoque e logistica de distribuicao.', 68, '2024-04-07', 'Gerente de Acervo', SHA2('Func@5615', 256)),
+(18, 'Sofia Nascimento', '830.131.328-32', '11903808090', 'sofia.nascimento3018@empresa.com', '2000-09-09', 'Profissional com experiencia em atendimento ao cliente e vendas.', 48, '2016-11-09', 'Atendente', SHA2('Func@2841', 256)),
+(19, 'Mariana Rodrigues', '624.702.518-38', '11989484475', 'mariana.rodrigues3019@empresa.com', '2002-01-26', 'Especialista em gestao de estoque e logistica de distribuicao.', 69, '2020-11-09', 'Atendente', SHA2('Func@8829', 256)),
+(20, 'Sofia Oliveira', '541.564.799-89', '11961022534', 'sofia.oliveira3020@empresa.com', '1981-06-20', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 15, '2021-03-10', 'Gerente de Acervo', SHA2('Func@2252', 256)),
+(21, 'Queila Silva', '549.896.302-35', '11935649169', 'queila.silva3021@empresa.com', '1981-09-25', 'Especialista em gestao de estoque e logistica de distribuicao.', 96, '2015-12-24', 'Bibliotecario', SHA2('Func@2027', 256)),
+(22, 'Lucas Santos', '527.113.955-92', '11996903336', 'lucas.santos3022@empresa.com', '1998-11-18', 'Especialista em gestao de estoque e logistica de distribuicao.', 72, '2020-11-06', 'Analista de Sistemas', SHA2('Func@6809', 256)),
+(23, 'Joao Souza', '145.857.279-98', '11947682272', 'joao.souza3023@empresa.com', '1988-01-26', 'Profissional com experiencia em atendimento ao cliente e vendas.', 99, '2016-06-04', 'Auxiliar de Estoque', SHA2('Func@6961', 256)),
+(24, 'Pedro Almeida', '184.445.913-50', '11963920166', 'pedro.almeida3024@empresa.com', '2003-03-28', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 68, '2024-05-17', 'Assistente Administrativo', SHA2('Func@4428', 256)),
+(25, 'Lucas Pereira', '772.121.297-45', '11969657454', 'lucas.pereira3025@empresa.com', '1988-12-24', 'Profissional com experiencia em atendimento ao cliente e vendas.', 21, '2021-03-05', 'Bibliotecario', SHA2('Func@2820', 256)),
+(26, 'Gabriela Lima', '644.488.128-11', '11911548773', 'gabriela.lima3026@empresa.com', '1989-01-07', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 69, '2016-06-11', 'Supervisor de Loja', SHA2('Func@8938', 256)),
+(27, 'Gabriela Silva', '349.309.463-58', '11913961079', 'gabriela.silva3027@empresa.com', '1978-10-05', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 57, '2022-10-19', 'Supervisor de Loja', SHA2('Func@2106', 256)),
+(28, 'Sofia Silva', '982.581.273-61', '11987496922', 'sofia.silva3028@empresa.com', '1996-12-08', 'Profissional com experiencia em atendimento ao cliente e vendas.', 89, '2022-10-05', 'Atendente', SHA2('Func@9158', 256)),
+(29, 'Tiago Rodrigues', '164.816.344-39', '11900657646', 'tiago.rodrigues3029@empresa.com', '1987-10-26', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 82, '2025-01-08', 'Atendente', SHA2('Func@4278', 256)),
+(30, 'Ana Silva', '577.149.511-40', '11929472825', 'ana.silva3030@empresa.com', '1999-11-02', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 82, '2024-07-09', 'Bibliotecario', SHA2('Func@3513', 256)),
+(31, 'Olivia Silva', '590.875.206-22', '11925090327', 'olivia.silva3031@empresa.com', '1979-09-06', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 66, '2020-02-17', 'Assistente Administrativo', SHA2('Func@1037', 256)),
+(32, 'Carla Silva', '669.763.941-20', '11967441073', 'carla.silva3032@empresa.com', '1992-10-20', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 69, '2016-12-02', 'Recepcionista', SHA2('Func@8488', 256)),
+(33, 'Mariana Silva', '673.862.313-13', '11925148162', 'mariana.silva3033@empresa.com', '2001-09-26', 'Profissional com experiencia em atendimento ao cliente e vendas.', 27, '2016-12-21', 'Gerente de Acervo', SHA2('Func@8029', 256)),
+(34, 'Daniel Lima', '188.659.632-55', '11990952842', 'daniel.lima3034@empresa.com', '1978-02-24', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 13, '2016-06-09', 'Recepcionista', SHA2('Func@6066', 256)),
+(35, 'Joao Oliveira', '605.720.690-52', '11925773546', 'joao.oliveira3035@empresa.com', '1975-02-03', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 15, '2025-12-25', 'Gerente de Acervo', SHA2('Func@9521', 256)),
+(36, 'Mariana Almeida', '517.725.688-93', '11928296542', 'mariana.almeida3036@empresa.com', '1999-12-25', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 3, '2015-12-24', 'Bibliotecario', SHA2('Func@3212', 256)),
+(37, 'Nuno Silva', '284.733.400-66', '11934287602', 'nuno.silva3037@empresa.com', '1997-03-09', 'Especialista em gestao de estoque e logistica de distribuicao.', 45, '2015-06-13', 'Atendente', SHA2('Func@3656', 256)),
+(38, 'Olivia Oliveira', '769.771.584-89', '11943750181', 'olivia.oliveira3038@empresa.com', '1983-04-01', 'Profissional com experiencia em atendimento ao cliente e vendas.', 69, '2015-06-08', 'Analista de Sistemas', SHA2('Func@6385', 256)),
+(39, 'Ana Santos', '450.913.181-78', '11921650017', 'ana.santos3039@empresa.com', '1978-01-27', 'Especialista em gestao de estoque e logistica de distribuicao.', 55, '2025-06-12', 'Atendente', SHA2('Func@9802', 256)),
+(40, 'Daniel Almeida', '264.316.643-16', '11987233519', 'daniel.almeida3040@empresa.com', '1996-09-08', 'Profissional com experiencia em atendimento ao cliente e vendas.', 67, '2025-02-21', 'Gerente de Acervo', SHA2('Func@4572', 256)),
+(41, 'Joao Silva', '831.366.541-25', '11923659704', 'joao.silva3041@empresa.com', '1994-08-20', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 89, '2019-07-08', 'Analista de Sistemas', SHA2('Func@5212', 256)),
+(42, 'Ana Souza', '807.987.314-92', '11934832182', 'ana.souza3042@empresa.com', '1994-11-21', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 19, '2025-02-20', 'Atendente', SHA2('Func@7408', 256)),
+(43, 'Joao Souza', '165.847.168-78', '11901951165', 'joao.souza3043@empresa.com', '1977-06-03', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 72, '2016-12-16', 'Recepcionista', SHA2('Func@8373', 256)),
+(44, 'Felipe Souza', '361.410.504-62', '11993519062', 'felipe.souza3044@empresa.com', '1997-03-15', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 59, '2020-06-27', 'Gerente de Acervo', SHA2('Func@1502', 256)),
+(45, 'Mariana Santos', '209.975.313-54', '11990022517', 'mariana.santos3045@empresa.com', '1985-05-20', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 25, '2016-02-06', 'Recepcionista', SHA2('Func@5309', 256)),
+(46, 'Felipe Silva', '247.592.199-17', '11951406971', 'felipe.silva3046@empresa.com', '1983-11-03', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 75, '2018-01-03', 'Recepcionista', SHA2('Func@1242', 256)),
+(47, 'Isabela Oliveira', '463.472.655-32', '11918570346', 'isabela.oliveira3047@empresa.com', '1986-12-09', 'Especialista em gestao de estoque e logistica de distribuicao.', 47, '2017-09-22', 'Atendente', SHA2('Func@5068', 256)),
+(48, 'Felipe Pereira', '879.489.883-13', '11930062286', 'felipe.pereira3048@empresa.com', '1995-04-08', 'Profissional com experiencia em atendimento ao cliente e vendas.', 47, '2018-11-16', 'Recepcionista', SHA2('Func@1123', 256)),
+(49, 'Bruno Souza', '779.486.956-57', '11931516084', 'bruno.souza3049@empresa.com', '1984-01-16', 'Profissional com experiencia em atendimento ao cliente e vendas.', 63, '2016-02-15', 'Supervisor de Loja', SHA2('Func@2535', 256)),
+(50, 'Mariana Souza', '596.591.277-39', '11957153725', 'mariana.souza3050@empresa.com', '1989-01-04', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 9, '2019-06-15', 'Supervisor de Loja', SHA2('Func@4917', 256)),
+(51, 'Karina Nascimento', '158.173.621-38', '11964956927', 'karina.nascimento3051@empresa.com', '1998-04-19', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 49, '2016-01-14', 'Bibliotecario', SHA2('Func@4927', 256)),
+(52, 'Queila Oliveira', '622.985.423-37', '11913623063', 'queila.oliveira3052@empresa.com', '1977-08-09', 'Profissional com experiencia em atendimento ao cliente e vendas.', 59, '2017-02-26', 'Supervisor de Loja', SHA2('Func@6207', 256)),
+(53, 'Daniel Santos', '387.778.908-56', '11909146378', 'daniel.santos3053@empresa.com', '1978-12-16', 'Profissional com experiencia em atendimento ao cliente e vendas.', 33, '2017-09-01', 'Bibliotecario', SHA2('Func@8705', 256)),
+(54, 'Bruno Nascimento', '763.339.891-73', '11989181176', 'bruno.nascimento3054@empresa.com', '1994-03-21', 'Especialista em gestao de estoque e logistica de distribuicao.', 19, '2021-06-24', 'Bibliotecario', SHA2('Func@7024', 256)),
+(55, 'Felipe Santos', '116.712.569-20', '11960314841', 'felipe.santos3055@empresa.com', '1981-01-10', 'Profissional com experiencia em atendimento ao cliente e vendas.', 18, '2018-05-24', 'Analista de Sistemas', SHA2('Func@4266', 256)),
+(56, 'Carla Rodrigues', '125.795.269-11', '11948307653', 'carla.rodrigues3056@empresa.com', '1990-04-03', 'Profissional com experiencia em atendimento ao cliente e vendas.', 48, '2023-12-16', 'Gerente de Acervo', SHA2('Func@4545', 256)),
+(57, 'Gabriela Almeida', '306.417.903-68', '11936370305', 'gabriela.almeida3057@empresa.com', '1982-06-02', 'Profissional com experiencia em atendimento ao cliente e vendas.', 23, '2020-07-22', 'Bibliotecario', SHA2('Func@7126', 256)),
+(58, 'Felipe Santos', '947.957.100-29', '11981542373', 'felipe.santos3058@empresa.com', '2000-05-20', 'Profissional com experiencia em atendimento ao cliente e vendas.', 61, '2023-09-23', 'Assistente Administrativo', SHA2('Func@3255', 256)),
+(59, 'Isabela Santos', '675.223.380-63', '11920018464', 'isabela.santos3059@empresa.com', '1979-09-05', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 42, '2015-03-08', 'Assistente Administrativo', SHA2('Func@3744', 256)),
+(60, 'Carla Lima', '939.563.908-62', '11933980911', 'carla.lima3060@empresa.com', '2003-10-22', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 20, '2019-12-14', 'Atendente', SHA2('Func@1845', 256)),
+(61, 'Nuno Souza', '117.396.172-46', '11923511548', 'nuno.souza3061@empresa.com', '2002-03-14', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 68, '2021-05-26', 'Atendente', SHA2('Func@8311', 256)),
+(62, 'Henrique Almeida', '773.643.700-97', '11949601994', 'henrique.almeida3062@empresa.com', '2003-09-18', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 56, '2016-10-09', 'Assistente Administrativo', SHA2('Func@3974', 256)),
+(63, 'Isabela Santos', '521.475.636-42', '11990918975', 'isabela.santos3063@empresa.com', '2001-02-23', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 80, '2025-08-07', 'Analista de Sistemas', SHA2('Func@1157', 256)),
+(64, 'Olivia Almeida', '448.794.879-92', '11924192279', 'olivia.almeida3064@empresa.com', '1989-06-26', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 56, '2016-04-18', 'Assistente Administrativo', SHA2('Func@7570', 256)),
+(65, 'Eduarda Santos', '479.852.825-56', '11951014566', 'eduarda.santos3065@empresa.com', '1996-08-25', 'Especialista em gestao de estoque e logistica de distribuicao.', 17, '2018-11-07', 'Recepcionista', SHA2('Func@2852', 256)),
+(66, 'Bruno Nascimento', '239.515.730-63', '11986754027', 'bruno.nascimento3066@empresa.com', '1977-08-19', 'Profissional com experiencia em atendimento ao cliente e vendas.', 43, '2024-09-12', 'Analista de Sistemas', SHA2('Func@8163', 256)),
+(67, 'Karina Oliveira', '930.593.809-12', '11990791530', 'karina.oliveira3067@empresa.com', '1996-03-13', 'Especialista em gestao de estoque e logistica de distribuicao.', 15, '2025-05-27', 'Gerente de Acervo', SHA2('Func@5072', 256)),
+(68, 'Sofia Santos', '478.884.970-48', '11987070191', 'sofia.santos3068@empresa.com', '1983-03-27', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 77, '2022-11-25', 'Bibliotecario', SHA2('Func@4249', 256)),
+(69, 'Ana Lima', '647.522.843-81', '11936566046', 'ana.lima3069@empresa.com', '1975-02-26', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 23, '2016-12-08', 'Bibliotecario', SHA2('Func@3844', 256)),
+(70, 'Henrique Oliveira', '371.828.904-40', '11902592729', 'henrique.oliveira3070@empresa.com', '1975-02-03', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 26, '2017-08-11', 'Atendente', SHA2('Func@9557', 256)),
+(71, 'Lucas Costa', '398.527.865-71', '11934697535', 'lucas.costa3071@empresa.com', '1985-01-03', 'Especialista em gestao de estoque e logistica de distribuicao.', 21, '2019-02-03', 'Bibliotecario', SHA2('Func@5308', 256)),
+(72, 'Eduarda Costa', '449.613.603-28', '11925285741', 'eduarda.costa3072@empresa.com', '1994-09-26', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 97, '2017-12-14', 'Assistente Administrativo', SHA2('Func@5835', 256)),
+(73, 'Ana Santos', '418.916.173-70', '11912644576', 'ana.santos3073@empresa.com', '1977-10-05', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 91, '2022-08-26', 'Gerente de Acervo', SHA2('Func@2528', 256)),
+(74, 'Pedro Lima', '545.241.113-34', '11978181096', 'pedro.lima3074@empresa.com', '1981-02-27', 'Profissional com experiencia em atendimento ao cliente e vendas.', 31, '2019-09-14', 'Analista de Sistemas', SHA2('Func@1935', 256)),
+(75, 'Ana Santos', '841.124.326-75', '11939031298', 'ana.santos3075@empresa.com', '1981-11-23', 'Profissional com experiencia em atendimento ao cliente e vendas.', 79, '2018-03-07', 'Recepcionista', SHA2('Func@5272', 256)),
+(76, 'Eduarda Oliveira', '163.331.574-53', '11994502540', 'eduarda.oliveira3076@empresa.com', '1997-11-23', 'Especialista em gestao de estoque e logistica de distribuicao.', 51, '2020-09-24', 'Recepcionista', SHA2('Func@1911', 256)),
+(77, 'Tiago Costa', '191.400.150-51', '11968953226', 'tiago.costa3077@empresa.com', '1982-03-06', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 60, '2015-04-11', 'Atendente', SHA2('Func@9303', 256)),
+(78, 'Queila Costa', '802.833.587-77', '11941710757', 'queila.costa3078@empresa.com', '1999-02-04', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 80, '2021-07-16', 'Atendente', SHA2('Func@5138', 256)),
+(79, 'Queila Santos', '560.425.972-71', '11995608107', 'queila.santos3079@empresa.com', '1988-12-12', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 58, '2020-10-02', 'Atendente', SHA2('Func@8466', 256)),
+(80, 'Carla Pereira', '236.138.978-81', '11917307649', 'carla.pereira3080@empresa.com', '1977-08-22', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 5, '2019-11-03', 'Analista de Sistemas', SHA2('Func@8165', 256)),
+(81, 'Queila Souza', '248.503.814-22', '11996082866', 'queila.souza3081@empresa.com', '1998-01-02', 'Especialista em gestao de estoque e logistica de distribuicao.', 99, '2025-03-17', 'Atendente', SHA2('Func@2157', 256)),
+(82, 'Karina Oliveira', '938.644.718-62', '11922697964', 'karina.oliveira3082@empresa.com', '1982-03-13', 'Profissional com experiencia em atendimento ao cliente e vendas.', 91, '2020-06-04', 'Gerente de Acervo', SHA2('Func@8505', 256)),
+(83, 'Rafael Souza', '193.365.858-59', '11963453960', 'rafael.souza3083@empresa.com', '1982-03-20', 'Especialista em gestao de estoque e logistica de distribuicao.', 98, '2022-07-23', 'Gerente de Acervo', SHA2('Func@3123', 256)),
+(84, 'Gabriela Almeida', '209.988.932-75', '11945479791', 'gabriela.almeida3084@empresa.com', '2000-04-01', 'Especialista em gestao de estoque e logistica de distribuicao.', 66, '2022-12-05', 'Analista de Sistemas', SHA2('Func@6135', 256)),
+(85, 'Felipe Costa', '799.292.775-63', '11907567445', 'felipe.costa3085@empresa.com', '2001-01-28', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 74, '2020-01-26', 'Recepcionista', SHA2('Func@1644', 256)),
+(86, 'Bruno Costa', '333.968.425-44', '11949102028', 'bruno.costa3086@empresa.com', '1984-06-20', 'Especialista em gestao de estoque e logistica de distribuicao.', 51, '2021-05-04', 'Gerente de Acervo', SHA2('Func@1206', 256)),
+(87, 'Nuno Lima', '873.350.936-92', '11907008438', 'nuno.lima3087@empresa.com', '2003-12-06', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 40, '2019-09-21', 'Analista de Sistemas', SHA2('Func@7236', 256)),
+(88, 'Nuno Pereira', '236.345.652-53', '11990043074', 'nuno.pereira3088@empresa.com', '2001-01-12', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 41, '2017-12-28', 'Bibliotecario', SHA2('Func@9974', 256)),
+(89, 'Olivia Costa', '581.901.572-37', '11997903982', 'olivia.costa3089@empresa.com', '1985-06-08', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 13, '2016-06-01', 'Bibliotecario', SHA2('Func@4720', 256)),
+(90, 'Lucas Souza', '729.169.609-16', '11926634205', 'lucas.souza3090@empresa.com', '2002-08-21', 'Profissional com experiencia em atendimento ao cliente e vendas.', 40, '2022-07-10', 'Supervisor de Loja', SHA2('Func@6218', 256)),
+(91, 'Lucas Pereira', '856.994.460-83', '11914211485', 'lucas.pereira3091@empresa.com', '1994-10-27', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 9, '2022-08-14', 'Bibliotecario', SHA2('Func@4720', 256)),
+(92, 'Gabriela Santos', '471.655.471-94', '11993402739', 'gabriela.santos3092@empresa.com', '2002-02-21', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 5, '2022-10-19', 'Assistente Administrativo', SHA2('Func@1387', 256)),
+(93, 'Eduarda Rodrigues', '194.288.636-47', '11969148548', 'eduarda.rodrigues3093@empresa.com', '2000-12-12', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 29, '2024-01-08', 'Analista de Sistemas', SHA2('Func@8101', 256)),
+(94, 'Felipe Rodrigues', '752.826.178-63', '11927074923', 'felipe.rodrigues3094@empresa.com', '1985-05-11', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 94, '2017-08-18', 'Bibliotecario', SHA2('Func@3347', 256)),
+(95, 'Tiago Rodrigues', '951.674.914-31', '11924607787', 'tiago.rodrigues3095@empresa.com', '1975-11-18', 'Experiencia previa em atendimento ao publico e organizacao de acervo.', 73, '2020-01-02', 'Gerente de Acervo', SHA2('Func@9272', 256)),
+(96, 'Ana Nascimento', '971.831.829-37', '11968558136', 'ana.nascimento3096@empresa.com', '1989-03-18', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 19, '2017-11-15', 'Bibliotecario', SHA2('Func@7944', 256)),
+(97, 'Eduarda Lima', '804.365.718-45', '11931377504', 'eduarda.lima3097@empresa.com', '1988-04-17', 'Profissional com experiencia em atendimento ao cliente e vendas.', 7, '2016-01-26', 'Analista de Sistemas', SHA2('Func@3710', 256)),
+(98, 'Henrique Nascimento', '361.337.629-32', '11931159551', 'henrique.nascimento3098@empresa.com', '1994-03-28', 'Formacao em Biblioteconomia com foco em catalogacao de obras.', 75, '2016-12-15', 'Gerente de Acervo', SHA2('Func@5465', 256)),
+(99, 'Nuno Nascimento', '153.600.101-66', '11911588174', 'nuno.nascimento3099@empresa.com', '2002-02-26', 'Conhecimento avancado em sistemas de gestao bibliotecaria.', 87, '2021-03-11', 'Supervisor de Loja', SHA2('Func@3811', 256)),
+(100, 'Gabriela Nascimento', '444.518.884-41', '11926692157', 'gabriela.nascimento3100@empresa.com', '1982-03-28', 'Profissional com experiencia em atendimento ao cliente e vendas.', 46, '2024-07-10', 'Recepcionista', SHA2('Func@3653', 256));
+ 
+-- ===== BOOKCOPYCONDITION =====
+INSERT INTO BookCopyCondition (BookCopyConditionID, InspectionDate, ConservationStatus, DamageDescription, ActionTaken, AvailabilityStatus, EmployeeID, InspectionNotes) VALUES
+(1, '2026-04-15', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 25, 'Avaliacao solicitada pelo setor de acervo'),
+(2, '2024-09-10', 'Bom', NULL, 'Higienizacao realizada', 'Disponivel', 62, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(3, '2026-08-16', 'Regular', 'Sem avarias visiveis', 'Retirado de circulacao', 'Disponivel', 26, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(4, '2026-09-05', 'Danificado', 'Paginas amareladas', 'Nenhuma acao necessaria', 'Indisponivel', 10, 'Avaliacao solicitada pelo setor de acervo'),
+(5, '2026-07-03', 'Desgastado', 'Lombada rasgada', 'Substituido por novo exemplar', 'Disponivel', 94, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(6, '2025-06-23', 'Desgastado', 'Paginas soltas', 'Nenhuma acao necessaria', 'Disponivel', 60, 'Inspecao de rotina semestral'),
+(7, '2024-12-16', 'Regular', 'Marcas de umidade', 'Higienizacao realizada', 'Disponivel', 56, 'Avaliacao solicitada pelo setor de acervo'),
+(8, '2024-09-21', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 81, 'Avaliacao solicitada pelo setor de acervo'),
+(9, '2026-07-26', 'Regular', 'Marcas de umidade', 'Retirado de circulacao', 'Disponivel', 87, 'Verificacao apos devolucao de emprestimo'),
+(10, '2025-03-18', 'Danificado', 'Sem avarias visiveis', 'Nenhuma acao necessaria', 'Indisponivel', 37, 'Inspecao de rotina semestral'),
+(11, '2024-01-20', 'Regular', 'Sem avarias visiveis', 'Higienizacao realizada', 'Disponivel', 64, 'Avaliacao solicitada pelo setor de acervo'),
+(12, '2025-09-01', 'Regular', 'Marcas de umidade', 'Retirado de circulacao', 'Disponivel', 42, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(13, '2024-06-09', 'Desgastado', 'Marcas de umidade', 'Retirado de circulacao', 'Disponivel', 73, 'Avaliacao solicitada pelo setor de acervo'),
+(14, '2024-06-26', 'Desgastado', 'Lombada rasgada', 'Substituido por novo exemplar', 'Disponivel', 81, 'Inspecao de rotina semestral'),
+(15, '2025-06-10', 'Desgastado', 'Paginas amareladas', 'Higienizacao realizada', 'Disponivel', 3, 'Inspecao de rotina semestral'),
+(16, '2024-04-02', 'Bom', NULL, 'Nenhuma acao necessaria', 'Disponivel', 40, 'Verificacao apos devolucao de emprestimo'),
+(17, '2024-01-14', 'Regular', 'Lombada rasgada', 'Encaminhado para restauro', 'Disponivel', 19, 'Inspecao de rotina semestral'),
+(18, '2024-07-27', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 96, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(19, '2026-07-14', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 77, 'Verificacao apos devolucao de emprestimo'),
+(20, '2025-01-03', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 16, 'Inspecao de rotina semestral'),
+(21, '2024-06-23', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 60, 'Verificacao apos devolucao de emprestimo'),
+(22, '2024-03-07', 'Danificado', 'Capa manchada', 'Nenhuma acao necessaria', 'Indisponivel', 47, 'Inspecao de rotina semestral'),
+(23, '2025-06-13', 'Desgastado', 'Capa manchada', 'Higienizacao realizada', 'Disponivel', 30, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(24, '2024-11-23', 'Bom', NULL, 'Nenhuma acao necessaria', 'Disponivel', 24, 'Verificacao apos devolucao de emprestimo'),
+(25, '2025-11-24', 'Novo', NULL, 'Higienizacao realizada', 'Disponivel', 68, 'Inspecao de rotina semestral'),
+(26, '2025-09-26', 'Danificado', 'Lombada rasgada', 'Higienizacao realizada', 'Indisponivel', 57, 'Inspecao de rotina semestral'),
+(27, '2026-11-11', 'Desgastado', 'Marcas de umidade', 'Nenhuma acao necessaria', 'Disponivel', 7, 'Verificacao apos devolucao de emprestimo'),
+(28, '2025-03-23', 'Desgastado', 'Paginas amareladas', 'Encaminhado para restauro', 'Disponivel', 65, 'Inspecao de rotina semestral'),
+(29, '2025-07-23', 'Bom', NULL, 'Retirado de circulacao', 'Disponivel', 49, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(30, '2025-08-19', 'Danificado', 'Paginas amareladas', 'Substituido por novo exemplar', 'Indisponivel', 49, 'Verificacao apos devolucao de emprestimo'),
+(31, '2025-04-26', 'Danificado', 'Lombada rasgada', 'Retirado de circulacao', 'Indisponivel', 89, 'Avaliacao solicitada pelo setor de acervo'),
+(32, '2025-11-25', 'Danificado', 'Capa manchada', 'Retirado de circulacao', 'Indisponivel', 44, 'Verificacao apos devolucao de emprestimo'),
+(33, '2026-09-16', 'Regular', 'Lombada rasgada', 'Higienizacao realizada', 'Disponivel', 97, 'Inspecao de rotina semestral'),
+(34, '2024-07-25', 'Novo', NULL, 'Retirado de circulacao', 'Disponivel', 54, 'Avaliacao solicitada pelo setor de acervo'),
+(35, '2026-09-14', 'Novo', NULL, 'Encaminhado para restauro', 'Disponivel', 76, 'Verificacao apos devolucao de emprestimo'),
+(36, '2024-07-09', 'Novo', NULL, 'Retirado de circulacao', 'Disponivel', 56, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(37, '2026-05-03', 'Desgastado', 'Paginas soltas', 'Substituido por novo exemplar', 'Disponivel', 13, 'Inspecao de rotina semestral'),
+(38, '2025-12-10', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 84, 'Avaliacao solicitada pelo setor de acervo'),
+(39, '2025-06-07', 'Danificado', 'Marcas de umidade', 'Retirado de circulacao', 'Indisponivel', 55, 'Avaliacao solicitada pelo setor de acervo'),
+(40, '2025-11-28', 'Regular', 'Sem avarias visiveis', 'Higienizacao realizada', 'Disponivel', 16, 'Inspecao de rotina semestral'),
+(41, '2026-03-26', 'Regular', 'Lombada rasgada', 'Retirado de circulacao', 'Disponivel', 70, 'Verificacao apos devolucao de emprestimo'),
+(42, '2025-11-28', 'Desgastado', 'Paginas amareladas', 'Substituido por novo exemplar', 'Disponivel', 65, 'Inspecao de rotina semestral'),
+(43, '2025-08-01', 'Novo', NULL, 'Encaminhado para restauro', 'Disponivel', 5, 'Verificacao apos devolucao de emprestimo'),
+(44, '2025-10-16', 'Novo', NULL, 'Substituido por novo exemplar', 'Disponivel', 44, 'Verificacao apos devolucao de emprestimo'),
+(45, '2024-11-27', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 65, 'Avaliacao solicitada pelo setor de acervo'),
+(46, '2025-03-06', 'Bom', NULL, 'Higienizacao realizada', 'Disponivel', 29, 'Avaliacao solicitada pelo setor de acervo'),
+(47, '2025-01-08', 'Bom', NULL, 'Retirado de circulacao', 'Disponivel', 39, 'Inspecao de rotina semestral'),
+(48, '2026-07-18', 'Danificado', 'Sem avarias visiveis', 'Nenhuma acao necessaria', 'Indisponivel', 13, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(49, '2025-06-22', 'Novo', NULL, 'Higienizacao realizada', 'Disponivel', 30, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(50, '2025-09-07', 'Regular', 'Paginas amareladas', 'Retirado de circulacao', 'Disponivel', 88, 'Inspecao de rotina semestral'),
+(51, '2026-06-13', 'Bom', NULL, 'Nenhuma acao necessaria', 'Disponivel', 61, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(52, '2025-05-19', 'Regular', 'Lombada rasgada', 'Retirado de circulacao', 'Disponivel', 64, 'Avaliacao solicitada pelo setor de acervo'),
+(53, '2024-06-04', 'Regular', 'Sem avarias visiveis', 'Encaminhado para restauro', 'Disponivel', 18, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(54, '2026-05-11', 'Desgastado', 'Marcas de umidade', 'Retirado de circulacao', 'Disponivel', 23, 'Avaliacao solicitada pelo setor de acervo'),
+(55, '2024-06-07', 'Desgastado', 'Lombada rasgada', 'Substituido por novo exemplar', 'Disponivel', 59, 'Avaliacao solicitada pelo setor de acervo'),
+(56, '2026-11-23', 'Regular', 'Sem avarias visiveis', 'Nenhuma acao necessaria', 'Disponivel', 70, 'Verificacao apos devolucao de emprestimo'),
+(57, '2025-04-20', 'Bom', NULL, 'Substituido por novo exemplar', 'Disponivel', 38, 'Verificacao apos devolucao de emprestimo'),
+(58, '2026-10-03', 'Desgastado', 'Lombada rasgada', 'Nenhuma acao necessaria', 'Disponivel', 71, 'Inspecao de rotina semestral'),
+(59, '2024-09-17', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 86, 'Inspecao de rotina semestral'),
+(60, '2026-05-04', 'Bom', NULL, 'Retirado de circulacao', 'Disponivel', 92, 'Inspecao de rotina semestral'),
+(61, '2025-01-14', 'Novo', NULL, 'Substituido por novo exemplar', 'Disponivel', 41, 'Inspecao de rotina semestral'),
+(62, '2026-07-12', 'Danificado', 'Marcas de umidade', 'Nenhuma acao necessaria', 'Indisponivel', 2, 'Verificacao apos devolucao de emprestimo'),
+(63, '2024-04-04', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 35, 'Avaliacao solicitada pelo setor de acervo'),
+(64, '2026-07-13', 'Novo', NULL, 'Encaminhado para restauro', 'Disponivel', 77, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(65, '2024-12-09', 'Danificado', 'Paginas amareladas', 'Higienizacao realizada', 'Indisponivel', 47, 'Inspecao de rotina semestral'),
+(66, '2024-01-14', 'Danificado', 'Marcas de umidade', 'Higienizacao realizada', 'Indisponivel', 21, 'Avaliacao solicitada pelo setor de acervo'),
+(67, '2026-06-18', 'Bom', NULL, 'Substituido por novo exemplar', 'Disponivel', 48, 'Avaliacao solicitada pelo setor de acervo'),
+(68, '2026-03-06', 'Bom', NULL, 'Nenhuma acao necessaria', 'Disponivel', 20, 'Inspecao de rotina semestral'),
+(69, '2026-02-06', 'Regular', 'Marcas de umidade', 'Retirado de circulacao', 'Disponivel', 74, 'Inspecao de rotina semestral'),
+(70, '2026-08-14', 'Desgastado', 'Marcas de umidade', 'Encaminhado para restauro', 'Disponivel', 94, 'Inspecao de rotina semestral'),
+(71, '2024-07-05', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 31, 'Avaliacao solicitada pelo setor de acervo'),
+(72, '2024-02-27', 'Desgastado', 'Marcas de umidade', 'Higienizacao realizada', 'Disponivel', 55, 'Avaliacao solicitada pelo setor de acervo'),
+(73, '2025-01-08', 'Novo', NULL, 'Higienizacao realizada', 'Disponivel', 65, 'Verificacao apos devolucao de emprestimo'),
+(74, '2024-10-06', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 34, 'Inspecao de rotina semestral'),
+(75, '2025-02-11', 'Novo', NULL, 'Higienizacao realizada', 'Disponivel', 97, 'Avaliacao solicitada pelo setor de acervo'),
+(76, '2024-09-25', 'Desgastado', 'Paginas amareladas', 'Nenhuma acao necessaria', 'Disponivel', 23, 'Avaliacao solicitada pelo setor de acervo'),
+(77, '2025-06-04', 'Danificado', 'Sem avarias visiveis', 'Nenhuma acao necessaria', 'Indisponivel', 76, 'Inspecao de rotina semestral'),
+(78, '2025-02-28', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 37, 'Inspecao de rotina semestral'),
+(79, '2025-01-04', 'Danificado', 'Paginas soltas', 'Nenhuma acao necessaria', 'Indisponivel', 66, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(80, '2024-04-22', 'Bom', NULL, 'Higienizacao realizada', 'Disponivel', 34, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(81, '2024-04-15', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 85, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(82, '2024-04-14', 'Novo', NULL, 'Retirado de circulacao', 'Disponivel', 88, 'Avaliacao solicitada pelo setor de acervo'),
+(83, '2025-06-08', 'Regular', 'Paginas soltas', 'Substituido por novo exemplar', 'Disponivel', 29, 'Inspecao de rotina semestral'),
+(84, '2025-07-23', 'Desgastado', 'Lombada rasgada', 'Nenhuma acao necessaria', 'Disponivel', 11, 'Inspecao de rotina semestral'),
+(85, '2024-09-07', 'Regular', 'Paginas soltas', 'Encaminhado para restauro', 'Disponivel', 49, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(86, '2025-04-04', 'Desgastado', 'Marcas de umidade', 'Higienizacao realizada', 'Disponivel', 38, 'Inspecao de rotina semestral'),
+(87, '2026-08-05', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 62, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(88, '2024-11-22', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 75, 'Inspecao de rotina semestral'),
+(89, '2026-02-04', 'Regular', 'Paginas amareladas', 'Encaminhado para restauro', 'Disponivel', 29, 'Avaliacao solicitada pelo setor de acervo'),
+(90, '2025-03-23', 'Regular', 'Sem avarias visiveis', 'Substituido por novo exemplar', 'Disponivel', 21, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(91, '2025-03-01', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 70, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(92, '2024-11-05', 'Regular', 'Paginas soltas', 'Encaminhado para restauro', 'Disponivel', 15, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(93, '2024-11-08', 'Novo', NULL, 'Nenhuma acao necessaria', 'Disponivel', 6, 'Avaliacao solicitada pelo setor de acervo'),
+(94, '2024-05-19', 'Regular', 'Paginas soltas', 'Retirado de circulacao', 'Disponivel', 76, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(95, '2026-10-18', 'Bom', NULL, 'Substituido por novo exemplar', 'Disponivel', 67, 'Verificacao apos devolucao de emprestimo'),
+(96, '2025-12-11', 'Bom', NULL, 'Substituido por novo exemplar', 'Disponivel', 46, 'Verificacao apos devolucao de emprestimo'),
+(97, '2026-05-22', 'Danificado', 'Paginas amareladas', 'Retirado de circulacao', 'Indisponivel', 3, 'Checagem de qualidade pos-recebimento do fornecedor'),
+(98, '2025-11-20', 'Bom', NULL, 'Encaminhado para restauro', 'Disponivel', 69, 'Avaliacao solicitada pelo setor de acervo'),
+(99, '2025-02-25', 'Desgastado', 'Capa manchada', 'Retirado de circulacao', 'Disponivel', 61, 'Verificacao apos devolucao de emprestimo'),
+(100, '2026-09-18', 'Desgastado', 'Marcas de umidade', 'Substituido por novo exemplar', 'Disponivel', 38, 'Checagem de qualidade pos-recebimento do fornecedor');
+ 
+-- ===== PHYSICALLOAN =====
+INSERT INTO PhysicalLoan (PhysicalLoanID, LoanDate, DueDate, ReturnDate, LoanStatus, CustomerID, EmployeeID, RenewalCount) VALUES
+(1, '2025-05-16', '2025-05-28', NULL, 'Atrasado', 94, 88, 0),
+(2, '2025-12-15', '2025-12-28', NULL, 'Atrasado', 91, 40, 0),
+(3, '2026-06-03', '2026-06-17', NULL, 'Atrasado', 94, 84, 0),
+(4, '2025-04-14', '2025-04-28', NULL, 'Atrasado', 82, 47, 0),
+(5, '2025-05-18', '2025-05-28', NULL, 'Em andamento', 44, 47, 0),
+(6, '2026-01-14', '2026-01-28', NULL, 'Atrasado', 30, 44, 0),
+(7, '2026-08-04', '2026-08-18', '2026-08-20', 'Devolvido', 14, 48, 0),
+(8, '2025-05-16', '2025-05-28', NULL, 'Em andamento', 92, 17, 0),
+(9, '2026-07-15', '2026-07-28', NULL, 'Atrasado', 54, 20, 0),
+(10, '2026-03-21', '2026-03-28', '2026-03-25', 'Devolvido', 46, 36, 0),
+(11, '2025-11-08', '2025-11-22', NULL, 'Atrasado', 5, 23, 0),
+(12, '2025-07-14', '2025-07-28', '2025-07-25', 'Devolvido', 99, 48, 0),
+(13, '2025-02-09', '2025-02-23', NULL, 'Renovado', 66, 51, 2),
+(14, '2025-07-13', '2025-07-27', '2025-07-28', 'Devolvido', 2, 95, 0),
+(15, '2026-02-25', '2026-02-28', NULL, 'Atrasado', 43, 17, 0),
+(16, '2025-10-23', '2025-10-28', '2025-10-26', 'Devolvido', 3, 75, 0),
+(17, '2025-05-04', '2025-05-18', '2025-05-16', 'Devolvido', 30, 61, 0),
+(18, '2026-02-02', '2026-02-16', NULL, 'Atrasado', 67, 83, 0),
+(19, '2025-09-15', '2025-09-28', NULL, 'Em andamento', 31, 28, 0),
+(20, '2026-05-14', '2026-05-28', NULL, 'Atrasado', 2, 30, 0),
+(21, '2025-06-13', '2025-06-27', '2025-06-28', 'Devolvido', 32, 43, 0),
+(22, '2025-07-21', '2025-07-28', NULL, 'Em andamento', 67, 71, 0),
+(23, '2026-05-16', '2026-05-28', NULL, 'Renovado', 60, 2, 0),
+(24, '2026-08-08', '2026-08-22', '2026-08-24', 'Devolvido', 71, 50, 0),
+(25, '2025-02-09', '2025-02-23', NULL, 'Renovado', 12, 40, 3),
+(26, '2025-12-01', '2025-12-15', NULL, 'Em andamento', 12, 12, 0),
+(27, '2025-06-01', '2025-06-15', NULL, 'Renovado', 53, 65, 3),
+(28, '2026-12-12', '2026-12-26', NULL, 'Atrasado', 92, 22, 0),
+(29, '2025-09-17', '2025-09-28', NULL, 'Renovado', 15, 48, 2),
+(30, '2025-04-13', '2025-04-27', NULL, 'Atrasado', 43, 78, 0),
+(31, '2026-05-25', '2026-05-28', NULL, 'Em andamento', 80, 92, 0),
+(32, '2026-02-12', '2026-02-26', NULL, 'Atrasado', 18, 43, 0),
+(33, '2025-06-06', '2025-06-20', NULL, 'Renovado', 3, 47, 1),
+(34, '2026-01-06', '2026-01-20', '2026-01-23', 'Devolvido', 58, 47, 0),
+(35, '2026-05-08', '2026-05-22', '2026-05-24', 'Devolvido', 22, 48, 0),
+(36, '2025-01-13', '2025-01-27', '2025-01-27', 'Devolvido', 88, 52, 0),
+(37, '2025-08-18', '2025-08-28', NULL, 'Renovado', 26, 70, 1),
+(38, '2025-11-06', '2025-11-20', '2025-11-19', 'Devolvido', 83, 65, 0),
+(39, '2025-12-20', '2025-12-28', '2025-12-28', 'Devolvido', 41, 38, 0),
+(40, '2025-12-16', '2025-12-28', NULL, 'Em andamento', 18, 36, 0),
+(41, '2026-05-22', '2026-05-28', '2026-05-28', 'Devolvido', 79, 100, 0),
+(42, '2025-11-15', '2025-11-28', NULL, 'Atrasado', 73, 17, 0),
+(43, '2026-08-15', '2026-08-28', '2026-08-23', 'Devolvido', 84, 14, 0),
+(44, '2025-10-20', '2025-10-28', NULL, 'Em andamento', 76, 89, 0),
+(45, '2025-05-03', '2025-05-17', '2025-05-20', 'Devolvido', 3, 3, 0),
+(46, '2025-08-03', '2025-08-17', NULL, 'Renovado', 69, 31, 1),
+(47, '2025-06-21', '2025-06-28', NULL, 'Atrasado', 78, 4, 0),
+(48, '2025-06-12', '2025-06-26', NULL, 'Em andamento', 10, 3, 0),
+(49, '2025-01-06', '2025-01-20', NULL, 'Atrasado', 86, 36, 0),
+(50, '2026-12-03', '2026-12-17', '2026-12-19', 'Devolvido', 78, 36, 0),
+(51, '2025-01-24', '2025-01-28', NULL, 'Atrasado', 30, 40, 0),
+(52, '2025-11-18', '2025-11-28', NULL, 'Renovado', 79, 77, 1),
+(53, '2026-12-18', '2026-12-28', NULL, 'Renovado', 49, 59, 1),
+(54, '2025-05-09', '2025-05-23', '2025-05-20', 'Devolvido', 89, 40, 0),
+(55, '2026-01-08', '2026-01-22', NULL, 'Em andamento', 28, 57, 0),
+(56, '2026-08-17', '2026-08-28', NULL, 'Atrasado', 65, 63, 0),
+(57, '2025-10-25', '2025-10-28', NULL, 'Atrasado', 52, 27, 0),
+(58, '2025-06-16', '2025-06-28', NULL, 'Renovado', 21, 68, 1),
+(59, '2026-03-16', '2026-03-28', '2026-03-26', 'Devolvido', 84, 93, 0),
+(60, '2025-06-19', '2025-06-28', NULL, 'Em andamento', 34, 36, 0),
+(61, '2026-11-04', '2026-11-18', NULL, 'Renovado', 37, 49, 1),
+(62, '2026-07-01', '2026-07-15', NULL, 'Atrasado', 33, 18, 0),
+(63, '2025-12-25', '2025-12-28', '2025-12-27', 'Devolvido', 87, 13, 0),
+(64, '2026-08-14', '2026-08-28', NULL, 'Renovado', 25, 13, 1),
+(65, '2026-03-17', '2026-03-28', '2026-03-28', 'Devolvido', 29, 83, 0),
+(66, '2026-07-09', '2026-07-23', '2026-07-19', 'Devolvido', 24, 93, 0),
+(67, '2025-03-16', '2025-03-28', '2025-03-28', 'Devolvido', 83, 65, 0),
+(68, '2026-02-01', '2026-02-15', '2026-02-17', 'Devolvido', 5, 99, 0),
+(69, '2025-09-14', '2025-09-28', '2025-09-27', 'Devolvido', 81, 94, 0),
+(70, '2025-10-06', '2025-10-20', NULL, 'Atrasado', 48, 14, 0),
+(71, '2026-02-21', '2026-02-28', '2026-02-27', 'Devolvido', 20, 33, 0),
+(72, '2025-01-19', '2025-01-28', NULL, 'Em andamento', 26, 32, 0),
+(73, '2025-02-09', '2025-02-23', NULL, 'Atrasado', 12, 34, 0),
+(74, '2026-03-09', '2026-03-23', NULL, 'Em andamento', 39, 60, 0),
+(75, '2025-06-08', '2025-06-22', NULL, 'Renovado', 15, 97, 1),
+(76, '2025-02-11', '2025-02-25', NULL, 'Em andamento', 58, 90, 0),
+(77, '2026-01-08', '2026-01-22', '2026-01-22', 'Devolvido', 5, 41, 0),
+(78, '2026-07-21', '2026-07-28', NULL, 'Renovado', 29, 40, 3),
+(79, '2025-10-17', '2025-10-28', NULL, 'Renovado', 87, 56, 3),
+(80, '2026-03-14', '2026-03-28', NULL, 'Renovado', 28, 85, 0),
+(81, '2025-08-19', '2025-08-28', '2025-08-28', 'Devolvido', 66, 16, 0),
+(82, '2025-11-12', '2025-11-26', NULL, 'Renovado', 2, 2, 2),
+(83, '2026-11-06', '2026-11-20', '2026-11-22', 'Devolvido', 17, 39, 0),
+(84, '2026-12-21', '2026-12-28', '2026-12-25', 'Devolvido', 83, 51, 0),
+(85, '2025-11-10', '2025-11-24', NULL, 'Em andamento', 49, 57, 0),
+(86, '2026-09-20', '2026-09-28', '2026-09-28', 'Devolvido', 9, 17, 0),
+(87, '2025-11-03', '2025-11-17', NULL, 'Atrasado', 6, 38, 0),
+(88, '2026-09-23', '2026-09-28', '2026-09-24', 'Devolvido', 12, 94, 0),
+(89, '2025-05-01', '2025-05-15', NULL, 'Atrasado', 91, 23, 0),
+(90, '2026-11-17', '2026-11-28', NULL, 'Renovado', 16, 16, 3),
+(91, '2026-08-15', '2026-08-28', NULL, 'Renovado', 14, 56, 1),
+(92, '2026-04-11', '2026-04-25', NULL, 'Renovado', 83, 92, 3),
+(93, '2026-09-25', '2026-09-28', NULL, 'Atrasado', 15, 76, 0),
+(94, '2025-11-15', '2025-11-28', NULL, 'Atrasado', 26, 20, 0),
+(95, '2026-07-25', '2026-07-28', NULL, 'Atrasado', 47, 20, 0),
+(96, '2025-07-05', '2025-07-19', NULL, 'Atrasado', 31, 16, 0),
+(97, '2025-07-03', '2025-07-17', NULL, 'Em andamento', 79, 57, 0),
+(98, '2026-10-15', '2026-10-28', NULL, 'Em andamento', 14, 14, 0),
+(99, '2026-05-17', '2026-05-28', NULL, 'Em andamento', 49, 47, 0),
+(100, '2025-08-03', '2025-08-17', NULL, 'Em andamento', 4, 20, 0);
+ 
+-- ===== DIGITALLOAN =====
+INSERT INTO DigitalLoan (DigitalLoanID, LoanDate, ExpirationDate, AccessStatus, CustomerID, EmployeeID, DownloadLimit) VALUES
+(1, '2025-11-03', '2025-11-10', 'Ativo', 71, 25, 10),
+(2, '2025-03-10', '2025-03-17', 'Expirado', 57, 33, 10),
+(3, '2025-06-02', '2025-06-09', 'Revogado', 96, 13, 10),
+(4, '2026-05-20', '2026-05-27', 'Ativo', 15, 13, 5),
+(5, '2025-10-23', '2025-10-28', 'Ativo', 76, 93, 5),
+(6, '2026-05-06', '2026-05-13', 'Revogado', 56, 3, 5),
+(7, '2026-10-11', '2026-10-18', 'Expirado', 71, 36, 10),
+(8, '2025-02-17', '2025-02-24', 'Expirado', 44, 30, 5),
+(9, '2025-06-17', '2025-06-24', 'Revogado', 38, 93, 5),
+(10, '2026-04-14', '2026-04-21', 'Revogado', 36, 77, 10),
+(11, '2025-07-15', '2025-07-22', 'Expirado', 79, 27, 3),
+(12, '2025-09-01', '2025-09-08', 'Ativo', 33, 91, 3),
+(13, '2026-05-23', '2026-05-28', 'Revogado', 25, 52, 5),
+(14, '2025-12-21', '2025-12-28', 'Ativo', 39, 85, 3),
+(15, '2025-08-21', '2025-08-28', 'Revogado', 68, 88, 5),
+(16, '2025-04-13', '2025-04-20', 'Expirado', 88, 55, 3),
+(17, '2026-11-23', '2026-11-28', 'Revogado', 95, 84, 5),
+(18, '2026-11-19', '2026-11-26', 'Expirado', 66, 51, 3),
+(19, '2026-03-17', '2026-03-24', 'Expirado', 72, 60, 3),
+(20, '2025-04-22', '2025-04-28', 'Revogado', 10, 92, 10),
+(21, '2025-06-09', '2025-06-16', 'Expirado', 61, 43, 5),
+(22, '2026-03-18', '2026-03-25', 'Revogado', 23, 22, 3),
+(23, '2025-10-17', '2025-10-24', 'Ativo', 62, 44, 3),
+(24, '2025-03-23', '2025-03-28', 'Revogado', 29, 43, 5),
+(25, '2026-02-09', '2026-02-16', 'Ativo', 51, 2, 5),
+(26, '2025-07-15', '2025-07-22', 'Ativo', 57, 81, 5),
+(27, '2025-02-08', '2025-02-15', 'Expirado', 33, 31, 3),
+(28, '2025-08-23', '2025-08-28', 'Expirado', 75, 86, 10),
+(29, '2025-04-15', '2025-04-22', 'Expirado', 28, 8, 5),
+(30, '2025-02-25', '2025-02-28', 'Revogado', 3, 81, 10),
+(31, '2026-09-05', '2026-09-12', 'Expirado', 20, 70, 5),
+(32, '2026-06-13', '2026-06-20', 'Ativo', 25, 12, 10),
+(33, '2026-10-14', '2026-10-21', 'Ativo', 38, 73, 10),
+(34, '2026-01-17', '2026-01-24', 'Expirado', 65, 14, 3),
+(35, '2026-05-23', '2026-05-28', 'Revogado', 83, 34, 10),
+(36, '2026-07-25', '2026-07-28', 'Revogado', 58, 58, 5),
+(37, '2026-10-11', '2026-10-18', 'Ativo', 89, 80, 3),
+(38, '2025-04-24', '2025-04-28', 'Revogado', 87, 91, 3),
+(39, '2025-03-07', '2025-03-14', 'Expirado', 86, 43, 3),
+(40, '2026-12-15', '2026-12-22', 'Expirado', 6, 81, 3),
+(41, '2025-03-15', '2025-03-22', 'Ativo', 9, 58, 3),
+(42, '2025-08-24', '2025-08-28', 'Expirado', 65, 12, 5),
+(43, '2025-03-25', '2025-03-28', 'Ativo', 76, 53, 3),
+(44, '2026-05-21', '2026-05-28', 'Expirado', 54, 51, 3),
+(45, '2025-06-02', '2025-06-09', 'Revogado', 56, 26, 3),
+(46, '2026-01-01', '2026-01-08', 'Ativo', 8, 55, 5),
+(47, '2026-06-04', '2026-06-11', 'Revogado', 49, 75, 5),
+(48, '2025-07-21', '2025-07-28', 'Expirado', 53, 80, 3),
+(49, '2026-09-17', '2026-09-24', 'Expirado', 14, 63, 3),
+(50, '2026-11-04', '2026-11-11', 'Expirado', 94, 56, 10),
+(51, '2025-02-24', '2025-02-28', 'Revogado', 61, 99, 5),
+(52, '2025-10-14', '2025-10-21', 'Revogado', 77, 36, 10),
+(53, '2025-08-08', '2025-08-15', 'Expirado', 74, 60, 5),
+(54, '2025-05-21', '2025-05-28', 'Revogado', 79, 7, 5),
+(55, '2026-09-08', '2026-09-15', 'Revogado', 52, 73, 10),
+(56, '2025-07-15', '2025-07-22', 'Revogado', 82, 94, 10),
+(57, '2025-10-24', '2025-10-28', 'Expirado', 39, 82, 10),
+(58, '2025-12-10', '2025-12-17', 'Revogado', 2, 19, 5),
+(59, '2025-04-01', '2025-04-08', 'Revogado', 22, 34, 3),
+(60, '2026-04-24', '2026-04-28', 'Revogado', 92, 68, 10),
+(61, '2026-10-19', '2026-10-26', 'Ativo', 100, 13, 3),
+(62, '2026-09-13', '2026-09-20', 'Expirado', 20, 58, 3),
+(63, '2026-06-01', '2026-06-08', 'Revogado', 35, 64, 3),
+(64, '2025-03-01', '2025-03-08', 'Expirado', 71, 88, 10),
+(65, '2025-06-11', '2025-06-18', 'Ativo', 20, 49, 3),
+(66, '2026-09-23', '2026-09-28', 'Ativo', 75, 16, 5),
+(67, '2025-08-04', '2025-08-11', 'Ativo', 20, 40, 3),
+(68, '2025-01-09', '2025-01-16', 'Ativo', 99, 24, 5),
+(69, '2026-03-06', '2026-03-13', 'Expirado', 91, 88, 5),
+(70, '2025-11-19', '2025-11-26', 'Expirado', 36, 33, 10),
+(71, '2025-03-20', '2025-03-27', 'Expirado', 20, 32, 10),
+(72, '2025-11-04', '2025-11-11', 'Ativo', 100, 40, 3),
+(73, '2026-06-04', '2026-06-11', 'Revogado', 37, 99, 10),
+(74, '2026-09-06', '2026-09-13', 'Expirado', 14, 12, 5),
+(75, '2026-03-06', '2026-03-13', 'Ativo', 10, 97, 3),
+(76, '2025-11-13', '2025-11-20', 'Ativo', 17, 32, 5),
+(77, '2025-07-21', '2025-07-28', 'Expirado', 15, 4, 5),
+(78, '2026-04-08', '2026-04-15', 'Revogado', 56, 92, 5),
+(79, '2026-09-12', '2026-09-19', 'Revogado', 17, 50, 3),
+(80, '2026-07-10', '2026-07-17', 'Expirado', 95, 16, 3),
+(81, '2026-06-15', '2026-06-22', 'Expirado', 25, 82, 5),
+(82, '2026-07-20', '2026-07-27', 'Ativo', 16, 58, 3),
+(83, '2026-07-09', '2026-07-16', 'Expirado', 34, 51, 3),
+(84, '2025-09-23', '2025-09-28', 'Revogado', 21, 66, 5),
+(85, '2025-01-16', '2025-01-23', 'Expirado', 44, 49, 10),
+(86, '2025-09-21', '2025-09-28', 'Revogado', 95, 11, 5),
+(87, '2025-05-14', '2025-05-21', 'Revogado', 17, 37, 5),
+(88, '2026-08-10', '2026-08-17', 'Revogado', 62, 79, 10),
+(89, '2025-03-09', '2025-03-16', 'Revogado', 65, 3, 5),
+(90, '2025-05-18', '2025-05-25', 'Expirado', 48, 28, 5),
+(91, '2025-08-14', '2025-08-21', 'Revogado', 26, 90, 10),
+(92, '2025-02-21', '2025-02-28', 'Ativo', 40, 49, 3),
+(93, '2026-06-19', '2026-06-26', 'Revogado', 88, 59, 10),
+(94, '2026-06-13', '2026-06-20', 'Ativo', 29, 9, 5),
+(95, '2025-10-24', '2025-10-28', 'Expirado', 98, 53, 10),
+(96, '2026-10-14', '2026-10-21', 'Revogado', 22, 31, 10),
+(97, '2026-06-09', '2026-06-16', 'Expirado', 41, 64, 10),
+(98, '2026-01-16', '2026-01-23', 'Revogado', 66, 27, 10),
+(99, '2025-03-02', '2025-03-09', 'Expirado', 39, 11, 3),
+(100, '2025-08-25', '2025-08-28', 'Expirado', 57, 69, 5);
+ 
+-- ===== LATEFEE =====
+INSERT INTO LateFee (LateFeeID, DaysLate, FineAmount, PaymentStatus, PaymentDate, PhysicalLoanID, PaymentMethod) VALUES
+(1, 18, 45.0, 'Pago', '2025-12-03', 23, 'Cartao de Credito'),
+(2, 23, 57.5, 'Pago', '2026-03-17', 96, 'Cartao de Debito'),
+(3, 12, 30.0, 'Pago', '2025-09-11', 84, 'Dinheiro'),
+(4, 8, 20.0, 'Pago', '2025-02-16', 42, 'Pix'),
+(5, 28, 70.0, 'Cancelado', NULL, 52, NULL),
+(6, 21, 52.5, 'Cancelado', NULL, 36, NULL),
+(7, 12, 30.0, 'Pendente', NULL, 30, NULL),
+(8, 9, 22.5, 'Pago', '2026-03-06', 98, 'Dinheiro'),
+(9, 23, 57.5, 'Pendente', NULL, 98, NULL),
+(10, 26, 65.0, 'Pago', '2026-09-03', 25, 'Cartao de Debito'),
+(11, 12, 30.0, 'Cancelado', NULL, 36, NULL),
+(12, 18, 45.0, 'Pago', '2025-09-11', 50, 'Cartao de Credito'),
+(13, 20, 50.0, 'Pendente', NULL, 2, NULL),
+(14, 1, 2.5, 'Pendente', NULL, 89, NULL),
+(15, 28, 70.0, 'Pendente', NULL, 81, NULL),
+(16, 24, 60.0, 'Pendente', NULL, 39, NULL),
+(17, 16, 40.0, 'Pago', '2025-05-07', 93, 'Cartao de Debito'),
+(18, 18, 45.0, 'Pendente', NULL, 74, NULL),
+(19, 12, 30.0, 'Cancelado', NULL, 49, NULL),
+(20, 3, 7.5, 'Pago', '2025-10-18', 89, 'Dinheiro'),
+(21, 21, 52.5, 'Cancelado', NULL, 41, NULL),
+(22, 16, 40.0, 'Pago', '2026-11-18', 77, 'Cartao de Credito'),
+(23, 16, 40.0, 'Pago', '2026-04-11', 61, 'Pix'),
+(24, 23, 57.5, 'Pendente', NULL, 38, NULL),
+(25, 22, 55.0, 'Cancelado', NULL, 98, NULL),
+(26, 5, 12.5, 'Cancelado', NULL, 98, NULL),
+(27, 15, 37.5, 'Cancelado', NULL, 80, NULL),
+(28, 22, 55.0, 'Pago', '2026-09-16', 77, 'Cartao de Credito'),
+(29, 24, 60.0, 'Pago', '2026-07-11', 3, 'Pix'),
+(30, 10, 25.0, 'Pendente', NULL, 94, NULL),
+(31, 7, 17.5, 'Cancelado', NULL, 19, NULL),
+(32, 6, 15.0, 'Pendente', NULL, 94, NULL),
+(33, 10, 25.0, 'Pago', '2026-10-05', 13, 'Cartao de Debito'),
+(34, 9, 22.5, 'Cancelado', NULL, 53, NULL),
+(35, 9, 22.5, 'Cancelado', NULL, 59, NULL),
+(36, 29, 72.5, 'Pendente', NULL, 98, NULL),
+(37, 24, 60.0, 'Cancelado', NULL, 90, NULL),
+(38, 30, 75.0, 'Cancelado', NULL, 44, NULL),
+(39, 9, 22.5, 'Cancelado', NULL, 94, NULL),
+(40, 1, 2.5, 'Pago', '2026-04-11', 100, 'Cartao de Credito'),
+(41, 26, 65.0, 'Pendente', NULL, 34, NULL),
+(42, 29, 72.5, 'Pendente', NULL, 4, NULL),
+(43, 24, 60.0, 'Cancelado', NULL, 40, NULL),
+(44, 10, 25.0, 'Pago', '2026-03-07', 47, 'Pix'),
+(45, 21, 52.5, 'Pendente', NULL, 44, NULL),
+(46, 4, 10.0, 'Cancelado', NULL, 24, NULL),
+(47, 14, 35.0, 'Pendente', NULL, 12, NULL),
+(48, 19, 47.5, 'Pendente', NULL, 64, NULL),
+(49, 10, 25.0, 'Pendente', NULL, 68, NULL),
+(50, 17, 42.5, 'Cancelado', NULL, 6, NULL),
+(51, 11, 27.5, 'Pendente', NULL, 80, NULL),
+(52, 26, 65.0, 'Pendente', NULL, 72, NULL),
+(53, 6, 15.0, 'Pendente', NULL, 64, NULL),
+(54, 11, 27.5, 'Pago', '2025-05-20', 89, 'Pix'),
+(55, 8, 20.0, 'Pago', '2025-01-07', 90, 'Boleto'),
+(56, 8, 20.0, 'Pago', '2026-06-28', 64, 'Cartao de Debito'),
+(57, 22, 55.0, 'Pago', '2025-11-21', 30, 'Dinheiro'),
+(58, 17, 42.5, 'Pendente', NULL, 25, NULL),
+(59, 2, 5.0, 'Cancelado', NULL, 44, NULL),
+(60, 2, 5.0, 'Pago', '2026-06-04', 63, 'Cartao de Credito'),
+(61, 17, 42.5, 'Cancelado', NULL, 23, NULL),
+(62, 26, 65.0, 'Cancelado', NULL, 13, NULL),
+(63, 17, 42.5, 'Cancelado', NULL, 20, NULL),
+(64, 28, 70.0, 'Pendente', NULL, 17, NULL),
+(65, 10, 25.0, 'Pago', '2026-08-03', 62, 'Cartao de Debito'),
+(66, 26, 65.0, 'Pendente', NULL, 27, NULL),
+(67, 25, 62.5, 'Pendente', NULL, 3, NULL),
+(68, 16, 40.0, 'Pendente', NULL, 26, NULL),
+(69, 7, 17.5, 'Cancelado', NULL, 65, NULL),
+(70, 4, 10.0, 'Cancelado', NULL, 59, NULL),
+(71, 25, 62.5, 'Cancelado', NULL, 29, NULL),
+(72, 20, 50.0, 'Pago', '2026-03-04', 25, 'Boleto'),
+(73, 24, 60.0, 'Cancelado', NULL, 41, NULL),
+(74, 12, 30.0, 'Cancelado', NULL, 11, NULL),
+(75, 14, 35.0, 'Pago', '2025-05-21', 50, 'Dinheiro'),
+(76, 16, 40.0, 'Pendente', NULL, 44, NULL),
+(77, 10, 25.0, 'Cancelado', NULL, 4, NULL),
+(78, 7, 17.5, 'Pendente', NULL, 23, NULL),
+(79, 3, 7.5, 'Pago', '2026-11-19', 55, 'Cartao de Credito'),
+(80, 24, 60.0, 'Pago', '2025-09-23', 94, 'Pix'),
+(81, 20, 50.0, 'Pago', '2025-09-16', 57, 'Boleto'),
+(82, 22, 55.0, 'Pendente', NULL, 36, NULL),
+(83, 30, 75.0, 'Pago', '2026-10-09', 68, 'Pix'),
+(84, 9, 22.5, 'Pago', '2026-04-24', 27, 'Cartao de Credito'),
+(85, 5, 12.5, 'Pago', '2026-03-16', 53, 'Cartao de Debito'),
+(86, 29, 72.5, 'Pago', '2026-07-23', 8, 'Boleto'),
+(87, 4, 10.0, 'Pendente', NULL, 75, NULL),
+(88, 27, 67.5, 'Cancelado', NULL, 6, NULL),
+(89, 13, 32.5, 'Cancelado', NULL, 18, NULL),
+(90, 16, 40.0, 'Pendente', NULL, 23, NULL),
+(91, 5, 12.5, 'Cancelado', NULL, 52, NULL),
+(92, 26, 65.0, 'Pago', '2026-05-09', 11, 'Cartao de Credito'),
+(93, 4, 10.0, 'Pendente', NULL, 83, NULL),
+(94, 12, 30.0, 'Cancelado', NULL, 13, NULL),
+(95, 29, 72.5, 'Cancelado', NULL, 69, NULL),
+(96, 17, 42.5, 'Pago', '2025-03-01', 12, 'Cartao de Debito'),
+(97, 8, 20.0, 'Pendente', NULL, 30, NULL),
+(98, 4, 10.0, 'Pago', '2026-03-02', 12, 'Dinheiro'),
+(99, 16, 40.0, 'Cancelado', NULL, 90, NULL),
+(100, 29, 72.5, 'Cancelado', NULL, 28, NULL);
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_CadastrarFornecedor (
+    IN pSupplierName VARCHAR(100),
+    IN pContactName  VARCHAR(100),
+    IN pEmail        VARCHAR(100),
+    IN pPhone        VARCHAR(20),
+    IN pCountry      VARCHAR(50),
+    IN pState        VARCHAR(50),
+    IN pCity         VARCHAR(50),
+    IN pAddress      VARCHAR(150),
+    IN pPostalCode   VARCHAR(10)
+)
+
+BEGIN
+    DECLARE vExiste INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao cadastrar fornecedor. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO vExiste
+    FROM Supplier
+    WHERE Email = pEmail OR Phone = pPhone;
+
+    IF vExiste > 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Já existe um fornecedor cadastrado com esse e-mail ou telefone.';
+    ELSE
+        START TRANSACTION;
+            INSERT INTO Supplier (SupplierName, ContactName, Email, Phone, Country, State, City, Address, PostalCode)
+            VALUES (pSupplierName, pContactName, pEmail, pPhone, pCountry, pState, pCity, pAddress, pPostalCode);
+        COMMIT;
+    END IF;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_CadastrarTransportadora (
+    IN pCarrierName VARCHAR(100),
+    IN pContactName VARCHAR(100),
+    IN pEmail       VARCHAR(100),
+    IN pPhone       VARCHAR(20),
+    IN pCountry     VARCHAR(50),
+    IN pState       VARCHAR(50),
+    IN pCity        VARCHAR(50),
+    IN pAddress     VARCHAR(150),
+    IN pPostalCode  VARCHAR(10)
+)
+
+BEGIN
+    DECLARE vExiste INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao cadastrar transportadora. Operação revertida.';
+    END;
+
+    SELECT COUNT(*) INTO vExiste
+    FROM Shippers
+    WHERE Email = pEmail OR Phone = pPhone;
+
+    IF vExiste > 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Já existe uma transportadora cadastrada com esse e-mail ou telefone.';
+    ELSE
+        START TRANSACTION;
+            INSERT INTO Shippers (CarrierName, ContactName, Email, Phone, Country, State, City, Address, PostalCode)
+            VALUES (pCarrierName, pContactName, pEmail, pPhone, pCountry, pState, pCity, pAddress, pPostalCode);
+        COMMIT;
+    END IF;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_AtualizarEstoque (
+    IN pInventoryID INT,
+    IN pQuantidade  INT,
+    IN pTipoOperacao VARCHAR(10) -- 'ENTRADA' ou 'SAIDA'
+)
+
+BEGIN
+    DECLARE vQuantidadeAtual INT DEFAULT 0;
+    DECLARE vExisteInventario INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao atualizar estoque. Operação revertida.';
+    END;
+
+    START TRANSACTION;
+
+        SELECT COUNT(*), IFNULL(MAX(Quantity), 0)
+            INTO vExisteInventario, vQuantidadeAtual
+        FROM Inventory
+        WHERE InventoryID = pInventoryID
+        FOR UPDATE;
+
+        IF vExisteInventario = 0 THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Item de inventário não encontrado.';
+
+        ELSEIF pTipoOperacao = 'SAIDA' THEN
+            IF vQuantidadeAtual < pQuantidade THEN
+                ROLLBACK;
+                SIGNAL SQLSTATE '45000'
+                    SET MESSAGE_TEXT = 'Quantidade insuficiente em estoque para essa saída.';
+            ELSE
+                UPDATE Inventory
+                SET Quantity = Quantity - pQuantidade
+                WHERE InventoryID = pInventoryID;
+                COMMIT;
+            END IF;
+
+        ELSEIF pTipoOperacao = 'ENTRADA' THEN
+            UPDATE Inventory
+            SET Quantity = Quantity + pQuantidade
+            WHERE InventoryID = pInventoryID;
+            COMMIT;
+
+        ELSE
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Tipo de operação inválido. Use ENTRADA ou SAIDA.';
+        END IF;
+
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_CadastrarCliente (
+    IN pCPF          VARCHAR(20),
+    IN pPhone        VARCHAR(20),
+    IN pEmail        VARCHAR(200),
+    IN pNameCustomer VARCHAR(200),
+    IN pDateOfBirth  DATE
+)
+
+BEGIN
+    DECLARE vIdade INT;
+    DECLARE vExiste INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao cadastrar cliente. Operação revertida.';
+    END;
+
+    SET vIdade = TIMESTAMPDIFF(YEAR, pDateOfBirth, CURDATE());
+
+    SELECT COUNT(*) INTO vExiste
+    FROM Customer
+    WHERE CPF = pCPF OR Phone = pPhone OR Email = pEmail;
+
+    IF vIdade < 16 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cliente deve ter no mínimo 16 anos para se cadastrar.';
+    ELSEIF vExiste > 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Já existe um cliente cadastrado com esse CPF, telefone ou e-mail.';
+    ELSE
+        START TRANSACTION;
+            INSERT INTO Customer (CPF, Phone, Email, NameCustomer, DateOfBirth)
+            VALUES (pCPF, pPhone, pEmail, pNameCustomer, pDateOfBirth);
+        COMMIT;
+    END IF;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_VincularFuncionarioInventario (
+    IN pEmployeeID  INT,
+    IN pInventoryID INT
+)
+
+BEGIN
+    DECLARE vExisteFuncionario INT DEFAULT 0;
+    DECLARE vExisteInventario  INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao vincular funcionário ao inventário.';
+    END;
+
+    SELECT COUNT(*) INTO vExisteFuncionario
+    FROM Employee WHERE EmployeeID = pEmployeeID;
+
+    SELECT COUNT(*) INTO vExisteInventario
+    FROM Inventory WHERE InventoryID = pInventoryID;
+
+    IF vExisteFuncionario = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Funcionário não encontrado.';
+    ELSEIF vExisteInventario = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Item de inventário não encontrado.';
+    ELSE
+        START TRANSACTION;
+            UPDATE Employee
+            SET InventoryID = pInventoryID
+            WHERE EmployeeID = pEmployeeID;
+        COMMIT;
+    END IF;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_RegistrarInspecaoLivro (
+    IN pInspectionDate      DATE,
+    IN pConservationStatus  VARCHAR(30),
+    IN pDamageDescription   VARCHAR(250),
+    IN pActionTaken         VARCHAR(150),
+    IN pEmployeeID          INT
+)
+
+BEGIN
+    DECLARE vAvailabilityStatus VARCHAR(40);
+    DECLARE vExisteFuncionario  INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao registrar inspeção do livro.';
+    END;
+
+    SELECT COUNT(*) INTO vExisteFuncionario
+    FROM Employee WHERE EmployeeID = pEmployeeID;
+
+    IF vExisteFuncionario = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Funcionário responsável pela inspeção não encontrado.';
+    END IF;
+
+    IF pConservationStatus IN ('Ótimo', 'Bom') THEN
+        SET vAvailabilityStatus = 'Disponível';
+    ELSEIF pConservationStatus = 'Regular' THEN
+        SET vAvailabilityStatus = 'Em Reparo';
+    ELSE
+        SET vAvailabilityStatus = 'Indisponível';
+    END IF;
+
+    START TRANSACTION;
+        INSERT INTO BookCopyCondition (
+            InspectionDate, ConservationStatus, DamageDescription,
+            ActionTaken, AvailabilityStatus, EmployeeID
+        )
+        VALUES (
+            pInspectionDate, pConservationStatus, pDamageDescription,
+            pActionTaken, vAvailabilityStatus, pEmployeeID
+        );
+    COMMIT;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_RealizarEmprestimoFisico (
+    IN pCustomerID  INT,
+    IN pEmployeeID  INT,
+    IN pInventoryID INT,
+    IN pLoanDate    DATE,
+    IN pDueDate     DATE
+)
+
+BEGIN
+    DECLARE vQuantidadeDisponivel INT DEFAULT 0;
+    DECLARE vExisteCliente        INT DEFAULT 0;
+    DECLARE vEmprestimosAtivos    INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao registrar empréstimo. Operação revertida.';
+    END;
+
+    START TRANSACTION;
+
+        SELECT Quantity INTO vQuantidadeDisponivel
+        FROM Inventory
+        WHERE InventoryID = pInventoryID
+        FOR UPDATE;
+
+        SELECT COUNT(*) INTO vExisteCliente
+        FROM Customer WHERE CustomerID = pCustomerID;
+
+        -- Subquery: quantos empréstimos ativos (não devolvidos) o cliente já possui
+        SELECT COUNT(*) INTO vEmprestimosAtivos
+        FROM PhysicalLoan pl
+        WHERE pl.CustomerID = pCustomerID
+          AND pl.ReturnDate IS NULL;
+
+        IF vExisteCliente = 0 THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Cliente não encontrado.';
+
+        ELSEIF vQuantidadeDisponivel IS NULL OR vQuantidadeDisponivel < 1 THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Sem exemplares disponíveis para empréstimo.';
+
+        ELSEIF vEmprestimosAtivos >= 5 THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Cliente já atingiu o limite de 5 empréstimos ativos.';
+
+        ELSE
+            INSERT INTO PhysicalLoan (LoanDate, DueDate, ReturnDate, LoanStatus, CustomerID, EmployeeID)
+            VALUES (pLoanDate, pDueDate, NULL, 'Em Andamento', pCustomerID, pEmployeeID);
+
+            UPDATE Inventory
+            SET Quantity = Quantity - 1
+            WHERE InventoryID = pInventoryID;
+
+            COMMIT;
+        END IF;
+
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_RegistrarDevolucaoFisica (
+    IN pPhysicalLoanID INT,
+    IN pInventoryID     INT,
+    IN pReturnDate      DATE
+)
+
+BEGIN
+    DECLARE vDueDate      DATE;
+    DECLARE vLoanStatus   VARCHAR(50);
+    DECLARE vExisteLoan   INT DEFAULT 0;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro inesperado ao registrar devolução.';
+    END;
+
+    SELECT COUNT(*), MAX(DueDate) INTO vExisteLoan, vDueDate
+    FROM PhysicalLoan
+    WHERE PhysicalLoanID = pPhysicalLoanID;
+
+    IF vExisteLoan = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Empréstimo não encontrado.';
+    ELSE
+        IF pReturnDate > vDueDate THEN
+            SET vLoanStatus = 'Devolvido com Atraso';
+        ELSE
+            SET vLoanStatus = 'Devolvido no Prazo';
+        END IF;
+
+        START TRANSACTION;
+            UPDATE PhysicalLoan
+            SET ReturnDate = pReturnDate,
+                LoanStatus = vLoanStatus
+            WHERE PhysicalLoanID = pPhysicalLoanID;
+
+            UPDATE Inventory
+            SET Quantity = Quantity + 1
+            WHERE InventoryID = pInventoryID;
+        COMMIT;
+    END IF;
+END $$
+DELIMITER ;
