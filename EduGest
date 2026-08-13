@@ -1,0 +1,243 @@
+CREATE DATABASE EduGest;
+USE EduGest;
+
+CREATE TABLE Professores (
+    ProfessoresID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    DataNascimento DATE NOT NULL,
+    Telefone VARCHAR(20) NOT NULL,
+    Endereco VARCHAR(40),
+    Email VARCHAR(40),
+    CPF VARCHAR(11) NOT NULL UNIQUE
+);
+
+CREATE TABLE Aluno (
+    AlunoID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(50) NOT NULL,
+    DataNascimento DATE NOT NULL,
+    CPF VARCHAR(11) NOT NULL UNIQUE,
+    Email VARCHAR(70)
+);
+
+CREATE TABLE Matriculas (
+    MatriculaID INT PRIMARY KEY AUTO_INCREMENT,
+    NomeDoAluno VARCHAR(40) NOT NULL,
+    CPFDoAluno VARCHAR(11) NOT NULL,
+    Email VARCHAR(40),
+    Endereco VARCHAR(40)
+);
+
+CREATE TABLE Disciplinas (
+    DisciplinasID INT PRIMARY KEY AUTO_INCREMENT,
+    ProfessorID INT NOT NULL,
+    FOREIGN KEY (ProfessorID) REFERENCES Professores(ProfessoresID)
+);
+
+CREATE TABLE Secretaria (
+    SecretariaID INT PRIMARY KEY AUTO_INCREMENT,
+    DisciplinasID INT NOT NULL,
+    Mensalidade DECIMAL(10,2),
+    FOREIGN KEY (DisciplinasID) REFERENCES Disciplinas(DisciplinasID)
+);
+
+CREATE TABLE Notas (
+    NotasID INT PRIMARY KEY AUTO_INCREMENT,
+    ProfessoresID INT NOT NULL,
+    SecretariaID INT NOT NULL,
+    FOREIGN KEY (ProfessoresID) REFERENCES Professores(ProfessoresID),
+    FOREIGN KEY (SecretariaID) REFERENCES Secretaria(SecretariaID)
+);
+
+CREATE TABLE Universidade (
+    UniversidadeID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(40) NOT NULL,
+    Endereco VARCHAR(40) NOT NULL,
+    CNPJ VARCHAR(14) UNIQUE NOT NULL,
+    SecretariaID INT NOT NULL,
+    FOREIGN KEY (SecretariaID) REFERENCES Secretaria(SecretariaID)
+);
+
+ALTER TABLE Professores
+ADD Salario DECIMAL(10,2);
+
+ALTER TABLE Aluno
+ADD Cidade VARCHAR(40);
+
+ALTER TABLE Matriculas
+ADD DataMatricula DATE;
+
+ALTER TABLE Disciplinas
+ADD NomeDisciplina VARCHAR(50);
+
+ALTER TABLE Secretaria
+ADD Turno VARCHAR(20);
+
+ALTER TABLE Notas
+ADD NotaFinal DECIMAL(4,2);
+
+ALTER TABLE Universidade
+ADD Telefone VARCHAR(20);
+
+INSERT INTO Professores
+(Nome, DataNascimento, Telefone, Endereco, Email, CPF, Salario)
+VALUES
+('Carlos Silva','1980-05-15','31999990001','Rua A, 100','carlos@edugest.com','11111111111',5500.00),
+('Maria Souza','1978-11-20','31999990002','Rua B, 200','maria@edugest.com','22222222222',6200.00),
+('João Pereira','1985-03-10','31999990003','Rua C, 300','joao@edugest.com','33333333333',5800.00),
+('Ana Lima','1990-07-08','31999990004','Rua D, 400','ana@edugest.com','44444444444',4900.00),
+('Fernanda Costa','1982-01-30','31999990005','Rua E, 500','fernanda@edugest.com','55555555555',6100.00);
+
+INSERT INTO Aluno
+(Nome, DataNascimento, CPF, Email, Cidade)
+VALUES
+('Lucas Oliveira','2003-02-15','66666666666','lucas@email.com','Belo Horizonte'),
+('Mariana Alves','2002-08-22','77777777777','mariana@email.com','Contagem'),
+('Pedro Santos','2001-05-17','88888888888','pedro@email.com','Betim'),
+('Juliana Rocha','2004-10-01','99999999999','juliana@email.com','Uberlândia'),
+('Gabriel Martins','2003-12-09','12312312312','gabriel@email.com','Montes Claros');
+
+INSERT INTO Matriculas
+(NomeDoAluno, CPFDoAluno, Email, Endereco, DataMatricula)
+VALUES
+('Lucas Oliveira','66666666666','lucas@email.com','Rua X','2026-01-15'),
+('Mariana Alves','77777777777','mariana@email.com','Rua Y','2026-01-18'),
+('Pedro Santos','88888888888','pedro@email.com','Rua Z','2026-01-20'),
+('Juliana Rocha','99999999999','juliana@email.com','Rua W','2026-01-22'),
+('Gabriel Martins','12312312312','gabriel@email.com','Rua V','2026-01-25');
+
+INSERT INTO Disciplinas
+(ProfessorID, NomeDisciplina)
+VALUES
+(1,'Matemática'),
+(2,'Português'),
+(3,'História'),
+(4,'Biologia'),
+(5,'Informática');
+
+INSERT INTO Secretaria
+(DisciplinasID, Mensalidade, Turno)
+VALUES
+(1,850.00,'Manhã'),
+(2,850.00,'Tarde'),
+(3,900.00,'Noite'),
+(4,950.00,'Manhã'),
+(5,1000.00,'Integral');
+
+INSERT INTO Notas
+(ProfessoresID, SecretariaID, NotaFinal)
+VALUES
+(1,1,8.5),
+(2,2,9.2),
+(3,3,7.8),
+(4,4,8.9),
+(5,5,9.7);
+
+INSERT INTO Universidade
+(Nome, Endereco, CNPJ, SecretariaID, Telefone)
+VALUES
+('Universidade Alfa','Av. Central, 100','11111111000111',1,'3133331111'),
+('Universidade Beta','Rua Brasil, 250','22222222000122',2,'3133332222'),
+('Universidade Gama','Av. Minas, 300','33333333000133',3,'3133333333'),
+('Universidade Delta','Rua Goiás, 450','44444444000144',4,'3133334444'),
+('Universidade Ômega','Av. Afonso Pena, 500','55555555000155',5,'3133335555');
+
+-- 1. Listar disciplinas com professores
+-- Regra: mostrar qual professor ministra cada disciplina
+
+DELIMITER $$
+
+CREATE PROCEDURE DisciplinasProfessores()
+BEGIN
+    SELECT d.DisciplinasID, d.NomeDisciplina, p.Nome AS Professor
+    FROM Disciplinas d
+    INNER JOIN Professores p ON d.ProfessorID = p.ProfessoresID;
+END $$
+
+DELIMITER ;
+
+-- 2. Listar notas com professores
+-- Regra: identificar quem lançou a nota
+
+DELIMITER $$
+
+CREATE PROCEDURE NotasProfessores()
+BEGIN
+    SELECT n.NotasID, p.Nome AS Professor, n.NotaFinal
+    FROM Notas n
+    INNER JOIN Professores p ON n.ProfessoresID = p.ProfessoresID;
+END $$
+
+DELIMITER ;
+
+-- 3. Listar notas com dados da secretaria
+-- Regra: integrar notas com setor financeiro/acadêmico
+
+DELIMITER $$
+
+CREATE PROCEDURE NotasSecretaria()
+BEGIN
+    SELECT n.NotasID, n.NotaFinal, s.Mensalidade, s.Turno
+    FROM Notas n
+    INNER JOIN Secretaria s ON n.SecretariaID = s.SecretariaID;
+END $$
+
+DELIMITER ;
+
+-- 4. Listar universidade com dados da secretaria
+-- Regra: integração institucional
+
+DELIMITER $$
+
+CREATE PROCEDURE UniversidadeSecretaria()
+BEGIN
+    SELECT u.Nome AS Universidade, u.CNPJ, s.Mensalidade, s.Turno
+    FROM Universidade u
+    INNER JOIN Secretaria s ON u.SecretariaID = s.SecretariaID;
+END $$
+
+DELIMITER ;
+
+-- 5. Listar disciplinas + professor + salário
+-- Regra: visão administrativa completa
+
+DELIMITER $$
+
+CREATE PROCEDURE DisciplinasSalarios()
+BEGIN
+    SELECT d.NomeDisciplina, p.Nome, p.Salario
+    FROM Disciplinas d
+    INNER JOIN Professores p ON d.ProfessorID = p.ProfessoresID;
+END $$
+
+DELIMITER ;
+
+-- 6. Listar notas completas (professor + secretaria)
+-- Regra: visão geral do lançamento de notas
+
+DELIMITER $$
+
+CREATE PROCEDURE NotasCompletas()
+BEGIN
+    SELECT n.NotasID, p.Nome AS Professor, s.Turno, n.NotaFinal
+    FROM Notas n
+    INNER JOIN Professores p ON n.ProfessoresID = p.ProfessoresID
+    INNER JOIN Secretaria s ON n.SecretariaID = s.SecretariaID;
+END $$
+
+DELIMITER ;
+
+-- 7. Média de notas por professor
+-- Regra: análise de desempenho docente
+
+DELIMITER $$
+
+CREATE PROCEDURE MediaPorProfessor()
+BEGIN
+    SELECT p.Nome, AVG(n.NotaFinal) AS Media
+    FROM Notas n
+    INNER JOIN Professores p ON n.ProfessoresID = p.ProfessoresID
+    GROUP BY p.ProfessoresID;
+END $$
+
+DELIMITER ;
+
